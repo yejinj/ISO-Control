@@ -11,14 +11,17 @@ type Event = {
 
 const EventTable: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
+  const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         const response = await axios.get("http://localhost:8000/events");
         setEvents(response.data);
+        setError(false);
       } catch (error) {
         console.error("Error fetching events:", error);
+        setError(true);
       }
     };
 
@@ -27,6 +30,19 @@ const EventTable: React.FC = () => {
     const interval = setInterval(fetchEvents, 5000);
     return () => clearInterval(interval);
   }, []);
+
+  if (error) {
+    return (
+      <section>
+        <h2 className="text-lg font-medium text-gray-900 mb-4">이벤트 로그</h2>
+        <div className="bg-white shadow-sm rounded-lg p-4">
+          <div className="text-center text-gray-500 py-4">
+            데이터를 불러올 수 없습니다.
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section>

@@ -14,14 +14,17 @@ type Service = {
 
 const ServiceList: React.FC = () => {
   const [services, setServices] = useState<Service[]>([]);
+  const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchServices = async () => {
       try {
         const response = await axios.get("http://localhost:8000/services");
         setServices(response.data);
+        setError(false);
       } catch (error) {
         console.error("Error fetching services:", error);
+        setError(true);
       }
     };
 
@@ -55,6 +58,16 @@ const ServiceList: React.FC = () => {
         return "bg-gray-100 text-gray-800";
     }
   };
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="text-center text-gray-500 py-4">
+          서비스 데이터를 불러올 수 없습니다.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -95,10 +108,10 @@ const ServiceList: React.FC = () => {
                 </div>
 
                 <div className="mt-4 flex justify-end space-x-3">
-                  <button className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                  <button className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
                     상세 정보
                   </button>
-                  <button className="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-sm font-medium rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                  <button className="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-sm font-medium rounded text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
                     재시작
                   </button>
                 </div>
