@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: liveness-app
+spec:
+  containers:
+  - name: liveness-demo
+    image: busybox
+    args:
+    - /bin/sh
+    - -c
+    - |
+      touch /tmp/healthy;
+      while true; do
+        if [ -f /tmp/healthy ]; then
+          : 
+        else 
+          exit 1;
+        fi;
+        sleep 5;
+      done
+    livenessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/healthy
+      initialDelaySeconds: 5
+      periodSeconds: 5
