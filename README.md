@@ -1,9 +1,8 @@
 # IsoCtrl: Kubernetes 기반 헬스체크 및 자동 격리 시스템
+> **IsoCtrl = Isolation + Control**
 
 **IsoCtrl**는 Kubernetes 클러스터 내에서 서비스 및 Pod 상태를 지속적으로 모니터링하고,  
-비정상 상태를 감지하면 자동으로 격리하거나 재시작하는 **자가 복구(자체 healing) 시스템**입니다.
-
-> **IsoCtrl = Isolation + Control**
+비정상 상태를 감지하면 자동으로 격리하거나 재시작하는 **자가 복구 시스템**입니다.
 
 ---
 
@@ -18,7 +17,10 @@
 ## 구현 기능
 
 ### 1. **서비스 및 Pod 헬스체크 자동화**
-- Kubernetes 기본 Probe(Liveness/Readiness/Startup) 적용
+- Kubernetes 기본 Probe 적용
+    - Liveness Probe
+    - Readiness Probe
+    - Startup Probe
 - Custom Sidecar를 통한 심화 내부 상태 체크
 
 ### 2. **비정상 상태 자동 조치**
@@ -48,7 +50,7 @@
 - Sidecar 컨테이너 기반 자원 감시 및 응답 지연 체크
 
 3. **심화 관리**  
-- Operator가 최종 판단 후 자동 격리/재배포 수행
+- Operator가 최종 판단 후 자동 격리/재배포
 
 ---
 
