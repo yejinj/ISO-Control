@@ -16,7 +16,7 @@ const EventTable: React.FC = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/events");
+        const response = await axios.get("http://localhost:8080/events");
         setEvents(response.data);
         setError(false);
       } catch (error) {
@@ -26,7 +26,6 @@ const EventTable: React.FC = () => {
     };
 
     fetchEvents();
-    // 5초마다 이벤트 새로고침
     const interval = setInterval(fetchEvents, 5000);
     return () => clearInterval(interval);
   }, []);
