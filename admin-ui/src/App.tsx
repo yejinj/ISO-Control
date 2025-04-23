@@ -1,9 +1,12 @@
 import { useState } from "react";
 import EventTable from "./components/EventTable";
 import ServiceList from "./components/ServiceList";
+import UserManagement from "./components/UserManagement";
+
+type Tab = 'dashboard' | 'services' | 'usermanagement';
 
 export default function App() {
-  const [currentTab, setCurrentTab] = useState<'dashboard' | 'services'>('dashboard');
+  const [currentTab, setCurrentTab] = useState<Tab>('dashboard');
 
   const renderContent = () => {
     switch (currentTab) {
@@ -19,6 +22,8 @@ export default function App() {
             </div>
           </>
         );
+      case 'usermanagement':
+        return <UserManagement />;
       default:
         return (
           <>
@@ -253,11 +258,24 @@ export default function App() {
                 </button>
               </div>
             </div>
+
+            <div className="flex items-center">
+              <button
+                onClick={() => setCurrentTab('usermanagement')}
+                className={`px-3 py-2 text-sm font-medium ${
+                  currentTab === 'usermanagement'
+                    ? 'text-gray-900 border-b-2 border-gray-900'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                사용자 관리
+              </button>
+            </div>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         {renderContent()}
       </main>
     </div>
