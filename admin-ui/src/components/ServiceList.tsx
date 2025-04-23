@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import apiClient from "../api/axiosConfig"; // apiClient를 import
 
-// 타입 정의 (export 제거)
 type Service = {
   id: string;
   name: string;
@@ -11,11 +10,6 @@ type Service = {
   memory: string;
   restartCount: number;
 };
-
-// props 인터페이스 제거
-// interface ServiceListProps {
-//   services: Service[];
-// }
 
 const getHealthBadgeColor = (status: Service['status']) => {
   switch (status) {
@@ -32,26 +26,21 @@ const getHealthBadgeColor = (status: Service['status']) => {
   }
 };
 
-// 컴포넌트 시그니처에서 props 제거
 const ServiceList: React.FC = () => {
-  // 내부 상태 관리 복원
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
 
-  // 데이터 로딩 로직 복원
   useEffect(() => {
     const fetchServices = async () => {
       try {
         setLoading(true);
         setError(false);
-        // 임시 URL 또는 이전 URL 사용 (원래 코드에 따라)
-        const response = await axios.get<Service[]>("http://localhost:8000/services");
+        const response = await apiClient.get<Service[]>("/services"); // 이미 apiClient 사용 중
         setServices(response.data);
       } catch (err) {
         console.error("Error fetching services:", err);
         setError(true);
-        // 에러 발생 시 임시 데이터 (옵션)
         setServices([
           { id: '1', name: 'auth-service', status: 'healthy', podCount: 3, cpu: '0.5 cores', memory: '256Mi', restartCount: 0 },
           { id: '2', name: 'user-service', status: 'unhealthy', podCount: 2, cpu: '1.2 cores', memory: '512Mi', restartCount: 5 },
@@ -63,7 +52,7 @@ const ServiceList: React.FC = () => {
     };
 
     fetchServices();
-    const interval = setInterval(fetchServices, 5000); // 주기적 로딩은 유지 (필요시 제거)
+    const interval = setInterval(fetchServices, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -121,4 +110,4 @@ const ServiceList: React.FC = () => {
   );
 };
 
-export default ServiceList; 
+export default ServiceList;

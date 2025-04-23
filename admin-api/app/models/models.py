@@ -4,7 +4,7 @@ from datetime import datetime
 
 class Event(BaseModel):
     timestamp: datetime
-    event_type: str  # e.g., "isolate", "restart"
-    target: str      # Pod or Service name
-    reason: Optional[str]
-    status: str      # e.g., "completed", "pending"
+    event_type: str
+    target: str
+    reason: str
+    status: str

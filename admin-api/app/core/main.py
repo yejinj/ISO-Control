@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import events, status
+from app.routes import events_router, status_router
 
 app = FastAPI()
 
@@ -12,9 +12,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
-def read_root():
-    return {"message": "IsoCtrl API root"}
+# Include routers
+app.include_router(events_router, prefix="/events")
+app.include_router(status_router, prefix="/status")
 
-app.include_router(events.router, prefix="/events")
-app.include_router(status.router, prefix="/status")
+@app.get("/")
+def root():
+    return {"message": "It works!"}
