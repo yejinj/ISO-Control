@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: isocontrol-core
+  namespace: isocontrol
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: isocontrol
+  template:
+    metadata:
+      labels:
+        app: isocontrol
+    spec:
+      containers:
+        - name: isocontrol-app
+          image: ${IMAGE_NAME}
+          ports:
+            - containerPort: ${APP_PORT}
+
+          livenessProbe:
+            httpGet:
+              path: ${LIVENESS_PATH}
+              port: ${APP_PORT}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: ${READINESS_PATH}
+              port: ${APP_PORT}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 2
+
+          startupProbe:
+            httpGet:
+              path: ${STARTUP_PATH}
+              port: ${APP_PORT}
+            failureThreshold: 10
+            periodSeconds: 10
+
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+
+        - name: sidecar-monitor
+          image: localhost:5000/sidecar-monitor:latest
+          env:
+            - name: OPERATOR_API
+              value: "http://admin-api.isocontrol.svc.cluster.local:8080/alert"
+            - name: CHECK_INTERVAL
+              value: "20"
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
