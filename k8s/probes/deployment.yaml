@@ -66,3 +66,22 @@ spec:
             requests:
               memory: "64Mi"
               cpu: "50m"
+
+        - name: sidecar-latency
+          image: localhost:5000/sidecar-latency:latest
+          env:
+            - name: TARGET_URL
+              value: "http://isocontrol-core:8080/healthz"
+            - name: OPERATOR_API
+              value: "http://admin-api.isocontrol.svc.cluster.local:8080/alert"
+            - name: CHECK_INTERVAL
+              value: "20"
+            - name: LATENCY_THRESHOLD
+              value: "500"
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
