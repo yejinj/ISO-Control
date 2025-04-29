@@ -2,12 +2,12 @@
 
 ## 개요
 
-Sidecar 모듈은 Kubernetes Pod 내부에 별도로 배치되어,
-메인 애플리케이션 컨테이너의 상태를 심층적으로 감시하고 이상 징후를 기록하는 역할을 합니다.
+Sidecar 모듈은 Kubernetes Pod 내부에 별도로 배치되어,<br>
+메인 애플리케이션 컨테이너의 상태를 감시하고 이상 징후를 기록한다.<br>
 
-기본 헬스체크(Liveness, Readiness, Startup Probe)로 잡지 못하는
-자원 사용량 초과, 서비스 지연 등을 실시간으로 모니터링하여,
-조기에 장애를 감지하고 대응할 수 있도록 지원합니다.
+기본 헬스체크(Liveness, Readiness, Startup Probe)로 잡지 못하는<br>
+자원 사용량 초과, 서비스 지연 등을 실시간으로 모니터링하여,<br>
+조기에 장애를 감지하고 대응할 수 있도록 한다.<br>
 
 ---
 
@@ -28,13 +28,13 @@ Sidecar 모듈은 Kubernetes Pod 내부에 별도로 배치되어,
 
 ### monitor.py
 
-- 20초 간격으로 CPU, 메모리, 디스크 상태를 주기적으로 체크합니다.
-- 임계치를 초과한 경우, `logger.py`의 `write_log()` 함수를 호출하여 장애 기록을 남깁니다.
-- 메인 함수(`monitor_loop()`)는 Sidecar 컨테이너가 실행되면 바로 시작됩니다.
+- 20초 간격으로 CPU, 메모리, 디스크 상태를 주기적으로 체크한다.
+- 임계치를 초과한 경우, `logger.py`의 `write_log()` 함수를 호출하여 장애 기록을 남긴다.
+- 메인 함수(`monitor_loop()`)는 Sidecar 컨테이너가 실행되면 바로 시작된다.
 
 ### logger.py
 
-- `/mnt/logs/log.json` 경로에 장애 이벤트를 JSON 포맷으로 저장합니다.
+- `/mnt/logs/log.json` 경로에 장애 이벤트를 JSON 포맷으로 저장한다.
 - 장애 이벤트 항목:
   - `timestamp`: 이벤트 발생 시각 (UTC ISO 8601 포맷)
   - `event_type`: 이벤트 종류 (ex. High CPU Usage)
@@ -44,6 +44,6 @@ Sidecar 모듈은 Kubernetes Pod 내부에 별도로 배치되어,
 
 ## 참고 사항
 
-- 로그 기록 경로(`/mnt/logs/`)는 Kubernetes에서 Persistent Volume(PV)으로 마운트되어야 합니다.
-- log.json 파일은 장애가 발생할 때마다 기존 데이터를 누적하여 기록합니다.
-- JSONDecodeError 발생 시 기존 로그가 손상된 것으로 간주하고 새로운 배열로 초기화합니다.
+- 로그 기록 경로(`/mnt/logs/`)는 Kubernetes에서 Persistent Volume(PV)으로 마운트되어야 한다.
+- log.json 파일은 장애가 발생할 때마다 기존 데이터를 누적하여 기록한다.
+- JSONDecodeError 발생 시 기존 로그가 손상된 것으로 간주하고 새로운 배열로 초기화한다.
