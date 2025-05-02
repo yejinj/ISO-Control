@@ -1,3 +1,18 @@
-node_modules
+# Python cache
+__pycache__/
+**/__pycache__/
+
+# Node modules
+node_modules/
+**/node_modules/
+
+# npm/yarn lock files
+package-lock.json
+**/package-lock.json
+
+# package.json (일부 프로젝트에서는 추적 필요할 수 있으나, 요청에 따라 제외)
+package.json
+**/package.json
+
 .env
 admin-ui/.env
