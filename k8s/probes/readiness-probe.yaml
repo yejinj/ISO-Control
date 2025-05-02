@@ -1,0 +1,8 @@
+readinessProbe:
+  httpGet:
+    path: ${READINESS_PATH}
+    port: ${APP_PORT}
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 2
+  failureThreshold: 2

@@ -9,7 +9,7 @@ const Sidebar = () => {
   return (
     <div className="w-52 h-screen bg-white shadow-md fixed top-0 left-0 p-4 flex flex-col">
       <div className="mb-6 pb-3 border-b border-gray-200 pt-1">
-        <h2 className="text-lg font-bold text-gray-800 text-center">IsoCtrl</h2>
+        <h2 className="text-xl font-semibold text-blue-600 text-center tracking-tight">IsoCtrl</h2>
       </div>
       
       <nav className="flex-grow">

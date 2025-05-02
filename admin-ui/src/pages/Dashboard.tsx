@@ -1,22 +1,55 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FiAlertTriangle, FiCheckCircle, FiClock, FiList, FiCpu } from 'react-icons/fi';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { fetchProbes, fetchPods, fetchEvents } from '../api';
 
-// Probe 실패 데이터 (Readiness 색상 red-500으로 변경)
-const probeFailData = [
-  { name: 'Liveness', value: 2, color: '#fbbf24' }, // amber-400
-  { name: 'Readiness', value: 5, color: '#ef4444' }, // red-500
-  { name: 'Startup', value: 0, color: '#d1d5db' },    // gray-300
-];
+interface ProbeFailData {
+  name: string;
+  value: number;
+  color: string;
+}
 
-// 최근 이벤트 데이터 (ProbeFail 색상 bg-red-500으로 변경)
-const recentEvents = [
-  { id: 1, type: 'ProbeFail', name: 'core-xyz-123', time: '10분 전', colorClass: 'bg-red-500' }, // red-500
-  { id: 2, type: 'Isolated', name: 'worker-abc-456', time: '15분 전', colorClass: 'bg-yellow-400' },
-  { id: 3, type: 'Recovered', name: 'db-main-789', time: '30분 전', colorClass: 'bg-green-400' },
-];
+interface EventItem {
+  id: number;
+  type: string;
+  name: string;
+  time: string;
+  colorClass: string;
+}
 
 const Dashboard = () => {
+  const [probeFailData, setProbeFailData] = useState<ProbeFailData[]>([
+    { name: 'Liveness', value: 0, color: '#fbbf24' },
+    { name: 'Readiness', value: 0, color: '#ef4444' },
+    { name: 'Startup', value: 0, color: '#d1d5db' },
+  ]);
+  const [recentEvents, setRecentEvents] = useState<EventItem[]>([]);
+  const [podStats, setPodStats] = useState<{ running: number; isolated: number }>({ running: 0, isolated: 0 });
+
+  useEffect(() => {
+    fetchProbes().then(data => {
+      setProbeFailData([
+        { name: 'Liveness', value: data.liveness.fail_count, color: '#fbbf24' },
+        { name: 'Readiness', value: data.readiness.fail_count, color: '#ef4444' },
+        { name: 'Startup', value: data.startup.fail_count, color: '#d1d5db' },
+      ]);
+    });
+    fetchEvents().then((data: any[]) => {
+      setRecentEvents(data.map((ev: any) => ({
+        ...ev,
+        colorClass:
+          ev.type === 'ProbeFail' ? 'bg-red-500' :
+          ev.type === 'Isolated' ? 'bg-yellow-400' :
+          ev.type === 'Recovered' ? 'bg-green-400' : 'bg-gray-300',
+      })));
+    });
+    fetchPods().then((data: any[]) => {
+      const running = data.filter((p: any) => p.status === 'Running').length;
+      const isolated = data.filter((p: any) => p.status === 'Isolated').length;
+      setPodStats({ running, isolated });
+    });
+  }, []);
+
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
@@ -26,17 +59,16 @@ const Dashboard = () => {
           </div>
           <div className="flex items-end justify-around text-center">
             <div>
-              <p className="text-3xl font-bold text-green-500">3</p>
+              <p className="text-3xl font-bold text-green-500">{podStats.running}</p>
               <p className="text-xs text-gray-500 mt-1">실행 중</p>
             </div>
             <div className="border-l border-gray-200 h-10 mx-4"></div>
             <div>
-              <p className="text-3xl font-bold text-red-500">1</p>
+              <p className="text-3xl font-bold text-red-500">{podStats.isolated}</p>
               <p className="text-xs text-gray-500 mt-1">격리됨</p>
             </div>
           </div>
         </div>
-
         <div className="bg-white p-5 rounded-lg border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col">
           <div className="flex items-center mb-3">
             <FiAlertTriangle className="text-base text-amber-400 mr-2" />
@@ -71,7 +103,6 @@ const Dashboard = () => {
               <li>Startup: <span className="font-semibold text-gray-500">{probeFailData[2].value}</span>회</li>
           </ul>
         </div>
-        
         <div className="bg-white p-5 rounded-lg border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center">

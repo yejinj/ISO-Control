@@ -1,0 +1,6 @@
+startupProbe:
+  httpGet:
+    path: ${STARTUP_PATH}
+    port: ${APP_PORT}
+  failureThreshold: 10
+  periodSeconds: 10

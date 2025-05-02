@@ -1,0 +1,8 @@
+livenessProbe:
+  httpGet:
+    path: ${LIVENESS_PATH}
+    port: ${APP_PORT}
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3

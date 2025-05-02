@@ -1,34 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FiHardDrive, FiCheckCircle, FiXCircle, FiAlertCircle } from 'react-icons/fi';
+import { fetchPods } from '../api';
 
-// 임시 Pod 상태 데이터
-const pods = [
-  {
-    name: 'isocontrol-core-123',
-    liveness: true,
-    readiness: false,
-    startup: true,
-    status: 'Isolated' // 'Running', 'Isolated', 'Pending' 등
-  },
-  {
-    name: 'api-gateway-prod-abc',
-    liveness: true,
-    readiness: true,
-    startup: true,
-    status: 'Running'
-  },
-   {
-    name: 'worker-xyz-789',
-    liveness: true,
-    readiness: true,
-    startup: false,
-    status: 'Pending'
-  },
-  // 추가 데이터...
-];
+interface Pod {
+  name: string;
+  liveness: boolean;
+  readiness: boolean;
+  startup: boolean;
+  status: string;
+}
 
-// Probe 상태 아이콘 컴포넌트 (크기 조정)
-const ProbeStatusIcon = ({ status }) => {
+// Probe 상태 아이콘 컴포넌트 (타입 추가)
+const ProbeStatusIcon: React.FC<{ status: boolean | null | undefined }> = ({ status }) => {
   if (status === true) {
     return <FiCheckCircle className="text-green-500 mx-auto" size={14} />;
   } else if (status === false) {
@@ -38,17 +21,16 @@ const ProbeStatusIcon = ({ status }) => {
   }
 };
 
-// Pod 상태 배지 컴포넌트 (폰트 크기는 xs 유지)
-const PodStatusBadge = ({ status }) => {
-  let colorClasses = 'bg-gray-100 text-gray-700'; // 기본값
+// Pod 상태 배지 컴포넌트 (타입 추가)
+const PodStatusBadge: React.FC<{ status: string }> = ({ status }) => {
+  let colorClasses = 'bg-gray-100 text-gray-700';
   if (status === 'Running') {
     colorClasses = 'bg-green-100 text-green-700';
   } else if (status === 'Isolated') {
     colorClasses = 'bg-red-100 text-red-700';
   } else if (status === 'Pending') {
-     colorClasses = 'bg-yellow-100 text-yellow-700';
+    colorClasses = 'bg-yellow-100 text-yellow-700';
   }
-  
   return (
     <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${colorClasses}`}>
       {status}
@@ -57,6 +39,12 @@ const PodStatusBadge = ({ status }) => {
 };
 
 const PodStatus = () => {
+  const [pods, setPods] = useState<Pod[]>([]);
+
+  useEffect(() => {
+    fetchPods().then((data: Pod[]) => setPods(data));
+  }, []);
+
   return (
     <div className="space-y-5"> 
       {/* 페이지 헤더 (폰트/아이콘 크기 조정) */}
@@ -66,7 +54,6 @@ const PodStatus = () => {
           Pod 상태 모니터링
         </h1>
       </div>
-
       {/* Pod 상태 테이블 (폰트 크기 조정) */}
       <div className="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
         <table className="w-full text-xs"> 
