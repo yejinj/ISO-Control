@@ -1,45 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FiList, FiFilter, FiSearch } from 'react-icons/fi'; // 필터 관련 아이콘 추가
-
-// 임시 이벤트 로그 데이터
-const logs = [
-  {
-    time: '04/23 14:20', 
-    podName: 'core-xyz-123', 
-    probeType: 'Liveness', 
-    reason: '/healthz timeout after 5s', 
-    isolated: true, 
-    recovered: true
-  },
-  {
-    time: '04/23 10:05', 
-    podName: 'worker-abc-456', 
-    probeType: 'Readiness', 
-    reason: 'Connection refused on port 8080', 
-    isolated: true, 
-    recovered: false
-  },
-  {
-    time: '04/22 18:30',
-    podName: 'api-gateway-prod',
-    probeType: 'Liveness',
-    reason: 'Pod unhealthy',
-    isolated: true,
-    recovered: true
-  },
-  {
-    time: '04/22 09:15',
-    podName: 'frontend-ui-dev',
-    probeType: 'Readiness',
-    reason: 'Service unavailable (503)',
-    isolated: false,
-    recovered: true
-  },
-  // 추가 로그 데이터...
-];
+import { fetchEvents } from '../api';
 
 // 상태 배지 스타일 함수
-const StatusBadge = ({ active, text, color }) => {
+const StatusBadge = ({ active, text, color }: { active: boolean, text: string, color: string }) => {
   if (!active) return <span className="text-gray-400">-</span>;
   return (
     <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-${color}-100 text-${color}-700`}>
@@ -49,6 +13,12 @@ const StatusBadge = ({ active, text, color }) => {
 };
 
 const EventLog = () => {
+  const [logs, setLogs] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchEvents().then(setLogs);
+  }, []);
+
   return (
     <div className="space-y-5"> {/* 간격 조정 */}
       {/* 페이지 헤더 (폰트/아이콘 크기 조정) */}
@@ -85,10 +55,7 @@ const EventLog = () => {
               {/* 헤더 폰트 크기/패딩 조정 */}
               <th className="px-3 py-1.5 text-left font-medium text-gray-500">시간</th>
               <th className="px-3 py-1.5 text-left font-medium text-gray-500">Pod 이름</th>
-              <th className="px-3 py-1.5 text-left font-medium text-gray-500">Probe 종류</th>
-              <th className="px-3 py-1.5 text-left font-medium text-gray-500">실패 원인</th>
-              <th className="px-3 py-1.5 text-center font-medium text-gray-500">격리</th>
-              <th className="px-3 py-1.5 text-center font-medium text-gray-500">복구</th>
+              <th className="px-3 py-1.5 text-left font-medium text-gray-500">이벤트 종류</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -96,20 +63,13 @@ const EventLog = () => {
               <tr key={index} className="odd:bg-white even:bg-gray-50 hover:bg-blue-50 transition-colors"> 
                 {/* 셀 패딩 조정 */}
                 <td className="px-3 py-1.5 whitespace-nowrap text-gray-700">{log.time}</td>
-                <td className="px-3 py-1.5 text-gray-700">{log.podName}</td>
-                <td className="px-3 py-1.5 text-gray-700">{log.probeType}</td>
-                <td className="px-3 py-1.5 text-gray-600">{log.reason}</td>
-                <td className="px-3 py-1.5 text-center">
-                   <StatusBadge active={log.isolated} text="격리됨" color="red" />
-                </td>
-                <td className="px-3 py-1.5 text-center">
-                   <StatusBadge active={log.recovered} text="복구됨" color="green" />
-                </td>
+                <td className="px-3 py-1.5 text-gray-700">{log.name}</td>
+                <td className="px-3 py-1.5 text-gray-700">{log.type}</td>
               </tr>
             ))}
             {logs.length === 0 && (
               <tr>
-                <td colSpan={6} className="text-center py-8 text-gray-400">이벤트 로그가 없습니다.</td> {/* 패딩 조정 */}
+                <td colSpan={3} className="text-center py-8 text-gray-400">이벤트 로그가 없습니다.</td> {/* 패딩 조정 */}
               </tr>
             )}
           </tbody>

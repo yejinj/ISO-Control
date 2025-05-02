@@ -9,3 +9,15 @@ spec:
       image: nginx:latest
       ports:
         - containerPort: 80
+      livenessProbe:
+        httpGet:
+          path: /not-exist
+          port: 80
+        initialDelaySeconds: 3
+        periodSeconds: 5
+      readinessProbe:
+        httpGet:
+          path: /not-exist
+          port: 80
+        initialDelaySeconds: 3
+        periodSeconds: 5
