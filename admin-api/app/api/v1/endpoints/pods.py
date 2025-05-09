@@ -1,8 +1,16 @@
 from fastapi import APIRouter
 from kubernetes import client, config
 from typing import List
+from datetime import datetime
 
 router = APIRouter()
+
+def parse_last_restart(container_status):
+    # 마지막 재시작 시각 추출
+    last_state = container_status.last_state
+    if last_state and last_state.terminated and last_state.terminated.finished_at:
+        return last_state.terminated.finished_at.strftime("%Y-%m-%dT%H:%M:%SZ")
+    return None
 
 @router.get("/pods")
 async def get_pods():
@@ -18,21 +26,49 @@ async def get_pods():
 
     result = []
     for pod in pods.items:
-        # 실제 probe 상태는 pod.status.conditions에서 파싱 필요
         liveness = None
         readiness = None
         startup = None
+        restart_count = 0
+        last_restart = None
+        container_states = []
         if pod.status.conditions:
             for cond in pod.status.conditions:
                 if cond.type == "Ready":
                     readiness = (cond.status == "True")
-                # Liveness/Startup은 annotation이나 별도 관리 필요 (k8s native에는 없음)
+        if pod.status.container_statuses:
+            for cs in pod.status.container_statuses:
+                rc = cs.restart_count if hasattr(cs, 'restart_count') else 0
+                restart_count = max(restart_count, rc)
+                lr = parse_last_restart(cs)
+                if lr and (last_restart is None or lr > last_restart):
+                    last_restart = lr
+                state = None
+                if cs.state:
+                    if cs.state.running:
+                        state = "Running"
+                    elif cs.state.waiting:
+                        state = cs.state.waiting.reason
+                    elif cs.state.terminated:
+                        state = cs.state.terminated.reason
+                container_states.append({
+                    "name": cs.name,
+                    "restartCount": rc,
+                    "lastRestart": lr,
+                    "state": state
+                })
+        # liveness/startup probe 상태 추론: 재시작이 있으면 최근 실패 경험 있음
+        liveness = restart_count == 0
+        startup = True  # startup probe는 최초 기동 실패 시에만 의미, 별도 이벤트 파싱 필요(추후)
         result.append({
             "name": pod.metadata.name,
             "namespace": pod.metadata.namespace,
             "liveness": liveness,
             "readiness": readiness,
             "startup": startup,
-            "status": pod.status.phase  # Running, Pending, Succeeded, Failed, Unknown
+            "status": pod.status.phase,
+            "restartCount": restart_count,
+            "lastRestart": last_restart,
+            "containerStates": container_states
         })
     return result 
