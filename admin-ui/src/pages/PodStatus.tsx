@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { FiHardDrive, FiCheckCircle, FiXCircle, FiAlertCircle } from 'react-icons/fi';
+import { FiHardDrive, FiCheckCircle, FiXCircle, FiAlertCircle, FiInfo } from 'react-icons/fi';
 import { fetchPods } from '../api';
+
+interface ContainerState {
+  name: string;
+  restartCount: number;
+  lastRestart: string | null;
+  state: string | null;
+}
 
 interface Pod {
   name: string;
@@ -8,6 +15,9 @@ interface Pod {
   readiness: boolean | null | undefined;
   startup: boolean | null | undefined;
   status: string;
+  restartCount?: number;
+  lastRestart?: string | null;
+  containerStates?: ContainerState[];
 }
 
 // Pod 이름 마스킹 함수 (고유 식별자 부분만 *)
@@ -44,10 +54,10 @@ const PodStatusBadge: React.FC<{ status: string }> = ({ status }) => {
 };
 
 const SORT_OPTIONS = [
-  { value: 'probe', label: 'Probe 실패/미시도 우선' },
-  { value: 'pending', label: 'Pending 우선' },
-  { value: 'name', label: '이름 가나다순' },
-  { value: 'status', label: '상태별 정렬' },
+  { value: 'probe', label: 'Probe 실패/미시도 우선순' },
+  { value: 'pending', label: 'Pending 우선순' },
+  { value: 'name', label: '이름순' },
+  { value: 'status', label: '상태순' },
 ];
 
 const STATUS_ORDER: Record<string, number> = {
@@ -117,6 +127,9 @@ const PodStatus = () => {
               <th className="px-3 py-1.5 text-center font-medium text-gray-500">Readiness</th>
               <th className="px-3 py-1.5 text-center font-medium text-gray-500">Startup</th>
               <th className="px-3 py-1.5 text-center font-medium text-gray-500">상태</th>
+              <th className="px-3 py-1.5 text-center font-medium text-gray-500">재시작</th>
+              <th className="px-3 py-1.5 text-center font-medium text-gray-500">마지막 재시작</th>
+              <th className="px-3 py-1.5 text-center font-medium text-gray-500">컨테이너</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -129,11 +142,30 @@ const PodStatus = () => {
                 <td className="px-3 py-1.5 text-center">
                   <PodStatusBadge status={pod.status} />
                 </td>
+                <td className={`px-3 py-1.5 text-center font-bold ${pod.restartCount && pod.restartCount > 0 ? 'text-red-500' : 'text-gray-700'}`}>{pod.restartCount ?? '-'}</td>
+                <td className="px-3 py-1.5 text-center text-gray-500">{pod.lastRestart ?? '-'}</td>
+                <td className="px-3 py-1.5 text-center">
+                  {pod.containerStates && pod.containerStates.length > 0 ? (
+                    <div className="flex flex-col items-center gap-1">
+                      {pod.containerStates.map(cs => (
+                        <span key={cs.name} className="group relative cursor-pointer">
+                          <FiInfo className="inline mr-1 text-blue-400" size={13} />
+                          <span className="underline text-xs text-gray-700">{cs.name}</span>
+                          <div className="absolute left-1/2 -translate-x-1/2 mt-1 w-48 bg-white border border-gray-200 rounded shadow-lg p-2 text-xs text-gray-700 z-20 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity">
+                            상태: {cs.state || '-'}<br />
+                            재시작: {cs.restartCount}<br />
+                            마지막 재시작: {cs.lastRestart || '-'}
+                          </div>
+                        </span>
+                      ))}
+                    </div>
+                  ) : '-'}
+                </td>
               </tr>
             ))}
             {sortedPods.length === 0 && (
               <tr>
-                <td colSpan={5} className="text-center py-8 text-gray-400">Pod 상태 정보가 없습니다.</td>
+                <td colSpan={8} className="text-center py-8 text-gray-400">Pod 상태 정보가 없습니다.</td>
               </tr>
             )}
           </tbody>
