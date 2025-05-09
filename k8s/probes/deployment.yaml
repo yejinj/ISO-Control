@@ -2,7 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: isocontrol-core
-  namespace: isocontrol
+  namespace: isocontrol-prod
+  labels:
+    app: isocontrol
+    env: prod
+    role: core
 spec:
   replicas: 1
   selector:
@@ -12,13 +16,23 @@ spec:
     metadata:
       labels:
         app: isocontrol
+        env: prod
+        role: core
     spec:
       containers:
         - name: isocontrol-app
           image: nginx:latest
           ports:
             - containerPort: 8080
-
+          env:
+            - name: PROBE_LIVENESS_PATH
+              value: "/healthz"
+            - name: PROBE_READINESS_PATH
+              value: "/ready"
+            - name: PROBE_STARTUP_PATH
+              value: "/startup"
+            - name: APP_PORT
+              value: "8080"
           livenessProbe:
             httpGet:
               path: /healthz
@@ -27,7 +41,6 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 3
             failureThreshold: 3
-
           readinessProbe:
             httpGet:
               path: /ready
@@ -36,14 +49,12 @@ spec:
             periodSeconds: 5
             timeoutSeconds: 2
             failureThreshold: 2
-
           startupProbe:
             httpGet:
               path: /startup
               port: 8080
             failureThreshold: 10
             periodSeconds: 10
-
           resources:
             limits:
               memory: "512Mi"
@@ -51,7 +62,6 @@ spec:
             requests:
               memory: "256Mi"
               cpu: "250m"
-
         - name: sidecar-monitor
           image: localhost:5000/sidecar-monitor:latest
           env:
@@ -66,7 +76,6 @@ spec:
             requests:
               memory: "64Mi"
               cpu: "50m"
-
         - name: sidecar-latency
           image: localhost:5000/sidecar-latency:latest
           env:
@@ -85,3 +94,5 @@ spec:
             requests:
               memory: "64Mi"
               cpu: "50m"
+# 주의: 운영/테스트 환경 분리, 라벨/네임스페이스/환경변수 일관성 유지
+# probe 실패 시 컨테이너 로그 및 sidecar 이벤트 연동 필요
