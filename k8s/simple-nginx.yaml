@@ -21,3 +21,9 @@ spec:
           port: 80
         initialDelaySeconds: 3
         periodSeconds: 5
+      startupProbe:
+        httpGet:
+          path: /not-exist
+          port: 80
+        failureThreshold: 10
+        periodSeconds: 3
