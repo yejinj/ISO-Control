@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from kubernetes import client, config
 from typing import List
 from datetime import datetime
+from .alert import event_log  # event_log import
 
 router = APIRouter()
 
@@ -25,6 +26,7 @@ async def get_pods():
     pods = v1.list_pod_for_all_namespaces(watch=False)
 
     result = []
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     for pod in pods.items:
         liveness = None
         readiness = None
@@ -60,6 +62,12 @@ async def get_pods():
         # liveness/startup probe 상태 추론: 재시작이 있으면 최근 실패 경험 있음
         liveness = restart_count == 0
         startup = True  # startup probe는 최초 기동 실패 시에만 의미, 별도 이벤트 파싱 필요(추후)
+        # 복구 감지 및 event_log 업데이트
+        if pod.status.phase == "Running":
+            for event in reversed(event_log):
+                if event["pod_name"] == pod.metadata.name and event["namespace"] == pod.metadata.namespace and event["recovery_time"] is None:
+                    event["recovery_time"] = now
+                    break
         result.append({
             "name": pod.metadata.name,
             "namespace": pod.metadata.namespace,
