@@ -1,8 +1,6 @@
-# startup-probe.yaml
-# 실제 배포에서는 deployment.yaml의 env로 경로/포트가 주입됨
 startupProbe:
   httpGet:
-    path: ${STARTUP_PATH}  # 예: /startup
-    port: ${APP_PORT}      # 예: 8080
+    path: /startup
+    port: 8080
   failureThreshold: 10
   periodSeconds: 10

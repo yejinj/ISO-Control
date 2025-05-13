@@ -1,9 +1,7 @@
-# readiness-probe.yaml
-# 실제 배포에서는 deployment.yaml의 env로 경로/포트가 주입됨
 readinessProbe:
   httpGet:
-    path: ${READINESS_PATH}  # 예: /ready
-    port: ${APP_PORT}        # 예: 8080
+    path: /ready
+    port: 8080
   initialDelaySeconds: 5
   periodSeconds: 5
   timeoutSeconds: 2
