@@ -1,9 +1,7 @@
-# liveness-probe.yaml
-# 실제 배포에서는 deployment.yaml의 env로 경로/포트가 주입됨
 livenessProbe:
   httpGet:
-    path: ${LIVENESS_PATH}  # 예: /healthz
-    port: ${APP_PORT}       # 예: 8080
+    path: /healthz
+    port: 8080
   initialDelaySeconds: 10
   periodSeconds: 10
   timeoutSeconds: 3
