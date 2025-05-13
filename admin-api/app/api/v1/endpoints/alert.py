@@ -5,7 +5,7 @@ from kubernetes import client, config
 
 router = APIRouter()
 event_log = []
-pod_fail_count = {}  # Pod별 장애 횟수 누적
+pod_fail_count = {}
 
 def restart_pod(namespace, pod_name):
     try:
@@ -34,7 +34,7 @@ async def receive_alert(request: Request):
     data = await request.json()
     print(f"[ALERT RECEIVED] {data}")
     data["time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # 서버 기준 시간 추가
-    event_log.append(data)  # 장애 이력 저장
+    event_log.append(data) # 장애 발생 시 이력 저장
 
     pod_name = data.get("pod_name")
     namespace = data.get("namespace", "isocontrol-prod")
