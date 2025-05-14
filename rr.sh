@@ -1,18 +1,18 @@
 #!/bin/bash
-
 set -e
+
+NAMESPACE="isocontrol"
+PROBES_DIR="k8s/probes"
+OUTPUT_DIR="$PROBES_DIR/build"
+FILES=( "deployment.yaml" "liveness-probe.yaml" "readiness-probe.yaml" "startup-probe.yaml" )
+
+if [ ! -f .env ]; then
+  echo ".env 파일이 없습니다. 환경변수를 직접 export 하거나 .env 파일을 생성하세요."
+  exit 1
+fi
 
 export $(grep -v '^#' .env | xargs)
 
-PROBES_DIR="k8s/probes"
-FILES=(
-  "deployment.yaml"
-  "liveness-probe.yaml"
-  "readiness-probe.yaml"
-  "startup-probe.yaml"
-)
-
-OUTPUT_DIR="k8s/probes/build"
 mkdir -p $OUTPUT_DIR
 
 for FILE in "${FILES[@]}"; do
@@ -20,4 +20,5 @@ for FILE in "${FILES[@]}"; do
   echo "$FILE → $OUTPUT_DIR/$FILE"
 done
 
-kubectl apply -f "$OUTPUT_DIR/deployment.yaml" --namespace=isocontrol
+echo "모든 yaml을 $NAMESPACE 네임스페이스에 배포합니다..."
+kubectl apply -f "$OUTPUT_DIR" --namespace="$NAMESPACE"
