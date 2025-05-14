@@ -1,61 +1,69 @@
 import React, { useEffect, useState } from 'react';
 import { FiAlertTriangle, FiList } from 'react-icons/fi';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { fetchProbes, fetchPods, fetchEvents } from '../api';
+import { fetchPods, fetchEvents } from '../api';
 
-interface ProbeFail {
-  pod_name: string;
-  type: string;
-  start_time: string;
-  message?: string;
-}
+const PROBE_COLORS: Record<string, string> = {
+  Liveness: '#fbbf24',
+  Readiness: '#ef4444',
+  Startup: '#6b7280',
+};
+const PROBE_TEXT_COLORS: Record<string, string> = {
+  Liveness: 'text-amber-500',
+  Readiness: 'text-red-500',
+  Startup: 'text-gray-500',
+};
 
 const Dashboard = () => {
-  const [probeFailData, setProbeFailData] = useState([
-    { name: 'Liveness', value: 0, color: '#fbbf24' },
-    { name: 'Readiness', value: 0, color: '#ef4444' },
-    { name: 'Startup', value: 0, color: '#d1d5db' },
-  ]);
   const [recentEvents, setRecentEvents] = useState<any[]>([]);
-  const [probeFails, setProbeFails] = useState<ProbeFail[]>([]);
+  const [probeFails, setProbeFails] = useState<any[]>([]);
+  const [probeFailTypeCount, setProbeFailTypeCount] = useState<Record<string, number>>({ Liveness: 0, Readiness: 0, Startup: 0 });
   const [podStats, setPodStats] = useState<{ running: number; isolated: number }>({ running: 0, isolated: 0 });
 
   useEffect(() => {
-    fetchProbes().then(data => {
-      setProbeFailData([
-        { name: 'Liveness', value: data.liveness.fail_count, color: '#fbbf24' },
-        { name: 'Readiness', value: data.readiness.fail_count, color: '#ef4444' },
-        { name: 'Startup', value: data.startup.fail_count, color: '#d1d5db' },
-      ]);
-    });
     fetchEvents().then((data: any[]) => {
-      // 최근 이벤트 (최신순 5개)
       setRecentEvents(
         data.slice(-5).reverse().map((ev: any, idx: number) => ({
           ...ev,
           id: ev.id || ev.start_time + ev.pod_name || idx,
         }))
       );
-      // 최근 24시간 probe 실패: type이 'ProbeFail' 또는 'alert'인 것 모두 포함
-      const now = new Date();
-      const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-      setProbeFails(
-        data.filter(ev =>
-          (ev.type === 'ProbeFail' || ev.type === 'alert') &&
-          new Date(ev.start_time) > dayAgo
-        )
-      );
     });
-    fetchPods().then((data: any[]) => {
-      const running = data.filter((p: any) => p.status === 'Running').length;
-      const isolated = data.filter((p: any) => p.status === 'Isolated').length;
+    fetchPods().then((pods: any[]) => {
+      // Pod 상태 기반 probe 실패 집계
+      const fails: any[] = [];
+      const typeCount: Record<string, number> = { Liveness: 0, Readiness: 0, Startup: 0 };
+      pods.forEach(pod => {
+        if (pod.liveness === false) {
+          fails.push({ ...pod, probeType: 'Liveness' });
+          typeCount.Liveness += 1;
+        }
+        if (pod.readiness === false) {
+          fails.push({ ...pod, probeType: 'Readiness' });
+          typeCount.Readiness += 1;
+        }
+        if (pod.startup === false) {
+          fails.push({ ...pod, probeType: 'Startup' });
+          typeCount.Startup += 1;
+        }
+      });
+      setProbeFails(fails);
+      setProbeFailTypeCount(typeCount);
+      const running = pods.filter((p: any) => p.status === 'Running').length;
+      const isolated = pods.filter((p: any) => p.status === 'Isolated').length;
       setPodStats({ running, isolated });
     });
   }, []);
 
+  // probe 실패 그래프 데이터 (Pod 상태 기반)
+  const probeFailGraphData = Object.entries(probeFailTypeCount)
+    .filter(([type, value]) => (type === 'Liveness' || type === 'Readiness' || type === 'Startup') && value > 0)
+    .map(([type, value]) => ({ name: type, value, color: PROBE_COLORS[type] }));
+
   return (
-    <div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
+    <div className="space-y-6 mt-6">
+      {/* 1행 2열: 현재 pod 상태, 최근 24시간 probe 실패 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div className="bg-white p-5 rounded-lg border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300">
           <div className="mb-4">
             <h2 className="text-sm font-semibold text-gray-700">현재 Pod 상태</h2>
@@ -73,15 +81,18 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="bg-white p-5 rounded-lg border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col">
-          <div className="flex items-center mb-3">
-            <FiAlertTriangle className="text-base text-amber-400 mr-2" />
-            <h2 className="text-sm font-semibold text-gray-700">최근 24시간 Probe 실패</h2>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center">
+              <FiAlertTriangle className="text-base text-amber-400 mr-2" />
+              <h2 className="text-sm font-semibold text-gray-700">최근 24시간 Probe 실패</h2>
+            </div>
+            <a href="/pod-status" className="text-xs text-blue-500 hover:underline">더보기</a>
           </div>
           <div className="flex-1 flex flex-col items-center justify-center mt-2 w-full">
             <ResponsiveContainer width="80%" height={100}>
               <PieChart>
                 <Pie
-                  data={probeFailData.filter(d => d.value > 0)}
+                  data={probeFailGraphData}
                   cx="50%"
                   cy="50%"
                   innerRadius={25}
@@ -89,7 +100,7 @@ const Dashboard = () => {
                   paddingAngle={3}
                   dataKey="value"
                 >
-                  {probeFailData.filter(d => d.value > 0).map((entry, index) => (
+                  {probeFailGraphData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
@@ -99,54 +110,60 @@ const Dashboard = () => {
                 />
               </PieChart>
             </ResponsiveContainer>
-            {/* 표로 자세히 보기 */}
-            <div className="w-full mt-4 overflow-x-auto">
-              <table className="w-full text-xs border">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-2 py-1 text-left font-medium text-gray-500">시간</th>
-                    <th className="px-2 py-1 text-left font-medium text-gray-500">Pod 이름</th>
-                    <th className="px-2 py-1 text-left font-medium text-gray-500">Probe 종류</th>
-                    <th className="px-2 py-1 text-left font-medium text-gray-500">메시지</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {probeFails.length === 0 && (
-                    <tr><td colSpan={4} className="text-center py-4 text-gray-400">최근 24시간 내 Probe 실패가 없습니다.</td></tr>
-                  )}
-                  {probeFails.map((fail, idx) => (
-                    <tr key={idx} className="odd:bg-white even:bg-gray-50">
-                      <td className="px-2 py-1 whitespace-nowrap text-gray-700">{fail.start_time}</td>
-                      <td className="px-2 py-1 text-gray-700">{fail.pod_name}</td>
-                      <td className="px-2 py-1 text-gray-700">{fail.type}</td>
-                      <td className="px-2 py-1 text-gray-500">{fail.message || '-'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
           </div>
-        </div>
-        <div className="bg-white p-5 rounded-lg border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center">
-              <FiList className="text-base text-purple-400 mr-2" />
-              <h2 className="text-sm font-semibold text-gray-700">최근 이벤트</h2>
-            </div>
-            <a href="/event-log" className="text-xs text-blue-500 hover:underline">더보기</a>
-          </div>
-          <div className="flex-grow space-y-2 overflow-y-auto max-h-28 pr-1">
-            {recentEvents.map((event, idx) => (
-              <div key={event.id || idx} className="flex items-center text-xs text-gray-600">
-                <span className={`w-2 h-2 rounded-full mr-2 flex-shrink-0 bg-gray-300`}></span>
-                <span className="flex-grow truncate" title={`${event.type}: ${event.pod_name}`}>[{event.type}] {event.pod_name}{event.message ? ` - ${event.message}` : ''}</span>
-                <span className="ml-2 text-gray-400 flex-shrink-0">{event.start_time}</span>
-              </div>
-            ))}
-            {recentEvents.length === 0 && (
-              <p className="text-xs text-gray-400 text-center py-4">최근 이벤트가 없습니다.</p>
+          {/* probe 실패 종류별 카운트 리스트 */}
+          <ul className="text-xs space-y-0.5 mt-3 text-center">
+            {probeFailGraphData.length === 0 && (
+              <li>최근 24시간 내 Probe 실패가 없습니다.</li>
             )}
+            {probeFailGraphData.map(({ name, value }) => (
+              <li key={name} className={PROBE_TEXT_COLORS[name] + ' font-semibold'}>{name}: {value}회</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      {/* 2행 1열: 최근 이벤트 표 (메시지 포함) */}
+      <div className="bg-white p-5 rounded-lg border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center">
+            <FiList className="text-base text-purple-400 mr-2" />
+            <h2 className="text-sm font-semibold text-gray-700">최근 이벤트</h2>
           </div>
+          <a href="/event-log" className="text-xs text-blue-500 hover:underline">더보기</a>
+        </div>
+        {/* 최근 이벤트 표 */}
+        <div className="overflow-x-auto mb-4">
+          <table className="w-full text-xs border">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-2 py-1 text-left font-medium text-gray-500">이벤트 종류</th>
+                <th className="px-2 py-1 text-left font-medium text-gray-500">Pod 이름</th>
+                <th className="px-2 py-1 text-left font-medium text-gray-500">메시지</th>
+                <th className="px-2 py-1 text-left font-medium text-gray-500">시간</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {recentEvents.length === 0 && (
+                <tr><td colSpan={4} className="text-center py-4 text-gray-400">최근 이벤트가 없습니다.</td></tr>
+              )}
+              {recentEvents.map((event, idx) => (
+                <tr key={event.id || idx} className="odd:bg-white even:bg-gray-50">
+                  <td className="px-2 py-1">
+                    <span className={`inline-block px-1 py-0.5 rounded text-white text-[10px] ${
+                      event.type === 'alert' ? 'bg-red-500' :
+                      event.type === 'ProbeFail' ? 'bg-yellow-400 text-gray-800' :
+                      'bg-gray-400'
+                    }`}>
+                      {event.type}
+                    </span>
+                  </td>
+                  <td className="px-2 py-1 text-gray-700">{event.pod_name}</td>
+                  <td className="px-2 py-1 text-gray-500">{event.message || '-'}</td>
+                  <td className="px-2 py-1 text-gray-500">{event.start_time}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
