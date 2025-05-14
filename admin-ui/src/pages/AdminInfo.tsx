@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FiUser, FiMail, FiShield, FiClock, FiKey, FiActivity, FiEdit3 } from 'react-icons/fi'; // 아이콘 추가
+
+const NAMESPACE_KEY = 'selectedNamespace';
+const REFRESH_KEY = 'refreshInterval';
 
 // 임시 관리자 정보
 const adminData = {
@@ -9,14 +12,40 @@ const adminData = {
   lastLogin: '2024-04-23 10:30:15',
 };
 
-// 임시 최근 활동
-const recentActivity = [
+const initialRecentActivity = [
   { id: 1, action: '로그인', timestamp: '2024-04-23 10:30:15' },
-  { id: 2, action: '설정 변경: 자동 새로고침 주기 30초', timestamp: '2024-04-22 15:05:00' },
+  { id: 2, action: `설정 변경: 자동 새로고침 주기 ${localStorage.getItem(REFRESH_KEY) || '10초'}`, timestamp: '2024-04-22 15:05:00' },
   { id: 3, action: 'Pod 격리: worker-abc-456', timestamp: '2024-04-22 09:10:30' },
 ];
 
 const AdminInfo = () => {
+  const [namespace, setNamespace] = useState(localStorage.getItem(NAMESPACE_KEY) || 'isocontrol');
+  const [refresh, setRefresh] = useState(localStorage.getItem(REFRESH_KEY) || '10초');
+  const [recentActivity, setRecentActivity] = useState(initialRecentActivity);
+
+  useEffect(() => {
+    const onNamespaceChange = (e: any) => {
+      setNamespace(e.detail);
+      setRecentActivity(prev => [
+        { id: Date.now(), action: `설정 변경: 네임스페이스 ${e.detail}`, timestamp: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }) },
+        ...prev
+      ]);
+    };
+    const onRefreshChange = (e: any) => {
+      setRefresh(e.detail);
+      setRecentActivity(prev => [
+        { id: Date.now(), action: `설정 변경: 자동 새로고침 주기 ${e.detail}`, timestamp: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }) },
+        ...prev
+      ]);
+    };
+    window.addEventListener('namespaceChange', onNamespaceChange);
+    window.addEventListener('refreshChange', onRefreshChange);
+    return () => {
+      window.removeEventListener('namespaceChange', onNamespaceChange);
+      window.removeEventListener('refreshChange', onRefreshChange);
+    };
+  }, []);
+
   return (
     <div className="space-y-6">
       {/* 페이지 헤더 */}
@@ -47,6 +76,14 @@ const AdminInfo = () => {
               <span className="inline-block px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700">
                 {adminData.role}
               </span>
+            </div>
+            <div className="flex items-center">
+              <span className="text-xs font-medium text-gray-500 w-20">네임스페이스:</span>
+              <span className="text-sm text-gray-800">{namespace}</span>
+            </div>
+            <div className="flex items-center">
+              <span className="text-xs font-medium text-gray-500 w-20">새로고침:</span>
+              <span className="text-sm text-gray-800">{refresh}</span>
             </div>
           </div>
         </div>

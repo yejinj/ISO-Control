@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { FiSettings, FiBarChart2, FiFilter, FiRefreshCw } from 'react-icons/fi';
 
@@ -7,6 +7,9 @@ const data = [
   { name: '04/22', 복구시간: 12 },
   { name: '04/23', 복구시간: 5 },
 ];
+
+const NAMESPACE_KEY = 'selectedNamespace';
+const REFRESH_KEY = 'refreshInterval';
 
 const RecoveryStats = () => {
   return (
@@ -32,6 +35,19 @@ const RecoveryStats = () => {
 };
 
 const Settings = () => {
+  const [namespace, setNamespace] = useState(() => localStorage.getItem(NAMESPACE_KEY) || 'isocontrol');
+  const [refresh, setRefresh] = useState(() => localStorage.getItem(REFRESH_KEY) || '10초');
+
+  useEffect(() => {
+    localStorage.setItem(NAMESPACE_KEY, namespace);
+    window.dispatchEvent(new CustomEvent('namespaceChange', { detail: namespace }));
+  }, [namespace]);
+
+  useEffect(() => {
+    localStorage.setItem(REFRESH_KEY, refresh);
+    window.dispatchEvent(new CustomEvent('refreshChange', { detail: refresh }));
+  }, [refresh]);
+
   return (
     <div className="space-y-6">
       <div className="pb-2 border-b border-gray-200">
@@ -51,7 +67,11 @@ const Settings = () => {
               <label className="block text-xs font-medium text-gray-600 mb-1.5 flex items-center">
                 <FiFilter className="mr-1.5" size={13}/>네임스페이스 필터
               </label>
-              <select className="w-full text-sm border border-gray-300 rounded px-2 py-1.5 focus:ring-1 focus:ring-blue-400 focus:border-blue-400 outline-none">
+              <select
+                className="w-full text-sm border border-gray-300 rounded px-2 py-1.5 focus:ring-1 focus:ring-blue-400 focus:border-blue-400 outline-none"
+                value={namespace}
+                onChange={e => setNamespace(e.target.value)}
+              >
                 <option>isocontrol</option>
                 <option>quarantine</option>
                 <option>모든 네임스페이스</option>
@@ -61,7 +81,11 @@ const Settings = () => {
               <label className="block text-xs font-medium text-gray-600 mb-1.5 flex items-center">
                 <FiRefreshCw className="mr-1.5" size={13}/>자동 새로고침 주기
               </label>
-              <select className="w-full text-sm border border-gray-300 rounded px-2 py-1.5 focus:ring-1 focus:ring-blue-400 focus:border-blue-400 outline-none">
+              <select
+                className="w-full text-sm border border-gray-300 rounded px-2 py-1.5 focus:ring-1 focus:ring-blue-400 focus:border-blue-400 outline-none"
+                value={refresh}
+                onChange={e => setRefresh(e.target.value)}
+              >
                 <option>10초</option>
                 <option>30초</option>
                 <option>1분</option>
