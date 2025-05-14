@@ -24,7 +24,7 @@ const Dashboard = () => {
     fetchEvents().then((data: any[]) => {
       setRecentEvents(
         data.slice(-5).reverse().map((ev: any, idx: number) => ({
-          ...ev,
+        ...ev,
           id: ev.id || ev.start_time + ev.pod_name || idx,
         }))
       );
@@ -83,8 +83,8 @@ const Dashboard = () => {
         <div className="bg-white p-5 rounded-lg border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center">
-              <FiAlertTriangle className="text-base text-amber-400 mr-2" />
-              <h2 className="text-sm font-semibold text-gray-700">최근 24시간 Probe 실패</h2>
+            <FiAlertTriangle className="text-base text-amber-400 mr-2" />
+            <h2 className="text-sm font-semibold text-gray-700">최근 24시간 Probe 실패</h2>
             </div>
           </div>
           <div className="flex-1 flex flex-col items-center justify-center mt-2 w-full">
@@ -122,13 +122,13 @@ const Dashboard = () => {
         </div>
       </div>
       {/* 2행 1열: 최근 이벤트 표 (메시지 포함) */}
-      <div className="bg-white p-5 rounded-lg border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center">
-            <FiList className="text-base text-purple-400 mr-2" />
-            <h2 className="text-sm font-semibold text-gray-700">최근 이벤트</h2>
+        <div className="bg-white p-5 rounded-lg border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center">
+              <FiList className="text-base text-purple-400 mr-2" />
+              <h2 className="text-sm font-semibold text-gray-700">최근 이벤트</h2>
+            </div>
           </div>
-        </div>
         {/* 최근 이벤트 표 */}
         <div className="overflow-x-auto mb-4">
           <table className="w-full text-xs border">
@@ -141,7 +141,7 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {recentEvents.length === 0 && (
+            {recentEvents.length === 0 && (
                 <tr><td colSpan={4} className="text-center py-4 text-gray-400">최근 이벤트가 없습니다.</td></tr>
               )}
               {recentEvents.map((event, idx) => (

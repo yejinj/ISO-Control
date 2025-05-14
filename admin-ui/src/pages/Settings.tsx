@@ -1,17 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { FiSettings, FiBarChart2, FiFilter, FiRefreshCw } from 'react-icons/fi';
-
-const data = [
-  { name: '04/21', 복구시간: 8 },
-  { name: '04/22', 복구시간: 12 },
-  { name: '04/23', 복구시간: 5 },
-];
+import { fetchEvents } from '../api';
 
 const NAMESPACE_KEY = 'selectedNamespace';
 const REFRESH_KEY = 'refreshInterval';
 
 const RecoveryStats = () => {
+  const [recoveryData, setRecoveryData] = useState<{ name: string, 복구시간: number }[]>([]);
+
+  useEffect(() => {
+    fetchEvents().then((events: any[]) => {
+      const byDate: Record<string, number[]> = {};
+      events.forEach(ev => {
+        if (ev.start_time && ev.recovery_time) {
+          const start = new Date(ev.start_time);
+          const end = new Date(ev.recovery_time);
+          const diffMin = (end.getTime() - start.getTime()) / 60000;
+          const dateKey = end.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul', month: '2-digit', day: '2-digit' });
+          if (!byDate[dateKey]) byDate[dateKey] = [];
+          byDate[dateKey].push(diffMin);
+        }
+      });
+      const data = Object.entries(byDate).map(([name, arr]) => ({
+        name,
+        복구시간: Math.round(arr.reduce((a, b) => a + b, 0) / arr.length)
+      }));
+      setRecoveryData(data);
+    });
+  }, []);
+
   return (
     <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
       <div className="flex items-center mb-4">
@@ -19,7 +37,7 @@ const RecoveryStats = () => {
         <h2 className="text-sm font-semibold text-gray-700">일별 평균 복구 시간 (분)</h2>
       </div>
       <ResponsiveContainer width="100%" height={200}>
-        <BarChart data={data} margin={{ top: 5, right: 10, left: -25, bottom: 0 }}>
+        <BarChart data={recoveryData} margin={{ top: 5, right: 10, left: -25, bottom: 0 }}>
           <XAxis dataKey="name" fontSize={10} tickLine={false} axisLine={false} dy={5} />
           <YAxis fontSize={10} tickLine={false} axisLine={false} />
           <Tooltip 
