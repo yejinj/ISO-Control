@@ -6,9 +6,12 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/pods': 'http://localhost:8000',
-      '/probes': 'http://localhost:8000',
-      '/events': 'http://localhost:8000',
+      '/pods': 'http://localhost:8080',
+      '/probes': 'http://localhost:8080',
+      '/events': 'http://localhost:8080',
+      '/healthz': 'http://localhost:8080',
+      '/ready': 'http://localhost:8080',
+      '/startup': 'http://localhost:8080',
     },
   },
 }) 

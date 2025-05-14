@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: isocontrol-app
-          image: nginx:latest
+          image: localhost:5001/isocontrol-app:latest
           ports:
             - containerPort: 8080
           env:
