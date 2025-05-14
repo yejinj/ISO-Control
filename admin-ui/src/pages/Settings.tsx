@@ -75,9 +75,8 @@ const Settings = () => {
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="flex flex-col gap-6">
         <RecoveryStats />
-
         <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
           <h2 className="text-sm font-semibold text-gray-700 mb-4 -mt-1">UI 설정</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
