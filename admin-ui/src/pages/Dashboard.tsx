@@ -36,12 +36,12 @@ const Dashboard = () => {
           id: ev.id || ev.start_time + ev.pod_name || idx,
         }))
       );
-      // 최근 24시간 probe 실패만 필터링
+      // 최근 24시간 probe 실패: type이 'ProbeFail' 또는 'alert'인 것 모두 포함
       const now = new Date();
       const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
       setProbeFails(
         data.filter(ev =>
-          ev.type === 'ProbeFail' &&
+          (ev.type === 'ProbeFail' || ev.type === 'alert') &&
           new Date(ev.start_time) > dayAgo
         )
       );
@@ -139,7 +139,7 @@ const Dashboard = () => {
             {recentEvents.map((event, idx) => (
               <div key={event.id || idx} className="flex items-center text-xs text-gray-600">
                 <span className={`w-2 h-2 rounded-full mr-2 flex-shrink-0 bg-gray-300`}></span>
-                <span className="flex-grow truncate" title={`${event.type}: ${event.pod_name}`}>{event.pod_name}</span>
+                <span className="flex-grow truncate" title={`${event.type}: ${event.pod_name}`}>[{event.type}] {event.pod_name}{event.message ? ` - ${event.message}` : ''}</span>
                 <span className="ml-2 text-gray-400 flex-shrink-0">{event.start_time}</span>
               </div>
             ))}
