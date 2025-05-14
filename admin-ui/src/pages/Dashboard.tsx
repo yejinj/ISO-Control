@@ -159,7 +159,11 @@ const Dashboard = () => {
                   </td>
                   <td className="px-2 py-1 text-gray-700">{event.pod_name}</td>
                   <td className="px-2 py-1 text-gray-500">{event.message || '-'}</td>
-                  <td className="px-2 py-1 text-gray-500">{event.start_time}</td>
+                  <td className="px-2 py-1 text-gray-500">
+                    {event.start_time
+                      ? new Date(event.start_time).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })
+                      : '-'}
+                  </td>
                 </tr>
               ))}
             </tbody>
