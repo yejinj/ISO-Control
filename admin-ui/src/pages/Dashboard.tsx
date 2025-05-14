@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FiAlertTriangle, FiList } from 'react-icons/fi';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { fetchPods, fetchEvents } from '../api';
+import { Link } from 'react-router-dom';
 
 const PROBE_COLORS: Record<string, string> = {
   Liveness: '#fbbf24',
@@ -86,7 +87,7 @@ const Dashboard = () => {
               <FiAlertTriangle className="text-base text-amber-400 mr-2" />
               <h2 className="text-sm font-semibold text-gray-700">최근 24시간 Probe 실패</h2>
             </div>
-            <a href="/pod-status" className="text-xs text-blue-500 hover:underline">더보기</a>
+            <Link to="/pod-status" className="text-xs text-blue-500 hover:underline">더보기</Link>
           </div>
           <div className="flex-1 flex flex-col items-center justify-center mt-2 w-full">
             <ResponsiveContainer width="80%" height={100}>
@@ -129,7 +130,7 @@ const Dashboard = () => {
             <FiList className="text-base text-purple-400 mr-2" />
             <h2 className="text-sm font-semibold text-gray-700">최근 이벤트</h2>
           </div>
-          <a href="/event-log" className="text-xs text-blue-500 hover:underline">더보기</a>
+          <Link to="/event-log" className="text-xs text-blue-500 hover:underline">더보기</Link>
         </div>
         {/* 최근 이벤트 표 */}
         <div className="overflow-x-auto mb-4">
