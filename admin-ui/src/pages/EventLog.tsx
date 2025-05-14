@@ -62,8 +62,8 @@ const EventLog = () => {
             {logs.map((log, index) => (
               <tr key={index} className="odd:bg-white even:bg-gray-50 hover:bg-blue-50 transition-colors"> 
                 {/* 셀 패딩 조정 */}
-                <td className="px-3 py-1.5 whitespace-nowrap text-gray-700">{log.time}</td>
-                <td className="px-3 py-1.5 text-gray-700">{log.name}</td>
+                <td className="px-3 py-1.5 whitespace-nowrap text-gray-700">{log.start_time}</td>
+                <td className="px-3 py-1.5 text-gray-700">{log.pod_name}</td>
                 <td className="px-3 py-1.5 text-gray-700">{log.type}</td>
               </tr>
             ))}
