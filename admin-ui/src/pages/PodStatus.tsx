@@ -143,7 +143,7 @@ const PodStatus = () => {
                   <PodStatusBadge status={pod.status} />
                 </td>
                 <td className={`px-3 py-1.5 text-center font-bold ${pod.restartCount && pod.restartCount > 0 ? 'text-red-500' : 'text-gray-700'}`}>{pod.restartCount ?? '-'}</td>
-                <td className="px-3 py-1.5 text-center text-gray-500">{pod.lastRestart ?? '-'}</td>
+                <td className="px-3 py-1.5 text-center text-gray-500">{pod.lastRestart ? new Date(pod.lastRestart).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }) : '-'}</td>
                 <td className="px-3 py-1.5 text-center">
                   {pod.containerStates && pod.containerStates.length > 0 ? (
                     <div className="flex flex-col items-center gap-1">
@@ -154,7 +154,7 @@ const PodStatus = () => {
                           <div className="absolute left-1/2 -translate-x-1/2 mt-1 w-48 bg-white border border-gray-200 rounded shadow-lg p-2 text-xs text-gray-700 z-20 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity">
                             상태: {cs.state || '-'}<br />
                             재시작: {cs.restartCount}<br />
-                            마지막 재시작: {cs.lastRestart || '-'}
+                            마지막 재시작: {cs.lastRestart ? new Date(cs.lastRestart).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }) : '-'}
                           </div>
                         </span>
                       ))}
