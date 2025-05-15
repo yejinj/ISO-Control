@@ -9,6 +9,7 @@ import PodStatus from './pages/PodStatus';
 import Settings from './pages/Settings';
 import Sidebar from './components/Sidebar'; // Sidebar 컴포넌트 import
 import AdminInfo from './pages/AdminInfo'; // AdminInfo 페이지 import
+import ResourceLatencyMonitor from './pages/ResourceLatencyMonitor';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
               <Route path="/event-log" element={<EventLog />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/admin-info" element={<AdminInfo />} /> {/* 관리자 정보 라우트 추가 */}
+              <Route path="/resource-latency" element={<ResourceLatencyMonitor />} />
             </Routes>
           </main>
         </div>

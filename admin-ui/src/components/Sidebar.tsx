@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { FiGrid, FiList, FiBarChart2, FiSettings } from 'react-icons/fi';
+import { FiGrid, FiList, FiBarChart2, FiSettings, FiCpu } from 'react-icons/fi';
 
 const Sidebar = () => {
   const baseLinkClasses = "flex items-center py-2 px-3 rounded transition duration-150 ease-in-out text-gray-600 hover:bg-gray-100 text-sm";
@@ -39,6 +39,15 @@ const Sidebar = () => {
             >
               <FiBarChart2 className="mr-2" size={14} />
               장애 이력
+            </NavLink>
+          </li>
+          <li>
+            <NavLink 
+              to="/resource-latency" 
+              className={({ isActive }) => `${baseLinkClasses} ${isActive ? activeLinkClasses : ''}`}
+            >
+              <FiCpu className="mr-2" size={14} />
+              리소스/지연 모니터링
             </NavLink>
           </li>
           <li>
