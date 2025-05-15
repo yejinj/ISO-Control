@@ -1,13 +1,20 @@
 from fastapi import APIRouter
+import psutil
 
 router = APIRouter()
 
 @router.get("/probes")
 async def get_probes():
-    # 임시 mock 데이터
+    cpu = psutil.cpu_percent(interval=1)
+    mem = psutil.virtual_memory().percent
+    # 소수점 한 자리로 제한, None이면 0 반환
+    cpu = round(cpu, 1) if cpu is not None else 0
+    mem = round(mem, 1) if mem is not None else 0
     return {
         "liveness": {"fail_count": 2},
-        "readiness": {"fail_count": 5}
+        "readiness": {"fail_count": 5},
+        "cpuUsage": cpu,
+        "memoryUsage": mem
     }
 
 @router.get("/healthz")

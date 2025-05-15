@@ -3,11 +3,12 @@ import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContai
 import { FiCpu, FiActivity } from 'react-icons/fi';
 
 const fetchResourceMetrics = async () => {
-  const [cpu, memory] = await Promise.all([
-    fetch('/api/v1/probes/metrics/cpu').then(res => res.json()),
-    fetch('/api/v1/probes/metrics/memory').then(res => res.json()),
-  ]);
-  return { cpu, memory };
+  const res = await fetch('/api/v1/probes');
+  const data = await res.json();
+  return {
+    cpu: { cpu_usage: data.cpuUsage },
+    memory: { memory_usage: data.memoryUsage }
+  };
 };
 
 const fetchLatencyMetrics = async () => {
@@ -39,8 +40,8 @@ const ResourceLatencyMonitor = () => {
           </div>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={[
-              { name: 'CPU', 사용률: parseFloat(resourceData.cpu?.cpu_usage) || 0 },
-              { name: '메모리', 사용률: parseFloat(resourceData.memory?.memory_usage) || 0 },
+              { name: 'CPU', 사용률: isNaN(parseFloat(resourceData.cpu?.cpu_usage)) ? 0 : parseFloat(resourceData.cpu?.cpu_usage) },
+              { name: '메모리', 사용률: isNaN(parseFloat(resourceData.memory?.memory_usage)) ? 0 : parseFloat(resourceData.memory?.memory_usage) },
             ]}>
               <XAxis dataKey="name" fontSize={11} />
               <YAxis fontSize={11} domain={[0, 100]} tickFormatter={v => `${v}%`} />
@@ -49,8 +50,8 @@ const ResourceLatencyMonitor = () => {
             </BarChart>
           </ResponsiveContainer>
           <div className="flex justify-between mt-4 text-xs text-gray-500">
-            <span>CPU 사용률: <span className="font-bold text-blue-600">{resourceData.cpu?.cpu_usage || 0}%</span></span>
-            <span>메모리 사용률: <span className="font-bold text-blue-600">{resourceData.memory?.memory_usage || 0}%</span></span>
+            <span>CPU 사용률: <span className="font-bold text-blue-600">{resourceData.cpu?.cpu_usage ?? 0}%</span></span>
+            <span>메모리 사용률: <span className="font-bold text-blue-600">{resourceData.memory?.memory_usage ?? 0}%</span></span>
           </div>
         </div>
         {/* API 응답 지연 추이 카드 */}
