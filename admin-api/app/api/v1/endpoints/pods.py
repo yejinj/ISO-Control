@@ -33,10 +33,7 @@ async def get_pods():
         restart_count = 0
         last_restart = None
         container_states = []
-        if pod.status.conditions:
-            for cond in pod.status.conditions:
-                if cond.type == "Ready":
-                    readiness = (cond.status == "True")
+        # 실제 컨테이너 상태 기반 liveness/readiness 판정
         if pod.status.container_statuses:
             for cs in pod.status.container_statuses:
                 rc = cs.restart_count if hasattr(cs, 'restart_count') else 0
@@ -48,18 +45,23 @@ async def get_pods():
                 if cs.state:
                     if cs.state.running:
                         state = "Running"
+                        liveness = True
                     elif cs.state.waiting:
                         state = cs.state.waiting.reason
+                        liveness = False
                     elif cs.state.terminated:
                         state = cs.state.terminated.reason
+                        liveness = False
                 container_states.append({
                     "name": cs.name,
                     "restartCount": rc,
                     "lastRestart": lr,
                     "state": state
                 })
-        # liveness probe 상태 추론: 재시작이 있으면 최근 실패 경험 있음
-        liveness = restart_count == 0
+        if pod.status.conditions:
+            for cond in pod.status.conditions:
+                if cond.type == "Ready":
+                    readiness = (cond.status == "True")
         # 복구 감지 및 event_log 업데이트
         if pod.status.phase == "Running":
             for event in reversed(event_log):

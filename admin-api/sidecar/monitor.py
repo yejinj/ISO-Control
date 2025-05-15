@@ -28,10 +28,10 @@ def check_cpu_usage():
             
             if total_usec > 0:
                 cpu_usage = (usage_usec / total_usec) * 100
-                if cpu_usage > CPU_THRESHOLD:
-                    write_log(
-                        event_type="High CPU Usage",
-                        details={
+    if cpu_usage > CPU_THRESHOLD:
+        write_log(
+            event_type="High CPU Usage",
+            details={
                             "cpu_usage": f"{cpu_usage:.2f}%",
                             "threshold": f"{CPU_THRESHOLD}%",
                             "usage_usec": usage_usec,
@@ -52,15 +52,15 @@ def check_memory_usage():
     if memory_max > 0:
         memory_usage = (memory_current / memory_max) * 100
         if memory_usage > MEMORY_THRESHOLD:
-            write_log(
-                event_type="High Memory Usage",
-                details={
+        write_log(
+            event_type="High Memory Usage",
+            details={
                     "memory_usage": f"{memory_usage:.2f}%",
                     "threshold": f"{MEMORY_THRESHOLD}%",
                     "current_bytes": memory_current,
                     "max_bytes": memory_max
-                }
-            )
+            }
+        )
 
 def check_disk_usage():
     # 디스크 사용량 계산 (cgroup v2)
