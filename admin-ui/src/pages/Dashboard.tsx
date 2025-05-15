@@ -5,19 +5,18 @@ import { fetchPods, fetchEvents } from '../api';
 
 const PROBE_COLORS: Record<string, string> = {
   Liveness: '#fbbf24',
-  Readiness: '#ef4444',
-  Startup: '#6b7280',
+  Readiness: '#ef4444'
 };
+
 const PROBE_TEXT_COLORS: Record<string, string> = {
   Liveness: 'text-amber-500',
-  Readiness: 'text-red-500',
-  Startup: 'text-gray-500',
+  Readiness: 'text-red-500'
 };
 
 const Dashboard = () => {
   const [recentEvents, setRecentEvents] = useState<any[]>([]);
   const [probeFails, setProbeFails] = useState<any[]>([]);
-  const [probeFailTypeCount, setProbeFailTypeCount] = useState<Record<string, number>>({ Liveness: 0, Readiness: 0, Startup: 0 });
+  const [probeFailTypeCount, setProbeFailTypeCount] = useState<Record<string, number>>({ Liveness: 0, Readiness: 0 });
   const [podStats, setPodStats] = useState<{ running: number; isolated: number }>({ running: 0, isolated: 0 });
 
   useEffect(() => {
@@ -32,7 +31,7 @@ const Dashboard = () => {
     fetchPods().then((pods: any[]) => {
       // Pod 상태 기반 probe 실패 집계
       const fails: any[] = [];
-      const typeCount: Record<string, number> = { Liveness: 0, Readiness: 0, Startup: 0 };
+      const typeCount: Record<string, number> = { Liveness: 0, Readiness: 0 };
       pods.forEach(pod => {
         if (pod.liveness === false) {
           fails.push({ ...pod, probeType: 'Liveness' });
@@ -41,10 +40,6 @@ const Dashboard = () => {
         if (pod.readiness === false) {
           fails.push({ ...pod, probeType: 'Readiness' });
           typeCount.Readiness += 1;
-        }
-        if (pod.startup === false) {
-          fails.push({ ...pod, probeType: 'Startup' });
-          typeCount.Startup += 1;
         }
       });
       setProbeFails(fails);
@@ -57,7 +52,7 @@ const Dashboard = () => {
 
   // probe 실패 그래프 데이터 (Pod 상태 기반)
   const probeFailGraphData = Object.entries(probeFailTypeCount)
-    .filter(([type, value]) => (type === 'Liveness' || type === 'Readiness' || type === 'Startup') && value > 0)
+    .filter(([type, value]) => (type === 'Liveness' || type === 'Readiness') && value > 0)
     .map(([type, value]) => ({ name: type, value, color: PROBE_COLORS[type] }));
 
   return (

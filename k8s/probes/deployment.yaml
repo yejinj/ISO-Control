@@ -29,8 +29,6 @@ spec:
               value: "/healthz"
             - name: PROBE_READINESS_PATH
               value: "/ready"
-            - name: PROBE_STARTUP_PATH
-              value: "/startup"
             - name: APP_PORT
               value: "8080"
           livenessProbe:
@@ -49,12 +47,6 @@ spec:
             periodSeconds: 5
             timeoutSeconds: 2
             failureThreshold: 2
-          startupProbe:
-            httpGet:
-              path: /startup
-              port: 8080
-            failureThreshold: 10
-            periodSeconds: 10
           resources:
             limits:
               memory: "512Mi"

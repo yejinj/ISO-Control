@@ -125,7 +125,6 @@ const PodStatus = () => {
               <th className="px-3 py-1.5 text-left font-medium text-gray-500">Pod 이름</th>
               <th className="px-3 py-1.5 text-center font-medium text-gray-500">Liveness</th>
               <th className="px-3 py-1.5 text-center font-medium text-gray-500">Readiness</th>
-              <th className="px-3 py-1.5 text-center font-medium text-gray-500">Startup</th>
               <th className="px-3 py-1.5 text-center font-medium text-gray-500">상태</th>
               <th className="px-3 py-1.5 text-center font-medium text-gray-500">재시작</th>
               <th className="px-3 py-1.5 text-center font-medium text-gray-500">마지막 재시작</th>
@@ -138,7 +137,6 @@ const PodStatus = () => {
                 <td className="px-3 py-1.5 text-gray-700">{maskPodName(pod.name)}</td>
                 <td className="px-3 py-1.5 text-center"><ProbeStatusIcon status={pod.liveness} /></td>
                 <td className="px-3 py-1.5 text-center"><ProbeStatusIcon status={pod.readiness} /></td>
-                <td className="px-3 py-1.5 text-center"><ProbeStatusIcon status={pod.startup} /></td>
                 <td className="px-3 py-1.5 text-center">
                   <PodStatusBadge status={pod.status} />
                 </td>

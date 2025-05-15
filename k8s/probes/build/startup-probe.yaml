@@ -1,6 +1,0 @@
-startupProbe:
-  httpGet:
-    path: /startup
-    port: 8080
-  failureThreshold: 10
-  periodSeconds: 10

@@ -4,7 +4,7 @@ set -e
 NAMESPACE="isocontrol"
 PROBES_DIR="k8s/probes"
 OUTPUT_DIR="$PROBES_DIR/build"
-FILES=( "deployment.yaml" "liveness-probe.yaml" "readiness-probe.yaml" "startup-probe.yaml" )
+FILES=( "deployment.yaml" "liveness-probe.yaml" "readiness-probe.yaml" )
 
 if [ ! -f .env ]; then
   echo ".env 파일이 없습니다. 환경변수를 직접 export 하거나 .env 파일을 생성하세요."

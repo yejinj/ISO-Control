@@ -30,7 +30,6 @@ async def get_pods():
     for pod in pods.items:
         liveness = None
         readiness = None
-        startup = None
         restart_count = 0
         last_restart = None
         container_states = []
@@ -59,9 +58,8 @@ async def get_pods():
                     "lastRestart": lr,
                     "state": state
                 })
-        # liveness/startup probe 상태 추론: 재시작이 있으면 최근 실패 경험 있음
+        # liveness probe 상태 추론: 재시작이 있으면 최근 실패 경험 있음
         liveness = restart_count == 0
-        startup = True  # startup probe는 최초 기동 실패 시에만 의미, 별도 이벤트 파싱 필요(추후)
         # 복구 감지 및 event_log 업데이트
         if pod.status.phase == "Running":
             for event in reversed(event_log):
@@ -73,7 +71,6 @@ async def get_pods():
             "namespace": pod.metadata.namespace,
             "liveness": liveness,
             "readiness": readiness,
-            "startup": startup,
             "status": pod.status.phase,
             "restartCount": restart_count,
             "lastRestart": last_restart,
