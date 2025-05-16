@@ -18,7 +18,7 @@ app.add_middleware(
 async def root():
     return {"status": "ok", "message": "ISO Control API is running"}
 
-app.include_router(alert.router)
-app.include_router(probes.router)
-app.include_router(pods.router)
-app.include_router(events.router)
+app.include_router(alert.router, prefix="/api/v1")
+app.include_router(probes.router, prefix="/api/v1")
+app.include_router(pods.router, prefix="/api/v1")
+app.include_router(events.router, prefix="/api/v1")

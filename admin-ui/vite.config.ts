@@ -8,11 +8,11 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     proxy: {
-      '/pods': 'http://localhost:8080',
-      '/probes': 'http://localhost:8080',
-      '/events': 'http://localhost:8080',
-      '/healthz': 'http://localhost:8080',
-      '/ready': 'http://localhost:8080'
+      '/api/v1/pods': 'http://localhost:8080',
+      '/api/v1/probes': 'http://localhost:8080',
+      '/api/v1/events': 'http://localhost:8080',
+      '/api/v1/healthz': 'http://localhost:8080',
+      '/api/v1/ready': 'http://localhost:8080'
     },
   },
 }) 
