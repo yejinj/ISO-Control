@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { FiCpu, FiActivity } from 'react-icons/fi';
+import { FiCpu, FiActivity, FiHardDrive } from 'react-icons/fi';
 
 const fetchResourceMetrics = async () => {
   const res = await fetch('/api/v1/probes');
   const data = await res.json();
   return {
     cpu: { cpu_usage: data.cpuUsage },
-    memory: { memory_usage: data.memoryUsage }
+    memory: { memory_usage: data.memoryUsage },
+    pvc: data.pvcUsage
   };
 };
 
@@ -17,13 +18,19 @@ const fetchLatencyMetrics = async () => {
 };
 
 const ResourceLatencyMonitor = () => {
-  const [resourceData, setResourceData] = useState<any>({ cpu: {}, memory: {} });
+  const [resourceData, setResourceData] = useState<any>({ cpu: {}, memory: {}, pvc: {} });
   const [latencyData, setLatencyData] = useState<any[]>([]);
 
   useEffect(() => {
     fetchResourceMetrics().then(setResourceData);
     fetchLatencyMetrics().then(setLatencyData);
   }, []);
+
+  // PVC 데이터를 차트용으로 변환
+  const pvcChartData = Object.entries(resourceData.pvc || {}).map(([pvcName, usage]) => ({
+    name: pvcName,
+    사용률: Number(usage)
+  }));
 
   return (
     <div className="px-0 md:px-6 py-6 w-full max-w-7xl mx-auto">
@@ -36,7 +43,7 @@ const ResourceLatencyMonitor = () => {
         <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm flex flex-col">
           <div className="flex items-center mb-3">
             <FiCpu className="text-blue-400 mr-2" size={18} />
-            <h2 className="text-base font-semibold text-gray-700">CPU/메모리 사용률</h2>
+            <h2 className="text-base font-semibold text-gray-700">시스템 리소스 사용률</h2>
           </div>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={[
@@ -54,6 +61,31 @@ const ResourceLatencyMonitor = () => {
             <span>메모리 사용률: <span className="font-bold text-blue-600">{resourceData.memory?.memory_usage ?? 0}%</span></span>
           </div>
         </div>
+
+        {/* PVC 사용률 카드 */}
+        <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm flex flex-col">
+          <div className="flex items-center mb-3">
+            <FiHardDrive className="text-green-400 mr-2" size={18} />
+            <h2 className="text-base font-semibold text-gray-700">PVC 사용률</h2>
+          </div>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={pvcChartData}>
+              <XAxis dataKey="name" fontSize={11} angle={-45} textAnchor="end" height={60} />
+              <YAxis fontSize={11} domain={[0, 100]} tickFormatter={v => `${v}%`} />
+              <Tooltip formatter={v => `${v}%`} />
+              <Bar dataKey="사용률" fill="#34d399" radius={[4, 4, 0, 0]} barSize={32} />
+            </BarChart>
+          </ResponsiveContainer>
+          <div className="mt-4 text-xs text-gray-500">
+            {Object.entries(resourceData.pvc || {}).map(([pvcName, usage]) => (
+              <div key={pvcName} className="flex justify-between mb-1">
+                <span>{pvcName}:</span>
+                <span className="font-bold text-green-600">{Number(usage)}%</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* API 응답 지연 추이 카드 */}
         <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm flex flex-col">
           <div className="flex items-center mb-3">
