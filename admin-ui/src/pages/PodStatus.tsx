@@ -72,6 +72,7 @@ const PodStatus = () => {
 
   useEffect(() => {
     fetchPods().then((data: Pod[]) => setPods(data));
+    console.log(pods);
   }, []);
 
   const sortedPods = [...pods].sort((a, b) => {
