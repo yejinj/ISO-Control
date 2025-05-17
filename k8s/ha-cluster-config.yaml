@@ -1,0 +1,28 @@
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: ClusterConfiguration
+kubernetesVersion: v1.29.2
+controlPlaneEndpoint: "192.168.1.6:6443"
+etcd:
+  external:
+    endpoints:
+    - "https://192.168.1.6:2379"
+    - "https://192.168.1.7:2379"
+    - "https://192.168.1.8:2379"
+    caFile: /etc/kubernetes/pki/etcd/ca.crt
+    certFile: /etc/kubernetes/pki/etcd/server.crt
+    keyFile: /etc/kubernetes/pki/etcd/server.key
+networking:
+  podSubnet: "10.244.0.0/16"
+  serviceSubnet: "10.96.0.0/12"
+---
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: "192.168.1.6"
+  bindPort: 6443
+nodeRegistration:
+  criSocket: "unix:///run/containerd/containerd.sock"
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+cgroupDriver: systemd 
