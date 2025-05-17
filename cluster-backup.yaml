@@ -1,0 +1,4104 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Pod","metadata":{"annotations":{},"name":"test-pod","namespace":"default"},"spec":{"containers":[{"command":["sleep","3600"],"image":"busybox","name":"test-container","volumeMounts":[{"mountPath":"/mnt/test","name":"test-volume"}]}],"volumes":[{"name":"test-volume","persistentVolumeClaim":{"claimName":"test-pvc"}}]}}
+    creationTimestamp: "2025-05-16T04:29:00Z"
+    name: test-pod
+    namespace: default
+    resourceVersion: "2893927"
+    uid: 71392977-d504-4c35-94d5-120fe168c719
+  spec:
+    containers:
+    - command:
+      - sleep
+      - "3600"
+      image: busybox
+      imagePullPolicy: Always
+      name: test-container
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /mnt/test
+        name: test-volume
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-p6r8j
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: plogscope-server
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - name: test-volume
+      persistentVolumeClaim:
+        claimName: test-pvc
+    - name: kube-api-access-p6r8j
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-16T04:29:04Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-16T04:29:01Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-16T04:29:04Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-16T04:29:04Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-16T04:29:01Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://4d0a4a3d68d365c8058c17a71b46a39ff244f18d3506c109a4205b25b7e68c70
+      image: docker.io/library/busybox:latest
+      imageID: docker.io/library/busybox@sha256:37f7b378a29ceb4c551b1b5582e27747b855bbfaa73fa11914fe0df028dc581f
+      lastState: {}
+      name: test-container
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2025-05-16T04:29:03Z"
+    hostIP: 192.168.1.6
+    hostIPs:
+    - ip: 192.168.1.6
+    phase: Running
+    podIP: 10.244.0.211
+    podIPs:
+    - ip: 10.244.0.211
+    qosClass: BestEffort
+    startTime: "2025-05-16T04:29:01Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    creationTimestamp: "2025-05-14T01:47:03Z"
+    generateName: isocontrol-core-69bcc6976c-
+    labels:
+      app: isocontrol
+      env: prod
+      pod-template-hash: 69bcc6976c
+      role: core
+    name: isocontrol-core-69bcc6976c-98wvh
+    namespace: isocontrol-prod
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: isocontrol-core-69bcc6976c
+      uid: 14fac8f7-8eda-4d7c-8f85-7785d23dc97e
+    resourceVersion: "2894661"
+    uid: d5da4531-bc21-44a3-852b-508d6f575652
+  spec:
+    containers:
+    - env:
+      - name: PROBE_LIVENESS_PATH
+        value: /healthz
+      - name: PROBE_READINESS_PATH
+        value: /ready
+      - name: PROBE_STARTUP_PATH
+        value: /startup
+      - name: APP_PORT
+        value: "8080"
+      image: localhost:5001/isocontrol-app:latest
+      imagePullPolicy: Always
+      livenessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /healthz
+          port: 8080
+          scheme: HTTP
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 3
+      name: isocontrol-app
+      ports:
+      - containerPort: 8080
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 2
+        httpGet:
+          path: /ready
+          port: 8080
+          scheme: HTTP
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        successThreshold: 1
+        timeoutSeconds: 2
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 250m
+          memory: 256Mi
+      startupProbe:
+        failureThreshold: 10
+        httpGet:
+          path: /startup
+          port: 8080
+          scheme: HTTP
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 1
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-q8nx8
+        readOnly: true
+    - env:
+      - name: OPERATOR_API
+        value: http://admin-api.isocontrol.svc.cluster.local:8080/alert
+      - name: CHECK_INTERVAL
+        value: "20"
+      image: localhost:5001/sidecar-monitor:latest
+      imagePullPolicy: Always
+      name: sidecar-monitor
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 50m
+          memory: 64Mi
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-q8nx8
+        readOnly: true
+    - env:
+      - name: TARGET_URL
+        value: http://isocontrol-core:8080/healthz
+      - name: OPERATOR_API
+        value: http://admin-api.isocontrol.svc.cluster.local:8080/alert
+      - name: CHECK_INTERVAL
+        value: "20"
+      - name: LATENCY_THRESHOLD
+        value: "500"
+      image: localhost:5001/sidecar-latency:latest
+      imagePullPolicy: Always
+      name: sidecar-latency
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 50m
+          memory: 64Mi
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-q8nx8
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: plogscope-server
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - name: kube-api-access-q8nx8
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-14T01:47:04Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-14T01:47:03Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-14T01:47:03Z"
+      message: 'containers with unready status: [isocontrol-app]'
+      reason: ContainersNotReady
+      status: "False"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-14T01:47:03Z"
+      message: 'containers with unready status: [isocontrol-app]'
+      reason: ContainersNotReady
+      status: "False"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-14T01:47:03Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - image: localhost:5001/isocontrol-app:latest
+      imageID: ""
+      lastState: {}
+      name: isocontrol-app
+      ready: false
+      restartCount: 0
+      started: false
+      state:
+        waiting:
+          message: Back-off pulling image "localhost:5001/isocontrol-app:latest"
+          reason: ImagePullBackOff
+    - containerID: containerd://e5fd1820c11e7c8f666680d9c4500b2f89add7c4f92528e8540bcb152e3742c7
+      image: localhost:5001/sidecar-latency:latest
+      imageID: localhost:5001/sidecar-latency@sha256:6677f8a622ad554c834657fb00ff6f733396b46de6f21af944f18ae3e14ac9dd
+      lastState:
+        terminated:
+          containerID: containerd://8c5054a3a1a0ca8199fabd0fcfd9ef0a49e62c4fe640c9e62bbfaac12fbc81fd
+          exitCode: 1
+          finishedAt: "2025-05-16T04:32:42Z"
+          reason: Error
+          startedAt: "2025-05-16T04:31:59Z"
+      name: sidecar-latency
+      ready: true
+      restartCount: 529
+      started: true
+      state:
+        running:
+          startedAt: "2025-05-16T04:37:52Z"
+    - containerID: containerd://87f156dd2150062e5158d5f46292ef6be6e67b43d1a846957dc8e5a84689f33b
+      image: localhost:5001/sidecar-monitor:latest
+      imageID: localhost:5001/sidecar-monitor@sha256:a0445d2e9769bc778fed568e429b866b6fa0d3381f929138fcccef613df0be0b
+      lastState: {}
+      name: sidecar-monitor
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2025-05-14T01:47:03Z"
+    hostIP: 192.168.1.6
+    hostIPs:
+    - ip: 192.168.1.6
+    phase: Pending
+    podIP: 10.244.0.206
+    podIPs:
+    - ip: 10.244.0.206
+    qosClass: Burstable
+    startTime: "2025-05-14T01:47:03Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    creationTimestamp: "2025-05-13T07:05:30Z"
+    generateName: isocontrol-core-765dff4b7-
+    labels:
+      app: isocontrol
+      env: prod
+      pod-template-hash: 765dff4b7
+      role: core
+    name: isocontrol-core-765dff4b7-lbn6d
+    namespace: isocontrol-prod
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: isocontrol-core-765dff4b7
+      uid: 1c88e310-1857-465e-8147-cf3ab1490871
+    resourceVersion: "2894624"
+    uid: d3992b0b-4acb-4529-9930-f51787c914c3
+  spec:
+    containers:
+    - env:
+      - name: PROBE_LIVENESS_PATH
+        value: /healthz
+      - name: PROBE_READINESS_PATH
+        value: /ready
+      - name: PROBE_STARTUP_PATH
+        value: /startup
+      - name: APP_PORT
+        value: "8080"
+      image: nginx:latest
+      imagePullPolicy: Always
+      livenessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /healthz
+          port: 8080
+          scheme: HTTP
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 3
+      name: isocontrol-app
+      ports:
+      - containerPort: 8080
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 2
+        httpGet:
+          path: /ready
+          port: 8080
+          scheme: HTTP
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        successThreshold: 1
+        timeoutSeconds: 2
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 250m
+          memory: 256Mi
+      startupProbe:
+        failureThreshold: 10
+        httpGet:
+          path: /startup
+          port: 8080
+          scheme: HTTP
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 1
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-rl9vt
+        readOnly: true
+    - env:
+      - name: OPERATOR_API
+        value: http://admin-api.isocontrol.svc.cluster.local:8080/alert
+      - name: CHECK_INTERVAL
+        value: "20"
+      image: localhost:5001/sidecar-monitor:latest
+      imagePullPolicy: Always
+      name: sidecar-monitor
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 50m
+          memory: 64Mi
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-rl9vt
+        readOnly: true
+    - env:
+      - name: TARGET_URL
+        value: http://isocontrol-core:8080/healthz
+      - name: OPERATOR_API
+        value: http://admin-api.isocontrol.svc.cluster.local:8080/alert
+      - name: CHECK_INTERVAL
+        value: "20"
+      - name: LATENCY_THRESHOLD
+        value: "500"
+      image: localhost:5001/sidecar-latency:latest
+      imagePullPolicy: Always
+      name: sidecar-latency
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 50m
+          memory: 64Mi
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-rl9vt
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: plogscope-server
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - name: kube-api-access-rl9vt
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-13T07:05:34Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-13T07:05:30Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-13T07:05:30Z"
+      message: 'containers with unready status: [isocontrol-app]'
+      reason: ContainersNotReady
+      status: "False"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-13T07:05:30Z"
+      message: 'containers with unready status: [isocontrol-app]'
+      reason: ContainersNotReady
+      status: "False"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-13T07:05:30Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://0a4f094ba1a9e20255068e961941592dbe37507f29e0f50af581b6a7f2cee187
+      image: docker.io/library/nginx:latest
+      imageID: docker.io/library/nginx@sha256:c15da6c91de8d2f436196f3a768483ad32c258ed4e1beb3d367a27ed67253e66
+      lastState:
+        terminated:
+          containerID: containerd://0a4f094ba1a9e20255068e961941592dbe37507f29e0f50af581b6a7f2cee187
+          exitCode: 0
+          finishedAt: "2025-05-16T04:34:11Z"
+          reason: Completed
+          startedAt: "2025-05-16T04:32:32Z"
+      name: isocontrol-app
+      ready: false
+      restartCount: 996
+      started: false
+      state:
+        waiting:
+          message: back-off 5m0s restarting failed container=isocontrol-app pod=isocontrol-core-765dff4b7-lbn6d_isocontrol-prod(d3992b0b-4acb-4529-9930-f51787c914c3)
+          reason: CrashLoopBackOff
+    - containerID: containerd://07055a790b33c2f28e1dc13f27b5d3aae82a6a586a9b61015d1d3087eb7ab509
+      image: localhost:5001/sidecar-latency:latest
+      imageID: localhost:5001/sidecar-latency@sha256:6677f8a622ad554c834657fb00ff6f733396b46de6f21af944f18ae3e14ac9dd
+      lastState:
+        terminated:
+          containerID: containerd://6a40fb27ea93cf36679e1640a2faf9ce75e9ee6d81a71901cca6c8aa80ccf06e
+          exitCode: 1
+          finishedAt: "2025-05-16T04:32:23Z"
+          reason: Error
+          startedAt: "2025-05-16T04:31:40Z"
+      name: sidecar-latency
+      ready: true
+      restartCount: 722
+      started: true
+      state:
+        running:
+          startedAt: "2025-05-16T04:37:27Z"
+    - containerID: containerd://d37b87723fd16a42c4e9d4ec9a56d1e13675d6d84dee01f4973e66967bdafebf
+      image: localhost:5001/sidecar-monitor:latest
+      imageID: localhost:5001/sidecar-monitor@sha256:a0445d2e9769bc778fed568e429b866b6fa0d3381f929138fcccef613df0be0b
+      lastState:
+        terminated:
+          containerID: containerd://bfa9a3156f872ea586ddf49210f6f12cfd818ab2280947a5c52a3221a5eba156
+          exitCode: 137
+          finishedAt: "2025-05-14T01:10:50Z"
+          reason: Error
+          startedAt: "2025-05-13T07:05:33Z"
+      name: sidecar-monitor
+      ready: true
+      restartCount: 1
+      started: true
+      state:
+        running:
+          startedAt: "2025-05-14T01:10:53Z"
+    hostIP: 192.168.1.6
+    hostIPs:
+    - ip: 192.168.1.6
+    phase: Running
+    podIP: 10.244.0.205
+    podIPs:
+    - ip: 10.244.0.205
+    qosClass: Burstable
+    startTime: "2025-05-13T07:05:30Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Pod","metadata":{"annotations":{},"labels":{"app":"test"},"name":"test-pod","namespace":"isocontrol-prod"},"spec":{"containers":[{"image":"nginx:latest","livenessProbe":{"httpGet":{"path":"/healthz","port":80},"initialDelaySeconds":5,"periodSeconds":5},"name":"test-container","ports":[{"containerPort":80}],"readinessProbe":{"httpGet":{"path":"/ready","port":80},"initialDelaySeconds":5,"periodSeconds":5},"startupProbe":{"httpGet":{"path":"/startup","port":80},"initialDelaySeconds":5,"periodSeconds":5},"volumeMounts":[{"mountPath":"/var/log/events","name":"event-log"}]}],"initContainers":[{"command":["sh","-c","mkdir -p /var/log/events \u0026\u0026 touch /var/log/events/event.log"],"image":"busybox","name":"init-event-log","volumeMounts":[{"mountPath":"/var/log/events","name":"event-log"}]}],"volumes":[{"emptyDir":{},"name":"event-log"}]}}
+    creationTimestamp: "2025-05-15T02:47:02Z"
+    labels:
+      app: test
+    name: test-pod
+    namespace: isocontrol-prod
+    resourceVersion: "2894406"
+    uid: 65bc4366-15fe-4ffd-a556-7a560519ba4f
+  spec:
+    containers:
+    - image: nginx:latest
+      imagePullPolicy: Always
+      livenessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /healthz
+          port: 80
+          scheme: HTTP
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        successThreshold: 1
+        timeoutSeconds: 1
+      name: test-container
+      ports:
+      - containerPort: 80
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /ready
+          port: 80
+          scheme: HTTP
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        successThreshold: 1
+        timeoutSeconds: 1
+      resources: {}
+      startupProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /startup
+          port: 80
+          scheme: HTTP
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        successThreshold: 1
+        timeoutSeconds: 1
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/log/events
+        name: event-log
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-wp78f
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    initContainers:
+    - command:
+      - sh
+      - -c
+      - mkdir -p /var/log/events && touch /var/log/events/event.log
+      image: busybox
+      imagePullPolicy: Always
+      name: init-event-log
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/log/events
+        name: event-log
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-wp78f
+        readOnly: true
+    nodeName: plogscope-server
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - emptyDir: {}
+      name: event-log
+    - name: kube-api-access-wp78f
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-15T02:47:07Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-15T02:47:07Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-15T02:47:02Z"
+      message: 'containers with unready status: [test-container]'
+      reason: ContainersNotReady
+      status: "False"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-15T02:47:02Z"
+      message: 'containers with unready status: [test-container]'
+      reason: ContainersNotReady
+      status: "False"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-15T02:47:02Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://0a27af69d6dd8ffe1d4fe62a80b5ce77fb167e38fc7af4b2a3d940fc15583e46
+      image: docker.io/library/nginx:latest
+      imageID: docker.io/library/nginx@sha256:c15da6c91de8d2f436196f3a768483ad32c258ed4e1beb3d367a27ed67253e66
+      lastState:
+        terminated:
+          containerID: containerd://0a27af69d6dd8ffe1d4fe62a80b5ce77fb167e38fc7af4b2a3d940fc15583e46
+          exitCode: 0
+          finishedAt: "2025-05-16T04:34:52Z"
+          reason: Completed
+          startedAt: "2025-05-16T04:34:34Z"
+      name: test-container
+      ready: false
+      restartCount: 543
+      started: false
+      state:
+        waiting:
+          message: back-off 5m0s restarting failed container=test-container pod=test-pod_isocontrol-prod(65bc4366-15fe-4ffd-a556-7a560519ba4f)
+          reason: CrashLoopBackOff
+    hostIP: 192.168.1.6
+    hostIPs:
+    - ip: 192.168.1.6
+    initContainerStatuses:
+    - containerID: containerd://26e550c1059c7ced707aad90eba990a60019ef884d9e04a0af488b988ebec221
+      image: docker.io/library/busybox:latest
+      imageID: docker.io/library/busybox@sha256:37f7b378a29ceb4c551b1b5582e27747b855bbfaa73fa11914fe0df028dc581f
+      lastState: {}
+      name: init-event-log
+      ready: true
+      restartCount: 0
+      started: false
+      state:
+        terminated:
+          containerID: containerd://26e550c1059c7ced707aad90eba990a60019ef884d9e04a0af488b988ebec221
+          exitCode: 0
+          finishedAt: "2025-05-15T02:47:07Z"
+          reason: Completed
+          startedAt: "2025-05-15T02:47:07Z"
+    phase: Running
+    podIP: 10.244.0.209
+    podIPs:
+    - ip: 10.244.0.209
+    qosClass: BestEffort
+    startTime: "2025-05-15T02:47:02Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    creationTimestamp: "2025-05-03T04:25:51Z"
+    generateName: isocontrol-core-64d966bdb6-
+    labels:
+      app: isocontrol
+      pod-template-hash: 64d966bdb6
+    name: isocontrol-core-64d966bdb6-2kwqm
+    namespace: isocontrol
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: isocontrol-core-64d966bdb6
+      uid: e5b09fed-4449-493d-961e-b7243c595fba
+    resourceVersion: "2894656"
+    uid: 1d7b7ccb-55a6-4f8a-a774-bcc9f79f1af2
+  spec:
+    containers:
+    - image: nginx:latest
+      imagePullPolicy: Always
+      livenessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /healthz
+          port: 8080
+          scheme: HTTP
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 3
+      name: isocontrol-app
+      ports:
+      - containerPort: 8080
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 2
+        httpGet:
+          path: /ready
+          port: 8080
+          scheme: HTTP
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        successThreshold: 1
+        timeoutSeconds: 2
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 250m
+          memory: 256Mi
+      startupProbe:
+        failureThreshold: 10
+        httpGet:
+          path: /startup
+          port: 8080
+          scheme: HTTP
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 1
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-w9l5q
+        readOnly: true
+    - env:
+      - name: OPERATOR_API
+        value: http://admin-api.isocontrol.svc.cluster.local:8080/alert
+      - name: CHECK_INTERVAL
+        value: "20"
+      image: localhost:5000/sidecar-monitor:latest
+      imagePullPolicy: Always
+      name: sidecar-monitor
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 50m
+          memory: 64Mi
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-w9l5q
+        readOnly: true
+    - env:
+      - name: TARGET_URL
+        value: http://isocontrol-core:8080/healthz
+      - name: OPERATOR_API
+        value: http://admin-api.isocontrol.svc.cluster.local:8080/alert
+      - name: CHECK_INTERVAL
+        value: "20"
+      - name: LATENCY_THRESHOLD
+        value: "500"
+      image: localhost:5000/sidecar-latency:latest
+      imagePullPolicy: Always
+      name: sidecar-latency
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 50m
+          memory: 64Mi
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-w9l5q
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: plogscope-server
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - name: kube-api-access-w9l5q
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-11T13:11:37Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-11T13:11:27Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-11T13:11:27Z"
+      message: 'containers with unready status: [isocontrol-app sidecar-monitor sidecar-latency]'
+      reason: ContainersNotReady
+      status: "False"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-11T13:11:27Z"
+      message: 'containers with unready status: [isocontrol-app sidecar-monitor sidecar-latency]'
+      reason: ContainersNotReady
+      status: "False"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-11T13:11:13Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://4173c73227a897a3c8f7bcfe3d9dc5376ee0bbfd9eacf8ceb8e353fe9cbab90e
+      image: docker.io/library/nginx:latest
+      imageID: docker.io/library/nginx@sha256:c15da6c91de8d2f436196f3a768483ad32c258ed4e1beb3d367a27ed67253e66
+      lastState:
+        terminated:
+          containerID: containerd://a75d3e4248e568ccfc59b5d4d23ed22db0885f2373d80a9faaa2d97edf0c362c
+          exitCode: 0
+          finishedAt: "2025-05-16T04:37:48Z"
+          reason: Completed
+          startedAt: "2025-05-16T04:36:14Z"
+      name: isocontrol-app
+      ready: false
+      restartCount: 1595
+      started: false
+      state:
+        running:
+          startedAt: "2025-05-16T04:37:49Z"
+    - image: localhost:5000/sidecar-latency:latest
+      imageID: ""
+      lastState: {}
+      name: sidecar-latency
+      ready: false
+      restartCount: 0
+      started: false
+      state:
+        waiting:
+          message: Back-off pulling image "localhost:5000/sidecar-latency:latest"
+          reason: ImagePullBackOff
+    - image: localhost:5000/sidecar-monitor:latest
+      imageID: ""
+      lastState: {}
+      name: sidecar-monitor
+      ready: false
+      restartCount: 0
+      started: false
+      state:
+        waiting:
+          message: Back-off pulling image "localhost:5000/sidecar-monitor:latest"
+          reason: ImagePullBackOff
+    hostIP: 192.168.1.6
+    hostIPs:
+    - ip: 192.168.1.6
+    phase: Pending
+    podIP: 10.244.0.184
+    podIPs:
+    - ip: 10.244.0.184
+    qosClass: Burstable
+    startTime: "2025-05-11T13:11:27Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    creationTimestamp: "2025-05-03T04:25:51Z"
+    generateName: isocontrol-core-7b84b5cb74-
+    labels:
+      app: isocontrol
+      pod-template-hash: 7b84b5cb74
+    name: isocontrol-core-7b84b5cb74-ql7h9
+    namespace: isocontrol
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: isocontrol-core-7b84b5cb74
+      uid: 015c3dea-5484-4344-b33c-2a603c382da2
+    resourceVersion: "2894504"
+    uid: c5be72b3-60e2-49b4-9bfb-f02e0adf6506
+  spec:
+    containers:
+    - image: localhost:5000/isocontrol:latest
+      imagePullPolicy: Always
+      livenessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /healthz
+          port: 8080
+          scheme: HTTP
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 3
+      name: isocontrol-app
+      ports:
+      - containerPort: 8080
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 2
+        httpGet:
+          path: /ready
+          port: 8080
+          scheme: HTTP
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        successThreshold: 1
+        timeoutSeconds: 2
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 250m
+          memory: 256Mi
+      startupProbe:
+        failureThreshold: 10
+        httpGet:
+          path: /startup
+          port: 8080
+          scheme: HTTP
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 1
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-jdcl8
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: plogscope-server
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - name: kube-api-access-jdcl8
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-11T13:11:37Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-11T13:11:27Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-11T13:11:27Z"
+      message: 'containers with unready status: [isocontrol-app]'
+      reason: ContainersNotReady
+      status: "False"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-11T13:11:27Z"
+      message: 'containers with unready status: [isocontrol-app]'
+      reason: ContainersNotReady
+      status: "False"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-11T13:11:13Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - image: localhost:5000/isocontrol:latest
+      imageID: ""
+      lastState: {}
+      name: isocontrol-app
+      ready: false
+      restartCount: 0
+      started: false
+      state:
+        waiting:
+          message: Back-off pulling image "localhost:5000/isocontrol:latest"
+          reason: ImagePullBackOff
+    hostIP: 192.168.1.6
+    hostIPs:
+    - ip: 192.168.1.6
+    phase: Pending
+    podIP: 10.244.0.186
+    podIPs:
+    - ip: 10.244.0.186
+    qosClass: Burstable
+    startTime: "2025-05-11T13:11:27Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    creationTimestamp: "2025-05-13T05:48:03Z"
+    generateName: kube-flannel-ds-
+    labels:
+      app: flannel
+      controller-revision-hash: 665448f95b
+      pod-template-generation: "1"
+      tier: node
+    name: kube-flannel-ds-ksw28
+    namespace: kube-flannel
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: DaemonSet
+      name: kube-flannel-ds
+      uid: 5b9c3bfa-f2d5-4d05-8ab9-310a96e50f99
+    resourceVersion: "2546433"
+    uid: 8014ac1c-243d-4945-a522-0147526c0edc
+  spec:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchFields:
+            - key: metadata.name
+              operator: In
+              values:
+              - plogscope-server
+    containers:
+    - args:
+      - --ip-masq
+      - --kube-subnet-mgr
+      command:
+      - /opt/bin/flanneld
+      env:
+      - name: POD_NAME
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: metadata.name
+      - name: POD_NAMESPACE
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: metadata.namespace
+      - name: EVENT_QUEUE_DEPTH
+        value: "5000"
+      image: ghcr.io/flannel-io/flannel:v0.26.7
+      imagePullPolicy: IfNotPresent
+      name: kube-flannel
+      resources:
+        requests:
+          cpu: 100m
+          memory: 50Mi
+      securityContext:
+        capabilities:
+          add:
+          - NET_ADMIN
+          - NET_RAW
+        privileged: false
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /run/flannel
+        name: run
+      - mountPath: /etc/kube-flannel/
+        name: flannel-cfg
+      - mountPath: /run/xtables.lock
+        name: xtables-lock
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-wtgnf
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    hostNetwork: true
+    initContainers:
+    - args:
+      - -f
+      - /flannel
+      - /opt/cni/bin/flannel
+      command:
+      - cp
+      image: ghcr.io/flannel-io/flannel-cni-plugin:v1.6.2-flannel1
+      imagePullPolicy: IfNotPresent
+      name: install-cni-plugin
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /opt/cni/bin
+        name: cni-plugin
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-wtgnf
+        readOnly: true
+    - args:
+      - -f
+      - /etc/kube-flannel/cni-conf.json
+      - /etc/cni/net.d/10-flannel.conflist
+      command:
+      - cp
+      image: ghcr.io/flannel-io/flannel:v0.26.7
+      imagePullPolicy: IfNotPresent
+      name: install-cni
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /etc/cni/net.d
+        name: cni
+      - mountPath: /etc/kube-flannel/
+        name: flannel-cfg
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-wtgnf
+        readOnly: true
+    nodeName: plogscope-server
+    preemptionPolicy: PreemptLowerPriority
+    priority: 2000001000
+    priorityClassName: system-node-critical
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: flannel
+    serviceAccountName: flannel
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/disk-pressure
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/memory-pressure
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/pid-pressure
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/unschedulable
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/network-unavailable
+      operator: Exists
+    volumes:
+    - hostPath:
+        path: /run/flannel
+        type: ""
+      name: run
+    - hostPath:
+        path: /opt/cni/bin
+        type: ""
+      name: cni-plugin
+    - hostPath:
+        path: /etc/cni/net.d
+        type: ""
+      name: cni
+    - configMap:
+        defaultMode: 420
+        name: kube-flannel-cfg
+      name: flannel-cfg
+    - hostPath:
+        path: /run/xtables.lock
+        type: FileOrCreate
+      name: xtables-lock
+    - name: kube-api-access-wtgnf
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-13T05:48:04Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-13T05:48:05Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-13T05:48:06Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-13T05:48:06Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-13T05:48:03Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://95bbaec319f80f351f0b41f76cadd4905c2c71b608e13bc5c197100cfc66b7d7
+      image: ghcr.io/flannel-io/flannel:v0.26.7
+      imageID: ghcr.io/flannel-io/flannel@sha256:7f471907fa940f944867270de4ed78121b8b4c5d564e17f940dc787cb16dea82
+      lastState: {}
+      name: kube-flannel
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2025-05-13T05:48:05Z"
+    hostIP: 192.168.1.6
+    hostIPs:
+    - ip: 192.168.1.6
+    initContainerStatuses:
+    - containerID: containerd://f3cbddd9354a5209cd161279ab50158cd721a1f12e193b701f2973a0b9463da4
+      image: ghcr.io/flannel-io/flannel-cni-plugin:v1.6.2-flannel1
+      imageID: ghcr.io/flannel-io/flannel-cni-plugin@sha256:f1812994f0edbcb5bb5ccb63be2147ba6ad10e1faaa7ca9fcdad4f441739d84f
+      lastState: {}
+      name: install-cni-plugin
+      ready: true
+      restartCount: 0
+      started: false
+      state:
+        terminated:
+          containerID: containerd://f3cbddd9354a5209cd161279ab50158cd721a1f12e193b701f2973a0b9463da4
+          exitCode: 0
+          finishedAt: "2025-05-13T05:48:03Z"
+          reason: Completed
+          startedAt: "2025-05-13T05:48:03Z"
+    - containerID: containerd://8c4b16b434e498d1c3edcbf17971fd6baaf1869cfba89794b3421bcc6f1f596e
+      image: ghcr.io/flannel-io/flannel:v0.26.7
+      imageID: ghcr.io/flannel-io/flannel@sha256:7f471907fa940f944867270de4ed78121b8b4c5d564e17f940dc787cb16dea82
+      lastState: {}
+      name: install-cni
+      ready: true
+      restartCount: 0
+      started: false
+      state:
+        terminated:
+          containerID: containerd://8c4b16b434e498d1c3edcbf17971fd6baaf1869cfba89794b3421bcc6f1f596e
+          exitCode: 0
+          finishedAt: "2025-05-13T05:48:04Z"
+          reason: Completed
+          startedAt: "2025-05-13T05:48:04Z"
+    phase: Running
+    podIP: 192.168.1.6
+    podIPs:
+    - ip: 192.168.1.6
+    qosClass: Burstable
+    startTime: "2025-05-13T05:48:03Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    creationTimestamp: "2025-04-21T02:09:55Z"
+    generateName: coredns-76f75df574-
+    labels:
+      k8s-app: kube-dns
+      pod-template-hash: 76f75df574
+    name: coredns-76f75df574-fnln6
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: coredns-76f75df574
+      uid: d1a627a6-7cb4-4422-811f-50ccb28496a1
+    resourceVersion: "2640359"
+    uid: 530bc0b1-7f4b-4848-9542-854593e57821
+  spec:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: k8s-app
+                operator: In
+                values:
+                - kube-dns
+            topologyKey: kubernetes.io/hostname
+          weight: 100
+    containers:
+    - args:
+      - -conf
+      - /etc/coredns/Corefile
+      image: registry.k8s.io/coredns/coredns:v1.11.1
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 5
+        httpGet:
+          path: /health
+          port: 8080
+          scheme: HTTP
+        initialDelaySeconds: 60
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5
+      name: coredns
+      ports:
+      - containerPort: 53
+        name: dns
+        protocol: UDP
+      - containerPort: 53
+        name: dns-tcp
+        protocol: TCP
+      - containerPort: 9153
+        name: metrics
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /ready
+          port: 8181
+          scheme: HTTP
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 1
+      resources:
+        limits:
+          memory: 170Mi
+        requests:
+          cpu: 100m
+          memory: 70Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          add:
+          - NET_BIND_SERVICE
+          drop:
+          - ALL
+        readOnlyRootFilesystem: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /etc/coredns
+        name: config-volume
+        readOnly: true
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-wsdxg
+        readOnly: true
+    dnsPolicy: Default
+    enableServiceLinks: true
+    nodeName: plogscope-server
+    nodeSelector:
+      kubernetes.io/os: linux
+    preemptionPolicy: PreemptLowerPriority
+    priority: 2000000000
+    priorityClassName: system-cluster-critical
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: coredns
+    serviceAccountName: coredns
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/control-plane
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - configMap:
+        defaultMode: 420
+        items:
+        - key: Corefile
+          path: Corefile
+        name: coredns
+      name: config-volume
+    - name: kube-api-access-wsdxg
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-04-21T02:27:12Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-04-21T02:14:18Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-14T01:10:54Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-14T01:10:54Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-04-21T02:14:18Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://2690ee338149097a6816c6fe47e1ce414bd773406b268700e6a29f48d016d85b
+      image: registry.k8s.io/coredns/coredns:v1.11.1
+      imageID: registry.k8s.io/coredns/coredns@sha256:1eeb4c7316bacb1d4c8ead65571cd92dd21e27359f0d4917f1a5822a73b75db1
+      lastState:
+        terminated:
+          containerID: containerd://56aab9332bfa1e09930315ddc1bf292f5899eb49814ff88ce58eabdfcd5e4540
+          exitCode: 137
+          finishedAt: "2025-05-14T01:10:50Z"
+          reason: Error
+          startedAt: "2025-04-29T01:42:32Z"
+      name: coredns
+      ready: true
+      restartCount: 2
+      started: true
+      state:
+        running:
+          startedAt: "2025-05-14T01:10:52Z"
+    hostIP: 192.168.1.6
+    hostIPs:
+    - ip: 192.168.1.6
+    phase: Running
+    podIP: 10.244.0.4
+    podIPs:
+    - ip: 10.244.0.4
+    qosClass: Burstable
+    startTime: "2025-04-21T02:14:18Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    creationTimestamp: "2025-04-21T02:09:55Z"
+    generateName: coredns-76f75df574-
+    labels:
+      k8s-app: kube-dns
+      pod-template-hash: 76f75df574
+    name: coredns-76f75df574-ph9fz
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: coredns-76f75df574
+      uid: d1a627a6-7cb4-4422-811f-50ccb28496a1
+    resourceVersion: "2640358"
+    uid: 9e4df583-2bf9-476b-b2fb-59098d7a3b7a
+  spec:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: k8s-app
+                operator: In
+                values:
+                - kube-dns
+            topologyKey: kubernetes.io/hostname
+          weight: 100
+    containers:
+    - args:
+      - -conf
+      - /etc/coredns/Corefile
+      image: registry.k8s.io/coredns/coredns:v1.11.1
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 5
+        httpGet:
+          path: /health
+          port: 8080
+          scheme: HTTP
+        initialDelaySeconds: 60
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5
+      name: coredns
+      ports:
+      - containerPort: 53
+        name: dns
+        protocol: UDP
+      - containerPort: 53
+        name: dns-tcp
+        protocol: TCP
+      - containerPort: 9153
+        name: metrics
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /ready
+          port: 8181
+          scheme: HTTP
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 1
+      resources:
+        limits:
+          memory: 170Mi
+        requests:
+          cpu: 100m
+          memory: 70Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          add:
+          - NET_BIND_SERVICE
+          drop:
+          - ALL
+        readOnlyRootFilesystem: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /etc/coredns
+        name: config-volume
+        readOnly: true
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-sg2dd
+        readOnly: true
+    dnsPolicy: Default
+    enableServiceLinks: true
+    nodeName: plogscope-server
+    nodeSelector:
+      kubernetes.io/os: linux
+    preemptionPolicy: PreemptLowerPriority
+    priority: 2000000000
+    priorityClassName: system-cluster-critical
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: coredns
+    serviceAccountName: coredns
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/control-plane
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - configMap:
+        defaultMode: 420
+        items:
+        - key: Corefile
+          path: Corefile
+        name: coredns
+      name: config-volume
+    - name: kube-api-access-sg2dd
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-04-21T02:27:12Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-04-21T02:14:18Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-14T01:10:54Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-14T01:10:54Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-04-21T02:14:18Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://c8a73acf2c9ef06e555cb8e081f07124cc6bbd92ea30613b8a7e1a68e8874c43
+      image: registry.k8s.io/coredns/coredns:v1.11.1
+      imageID: registry.k8s.io/coredns/coredns@sha256:1eeb4c7316bacb1d4c8ead65571cd92dd21e27359f0d4917f1a5822a73b75db1
+      lastState:
+        terminated:
+          containerID: containerd://49e9ec2999d0121883083ff4dbddad0f3f75745bd42a62c3bd71bb41b4c8ee96
+          exitCode: 137
+          finishedAt: "2025-05-14T01:10:50Z"
+          reason: Error
+          startedAt: "2025-04-29T01:42:32Z"
+      name: coredns
+      ready: true
+      restartCount: 2
+      started: true
+      state:
+        running:
+          startedAt: "2025-05-14T01:10:52Z"
+    hostIP: 192.168.1.6
+    hostIPs:
+    - ip: 192.168.1.6
+    phase: Running
+    podIP: 10.244.0.2
+    podIPs:
+    - ip: 10.244.0.2
+    qosClass: Burstable
+    startTime: "2025-04-21T02:14:18Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubeadm.kubernetes.io/etcd.advertise-client-urls: https://192.168.1.6:2379
+      kubernetes.io/config.hash: f302e9bd4aa3b22431384f7e94a0c3c6
+      kubernetes.io/config.mirror: f302e9bd4aa3b22431384f7e94a0c3c6
+      kubernetes.io/config.seen: "2025-04-21T11:09:42.572485833+09:00"
+      kubernetes.io/config.source: file
+    creationTimestamp: "2025-04-21T02:09:42Z"
+    labels:
+      component: etcd
+      tier: control-plane
+    name: etcd-plogscope-server
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: v1
+      controller: true
+      kind: Node
+      name: plogscope-server
+      uid: 7841cf5c-725c-4f53-9f33-56a2b91590eb
+    resourceVersion: "2546076"
+    uid: d74ed751-9b99-4843-9757-92cc5ef325a6
+  spec:
+    containers:
+    - command:
+      - etcd
+      - --advertise-client-urls=https://192.168.1.6:2379
+      - --cert-file=/etc/kubernetes/pki/etcd/server.crt
+      - --client-cert-auth=true
+      - --data-dir=/var/lib/etcd
+      - --experimental-initial-corrupt-check=true
+      - --experimental-watch-progress-notify-interval=5s
+      - --initial-advertise-peer-urls=https://192.168.1.6:2380
+      - --initial-cluster=plogscope-server=https://192.168.1.6:2380
+      - --key-file=/etc/kubernetes/pki/etcd/server.key
+      - --listen-client-urls=https://127.0.0.1:2379,https://192.168.1.6:2379
+      - --listen-metrics-urls=http://127.0.0.1:2381
+      - --listen-peer-urls=https://192.168.1.6:2380
+      - --name=plogscope-server
+      - --peer-cert-file=/etc/kubernetes/pki/etcd/peer.crt
+      - --peer-client-cert-auth=true
+      - --peer-key-file=/etc/kubernetes/pki/etcd/peer.key
+      - --peer-trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt
+      - --snapshot-count=10000
+      - --trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt
+      image: registry.k8s.io/etcd:3.5.10-0
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 8
+        httpGet:
+          host: 127.0.0.1
+          path: /health?exclude=NOSPACE&serializable=true
+          port: 2381
+          scheme: HTTP
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 15
+      name: etcd
+      resources:
+        requests:
+          cpu: 100m
+          memory: 100Mi
+      startupProbe:
+        failureThreshold: 24
+        httpGet:
+          host: 127.0.0.1
+          path: /health?serializable=false
+          port: 2381
+          scheme: HTTP
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 15
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/lib/etcd
+        name: etcd-data
+      - mountPath: /etc/kubernetes/pki/etcd
+        name: etcd-certs
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    hostNetwork: true
+    nodeName: plogscope-server
+    preemptionPolicy: PreemptLowerPriority
+    priority: 2000001000
+    priorityClassName: system-node-critical
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      seccompProfile:
+        type: RuntimeDefault
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      operator: Exists
+    volumes:
+    - hostPath:
+        path: /etc/kubernetes/pki/etcd
+        type: DirectoryOrCreate
+      name: etcd-certs
+    - hostPath:
+        path: /var/lib/etcd
+        type: DirectoryOrCreate
+      name: etcd-data
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-02T08:28:34Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-02T08:28:34Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-11T13:06:33Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-11T13:06:33Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-02T08:28:34Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://d6ee49b01eac79ad66d96e5a7652269190fbe2708d8b88df607abeefa0a072e4
+      image: registry.k8s.io/etcd:3.5.10-0
+      imageID: registry.k8s.io/etcd@sha256:22f892d7672adc0b9c86df67792afdb8b2dc08880f49f669eaaa59c47d7908c2
+      lastState:
+        terminated:
+          containerID: containerd://298bae57812fe21c6ac10b7157229f084d42a7ae64562682fe2c965596d56b50
+          exitCode: 2
+          finishedAt: "2025-05-11T13:01:10Z"
+          reason: Error
+          startedAt: "2025-05-11T13:01:08Z"
+      name: etcd
+      ready: true
+      restartCount: 2
+      started: true
+      state:
+        running:
+          startedAt: "2025-05-11T13:06:14Z"
+    hostIP: 192.168.1.6
+    hostIPs:
+    - ip: 192.168.1.6
+    phase: Running
+    podIP: 192.168.1.6
+    podIPs:
+    - ip: 192.168.1.6
+    qosClass: Burstable
+    startTime: "2025-05-02T08:28:34Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubeadm.kubernetes.io/kube-apiserver.advertise-address.endpoint: 192.168.1.6:6443
+      kubernetes.io/config.hash: 84304a8917c777d5059dd1772c89ed3f
+      kubernetes.io/config.mirror: 84304a8917c777d5059dd1772c89ed3f
+      kubernetes.io/config.seen: "2025-04-21T11:09:34.428715454+09:00"
+      kubernetes.io/config.source: file
+    creationTimestamp: "2025-04-21T02:09:40Z"
+    labels:
+      component: kube-apiserver
+      tier: control-plane
+    name: kube-apiserver-plogscope-server
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: v1
+      controller: true
+      kind: Node
+      name: plogscope-server
+      uid: 7841cf5c-725c-4f53-9f33-56a2b91590eb
+    resourceVersion: "2546083"
+    uid: e2f5d34c-21af-4be3-a971-91fbccca87a5
+  spec:
+    containers:
+    - command:
+      - kube-apiserver
+      - --advertise-address=192.168.1.6
+      - --allow-privileged=true
+      - --authorization-mode=Node,RBAC
+      - --client-ca-file=/etc/kubernetes/pki/ca.crt
+      - --enable-admission-plugins=NodeRestriction
+      - --enable-bootstrap-token-auth=true
+      - --etcd-cafile=/etc/kubernetes/pki/etcd/ca.crt
+      - --etcd-certfile=/etc/kubernetes/pki/apiserver-etcd-client.crt
+      - --etcd-keyfile=/etc/kubernetes/pki/apiserver-etcd-client.key
+      - --etcd-servers=https://127.0.0.1:2379
+      - --kubelet-client-certificate=/etc/kubernetes/pki/apiserver-kubelet-client.crt
+      - --kubelet-client-key=/etc/kubernetes/pki/apiserver-kubelet-client.key
+      - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+      - --proxy-client-cert-file=/etc/kubernetes/pki/front-proxy-client.crt
+      - --proxy-client-key-file=/etc/kubernetes/pki/front-proxy-client.key
+      - --requestheader-allowed-names=front-proxy-client
+      - --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt
+      - --requestheader-extra-headers-prefix=X-Remote-Extra-
+      - --requestheader-group-headers=X-Remote-Group
+      - --requestheader-username-headers=X-Remote-User
+      - --secure-port=6443
+      - --service-account-issuer=https://kubernetes.default.svc.cluster.local
+      - --service-account-key-file=/etc/kubernetes/pki/sa.pub
+      - --service-account-signing-key-file=/etc/kubernetes/pki/sa.key
+      - --service-cluster-ip-range=10.96.0.0/12
+      - --tls-cert-file=/etc/kubernetes/pki/apiserver.crt
+      - --tls-private-key-file=/etc/kubernetes/pki/apiserver.key
+      image: registry.k8s.io/kube-apiserver:v1.29.15
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 8
+        httpGet:
+          host: 192.168.1.6
+          path: /livez
+          port: 6443
+          scheme: HTTPS
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 15
+      name: kube-apiserver
+      readinessProbe:
+        failureThreshold: 3
+        httpGet:
+          host: 192.168.1.6
+          path: /readyz
+          port: 6443
+          scheme: HTTPS
+        periodSeconds: 1
+        successThreshold: 1
+        timeoutSeconds: 15
+      resources:
+        requests:
+          cpu: 250m
+      startupProbe:
+        failureThreshold: 24
+        httpGet:
+          host: 192.168.1.6
+          path: /livez
+          port: 6443
+          scheme: HTTPS
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 15
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /etc/ssl/certs
+        name: ca-certs
+        readOnly: true
+      - mountPath: /etc/ca-certificates
+        name: etc-ca-certificates
+        readOnly: true
+      - mountPath: /etc/pki
+        name: etc-pki
+        readOnly: true
+      - mountPath: /etc/kubernetes/pki
+        name: k8s-certs
+        readOnly: true
+      - mountPath: /usr/local/share/ca-certificates
+        name: usr-local-share-ca-certificates
+        readOnly: true
+      - mountPath: /usr/share/ca-certificates
+        name: usr-share-ca-certificates
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    hostNetwork: true
+    nodeName: plogscope-server
+    preemptionPolicy: PreemptLowerPriority
+    priority: 2000001000
+    priorityClassName: system-node-critical
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      seccompProfile:
+        type: RuntimeDefault
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      operator: Exists
+    volumes:
+    - hostPath:
+        path: /etc/ssl/certs
+        type: DirectoryOrCreate
+      name: ca-certs
+    - hostPath:
+        path: /etc/ca-certificates
+        type: DirectoryOrCreate
+      name: etc-ca-certificates
+    - hostPath:
+        path: /etc/pki
+        type: DirectoryOrCreate
+      name: etc-pki
+    - hostPath:
+        path: /etc/kubernetes/pki
+        type: DirectoryOrCreate
+      name: k8s-certs
+    - hostPath:
+        path: /usr/local/share/ca-certificates
+        type: DirectoryOrCreate
+      name: usr-local-share-ca-certificates
+    - hostPath:
+        path: /usr/share/ca-certificates
+        type: DirectoryOrCreate
+      name: usr-share-ca-certificates
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-02T08:28:34Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-02T08:28:34Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-11T13:10:20Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-11T13:10:20Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-02T08:28:34Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://e5762b57c9bbf2df7802ea1b9e0ec39c72fd88f6c1c1663054edb29ecce0dcfd
+      image: registry.k8s.io/kube-apiserver:v1.29.15
+      imageID: registry.k8s.io/kube-apiserver@sha256:fd82c74e0773a10396055904753126411b3a9584cc453e1c7152c81018a933b6
+      lastState:
+        terminated:
+          containerID: containerd://cfe201defde2447b0aed568067c165be6f6968315a477de6efcb0c456850a101
+          exitCode: 255
+          finishedAt: "2025-05-11T13:05:02Z"
+          reason: Error
+          startedAt: "2025-05-11T13:04:41Z"
+      name: kube-apiserver
+      ready: true
+      restartCount: 3
+      started: true
+      state:
+        running:
+          startedAt: "2025-05-11T13:10:10Z"
+    hostIP: 192.168.1.6
+    hostIPs:
+    - ip: 192.168.1.6
+    phase: Running
+    podIP: 192.168.1.6
+    podIPs:
+    - ip: 192.168.1.6
+    qosClass: Burstable
+    startTime: "2025-05-02T08:28:34Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubernetes.io/config.hash: 118c17fb10bad9a032be58813298f89e
+      kubernetes.io/config.mirror: 118c17fb10bad9a032be58813298f89e
+      kubernetes.io/config.seen: "2025-04-21T11:09:34.428720754+09:00"
+      kubernetes.io/config.source: file
+    creationTimestamp: "2025-04-21T02:09:40Z"
+    labels:
+      component: kube-controller-manager
+      tier: control-plane
+    name: kube-controller-manager-plogscope-server
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: v1
+      controller: true
+      kind: Node
+      name: plogscope-server
+      uid: 7841cf5c-725c-4f53-9f33-56a2b91590eb
+    resourceVersion: "2796547"
+    uid: cc10d9ea-edd0-4537-bf69-b53c4b88d53e
+  spec:
+    containers:
+    - command:
+      - kube-controller-manager
+      - --allocate-node-cidrs=true
+      - --authentication-kubeconfig=/etc/kubernetes/controller-manager.conf
+      - --authorization-kubeconfig=/etc/kubernetes/controller-manager.conf
+      - --bind-address=127.0.0.1
+      - --client-ca-file=/etc/kubernetes/pki/ca.crt
+      - --cluster-cidr=10.244.0.0/16
+      - --cluster-name=kubernetes
+      - --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt
+      - --cluster-signing-key-file=/etc/kubernetes/pki/ca.key
+      - --controllers=*,bootstrapsigner,tokencleaner
+      - --kubeconfig=/etc/kubernetes/controller-manager.conf
+      - --leader-elect=true
+      - --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt
+      - --root-ca-file=/etc/kubernetes/pki/ca.crt
+      - --service-account-private-key-file=/etc/kubernetes/pki/sa.key
+      - --service-cluster-ip-range=10.96.0.0/12
+      - --use-service-account-credentials=true
+      image: registry.k8s.io/kube-controller-manager:v1.29.15
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 8
+        httpGet:
+          host: 127.0.0.1
+          path: /healthz
+          port: 10257
+          scheme: HTTPS
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 15
+      name: kube-controller-manager
+      resources:
+        requests:
+          cpu: 200m
+      startupProbe:
+        failureThreshold: 24
+        httpGet:
+          host: 127.0.0.1
+          path: /healthz
+          port: 10257
+          scheme: HTTPS
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 15
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /etc/ssl/certs
+        name: ca-certs
+        readOnly: true
+      - mountPath: /etc/ca-certificates
+        name: etc-ca-certificates
+        readOnly: true
+      - mountPath: /etc/pki
+        name: etc-pki
+        readOnly: true
+      - mountPath: /usr/libexec/kubernetes/kubelet-plugins/volume/exec
+        name: flexvolume-dir
+      - mountPath: /etc/kubernetes/pki
+        name: k8s-certs
+        readOnly: true
+      - mountPath: /etc/kubernetes/controller-manager.conf
+        name: kubeconfig
+        readOnly: true
+      - mountPath: /usr/local/share/ca-certificates
+        name: usr-local-share-ca-certificates
+        readOnly: true
+      - mountPath: /usr/share/ca-certificates
+        name: usr-share-ca-certificates
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    hostNetwork: true
+    nodeName: plogscope-server
+    preemptionPolicy: PreemptLowerPriority
+    priority: 2000001000
+    priorityClassName: system-node-critical
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      seccompProfile:
+        type: RuntimeDefault
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      operator: Exists
+    volumes:
+    - hostPath:
+        path: /etc/ssl/certs
+        type: DirectoryOrCreate
+      name: ca-certs
+    - hostPath:
+        path: /etc/ca-certificates
+        type: DirectoryOrCreate
+      name: etc-ca-certificates
+    - hostPath:
+        path: /etc/pki
+        type: DirectoryOrCreate
+      name: etc-pki
+    - hostPath:
+        path: /usr/libexec/kubernetes/kubelet-plugins/volume/exec
+        type: DirectoryOrCreate
+      name: flexvolume-dir
+    - hostPath:
+        path: /etc/kubernetes/pki
+        type: DirectoryOrCreate
+      name: k8s-certs
+    - hostPath:
+        path: /etc/kubernetes/controller-manager.conf
+        type: FileOrCreate
+      name: kubeconfig
+    - hostPath:
+        path: /usr/local/share/ca-certificates
+        type: DirectoryOrCreate
+      name: usr-local-share-ca-certificates
+    - hostPath:
+        path: /usr/share/ca-certificates
+        type: DirectoryOrCreate
+      name: usr-share-ca-certificates
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-02T08:28:34Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-02T08:28:34Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-15T08:47:12Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-15T08:47:12Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-02T08:28:34Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://14b122458cc9567376d8de4d05437f1ae86b373b861076e26b846fef1c6f338a
+      image: registry.k8s.io/kube-controller-manager:v1.29.15
+      imageID: registry.k8s.io/kube-controller-manager@sha256:4f05be2c0667d9f4975bcc43d5e136b2436946f84c8f7dc2d2da14392e761a71
+      lastState:
+        terminated:
+          containerID: containerd://a97166bd969d6a56fa3fd2d078f38067027591b6d1286261402727d6f1fae8bd
+          exitCode: 2
+          finishedAt: "2025-05-15T08:46:40Z"
+          reason: Error
+          startedAt: "2025-05-15T08:44:47Z"
+      name: kube-controller-manager
+      ready: true
+      restartCount: 8
+      started: true
+      state:
+        running:
+          startedAt: "2025-05-15T08:46:59Z"
+    hostIP: 192.168.1.6
+    hostIPs:
+    - ip: 192.168.1.6
+    phase: Running
+    podIP: 192.168.1.6
+    podIPs:
+    - ip: 192.168.1.6
+    qosClass: Burstable
+    startTime: "2025-05-02T08:28:34Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    creationTimestamp: "2025-04-21T02:09:54Z"
+    generateName: kube-proxy-
+    labels:
+      controller-revision-hash: 5787cd6d6c
+      k8s-app: kube-proxy
+      pod-template-generation: "1"
+    name: kube-proxy-rgtf8
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: DaemonSet
+      name: kube-proxy
+      uid: 2c0dc9c3-6889-4b59-8ae1-d818c78ffd99
+    resourceVersion: "2546077"
+    uid: aeba4882-66ed-4f75-8fa7-05081708f16f
+  spec:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchFields:
+            - key: metadata.name
+              operator: In
+              values:
+              - plogscope-server
+    containers:
+    - command:
+      - /usr/local/bin/kube-proxy
+      - --config=/var/lib/kube-proxy/config.conf
+      - --hostname-override=$(NODE_NAME)
+      env:
+      - name: NODE_NAME
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: spec.nodeName
+      image: registry.k8s.io/kube-proxy:v1.29.15
+      imagePullPolicy: IfNotPresent
+      name: kube-proxy
+      resources: {}
+      securityContext:
+        privileged: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/lib/kube-proxy
+        name: kube-proxy
+      - mountPath: /run/xtables.lock
+        name: xtables-lock
+      - mountPath: /lib/modules
+        name: lib-modules
+        readOnly: true
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-dpf2p
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    hostNetwork: true
+    nodeName: plogscope-server
+    nodeSelector:
+      kubernetes.io/os: linux
+    preemptionPolicy: PreemptLowerPriority
+    priority: 2000001000
+    priorityClassName: system-node-critical
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: kube-proxy
+    serviceAccountName: kube-proxy
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - operator: Exists
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/disk-pressure
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/memory-pressure
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/pid-pressure
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/unschedulable
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/network-unavailable
+      operator: Exists
+    volumes:
+    - configMap:
+        defaultMode: 420
+        name: kube-proxy
+      name: kube-proxy
+    - hostPath:
+        path: /run/xtables.lock
+        type: FileOrCreate
+      name: xtables-lock
+    - hostPath:
+        path: /lib/modules
+        type: ""
+      name: lib-modules
+    - name: kube-api-access-dpf2p
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-04-21T02:09:56Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-04-21T02:09:54Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-04-21T02:09:56Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-04-21T02:09:56Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-04-21T02:09:54Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://8d30f4fce85efc3debc1a8af6104e3fd110519a3deed6c67058df05d500e9b76
+      image: registry.k8s.io/kube-proxy:v1.29.15
+      imageID: registry.k8s.io/kube-proxy@sha256:243026cfce3209b89d9f883789108276ffec87d98190ac2a77776edd4e0e6015
+      lastState: {}
+      name: kube-proxy
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2025-04-21T02:09:56Z"
+    hostIP: 192.168.1.6
+    hostIPs:
+    - ip: 192.168.1.6
+    phase: Running
+    podIP: 192.168.1.6
+    podIPs:
+    - ip: 192.168.1.6
+    qosClass: BestEffort
+    startTime: "2025-04-21T02:09:54Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubernetes.io/config.hash: cbc8337277926372157cf4e3fa8431c4
+      kubernetes.io/config.mirror: cbc8337277926372157cf4e3fa8431c4
+      kubernetes.io/config.seen: "2025-04-21T11:09:42.572480657+09:00"
+      kubernetes.io/config.source: file
+    creationTimestamp: "2025-04-21T02:09:42Z"
+    labels:
+      component: kube-scheduler
+      tier: control-plane
+    name: kube-scheduler-plogscope-server
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: v1
+      controller: true
+      kind: Node
+      name: plogscope-server
+      uid: 7841cf5c-725c-4f53-9f33-56a2b91590eb
+    resourceVersion: "2546074"
+    uid: c7ec266f-b747-4f8b-90ec-f57c5ae2e032
+  spec:
+    containers:
+    - command:
+      - kube-scheduler
+      - --authentication-kubeconfig=/etc/kubernetes/scheduler.conf
+      - --authorization-kubeconfig=/etc/kubernetes/scheduler.conf
+      - --bind-address=127.0.0.1
+      - --kubeconfig=/etc/kubernetes/scheduler.conf
+      - --leader-elect=true
+      image: registry.k8s.io/kube-scheduler:v1.29.15
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 8
+        httpGet:
+          host: 127.0.0.1
+          path: /healthz
+          port: 10259
+          scheme: HTTPS
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 15
+      name: kube-scheduler
+      resources:
+        requests:
+          cpu: 100m
+      startupProbe:
+        failureThreshold: 24
+        httpGet:
+          host: 127.0.0.1
+          path: /healthz
+          port: 10259
+          scheme: HTTPS
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 15
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /etc/kubernetes/scheduler.conf
+        name: kubeconfig
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    hostNetwork: true
+    nodeName: plogscope-server
+    preemptionPolicy: PreemptLowerPriority
+    priority: 2000001000
+    priorityClassName: system-node-critical
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      seccompProfile:
+        type: RuntimeDefault
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      operator: Exists
+    volumes:
+    - hostPath:
+        path: /etc/kubernetes/scheduler.conf
+        type: FileOrCreate
+      name: kubeconfig
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-02T08:28:34Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-02T08:28:34Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-11T13:01:13Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-11T13:01:13Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-05-02T08:28:34Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://00dcf7c925ff016161539ea0f989c8e3c700ce6c8c703c28208b4ebb2439a119
+      image: registry.k8s.io/kube-scheduler:v1.29.15
+      imageID: registry.k8s.io/kube-scheduler@sha256:276108a4541a51894a010633230f7b6d10e92e730274f24bd21e827e64243d66
+      lastState:
+        terminated:
+          containerID: containerd://b748ed010cc6bc82f59524165165ec4c61b0e70789b8111f79d2a21825558863
+          exitCode: 1
+          finishedAt: "2025-05-11T10:57:02Z"
+          reason: Error
+          startedAt: "2025-04-21T02:09:37Z"
+      name: kube-scheduler
+      ready: true
+      restartCount: 1
+      started: true
+      state:
+        running:
+          startedAt: "2025-05-11T13:01:03Z"
+    hostIP: 192.168.1.6
+    hostIPs:
+    - ip: 192.168.1.6
+    phase: Running
+    podIP: 192.168.1.6
+    podIPs:
+    - ip: 192.168.1.6
+    qosClass: Burstable
+    startTime: "2025-05-02T08:28:34Z"
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: "2025-04-21T02:09:40Z"
+    labels:
+      component: apiserver
+      provider: kubernetes
+    name: kubernetes
+    namespace: default
+    resourceVersion: "196"
+    uid: 691d610d-f1bc-4f09-a85a-2791ca7183c1
+  spec:
+    clusterIP: 10.96.0.1
+    clusterIPs:
+    - 10.96.0.1
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: 6443
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"readiness-service","namespace":"default"},"spec":{"ports":[{"port":80,"protocol":"TCP","targetPort":8080}],"selector":{"app":"readiness-app"}}}
+    creationTimestamp: "2025-04-21T04:22:55Z"
+    name: readiness-service
+    namespace: default
+    resourceVersion: "10933"
+    uid: 5f4684f6-82a4-4390-8651-06894563e985
+  spec:
+    clusterIP: 10.97.18.26
+    clusterIPs:
+    - 10.97.18.26
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: readiness-app
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      prometheus.io/port: "9153"
+      prometheus.io/scrape: "true"
+    creationTimestamp: "2025-04-21T02:09:42Z"
+    labels:
+      k8s-app: kube-dns
+      kubernetes.io/cluster-service: "true"
+      kubernetes.io/name: CoreDNS
+    name: kube-dns
+    namespace: kube-system
+    resourceVersion: "241"
+    uid: 480aeb36-bd61-40d7-a3b7-6437c90eb0a7
+  spec:
+    clusterIP: 10.96.0.10
+    clusterIPs:
+    - 10.96.0.10
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: dns
+      port: 53
+      protocol: UDP
+      targetPort: 53
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+      targetPort: 53
+    - name: metrics
+      port: 9153
+      protocol: TCP
+      targetPort: 9153
+    selector:
+      k8s-app: kube-dns
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: apps/v1
+  kind: DaemonSet
+  metadata:
+    annotations:
+      deprecated.daemonset.template.generation: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"DaemonSet","metadata":{"annotations":{},"labels":{"app":"flannel","k8s-app":"flannel","tier":"node"},"name":"kube-flannel-ds","namespace":"kube-flannel"},"spec":{"selector":{"matchLabels":{"app":"flannel"}},"template":{"metadata":{"labels":{"app":"flannel","tier":"node"}},"spec":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"kubernetes.io/os","operator":"In","values":["linux"]}]}]}}},"containers":[{"args":["--ip-masq","--kube-subnet-mgr"],"command":["/opt/bin/flanneld"],"env":[{"name":"POD_NAME","valueFrom":{"fieldRef":{"fieldPath":"metadata.name"}}},{"name":"POD_NAMESPACE","valueFrom":{"fieldRef":{"fieldPath":"metadata.namespace"}}},{"name":"EVENT_QUEUE_DEPTH","value":"5000"}],"image":"ghcr.io/flannel-io/flannel:v0.26.7","name":"kube-flannel","resources":{"requests":{"cpu":"100m","memory":"50Mi"}},"securityContext":{"capabilities":{"add":["NET_ADMIN","NET_RAW"]},"privileged":false},"volumeMounts":[{"mountPath":"/run/flannel","name":"run"},{"mountPath":"/etc/kube-flannel/","name":"flannel-cfg"},{"mountPath":"/run/xtables.lock","name":"xtables-lock"}]}],"hostNetwork":true,"initContainers":[{"args":["-f","/flannel","/opt/cni/bin/flannel"],"command":["cp"],"image":"ghcr.io/flannel-io/flannel-cni-plugin:v1.6.2-flannel1","name":"install-cni-plugin","volumeMounts":[{"mountPath":"/opt/cni/bin","name":"cni-plugin"}]},{"args":["-f","/etc/kube-flannel/cni-conf.json","/etc/cni/net.d/10-flannel.conflist"],"command":["cp"],"image":"ghcr.io/flannel-io/flannel:v0.26.7","name":"install-cni","volumeMounts":[{"mountPath":"/etc/cni/net.d","name":"cni"},{"mountPath":"/etc/kube-flannel/","name":"flannel-cfg"}]}],"priorityClassName":"system-node-critical","serviceAccountName":"flannel","tolerations":[{"effect":"NoSchedule","operator":"Exists"}],"volumes":[{"hostPath":{"path":"/run/flannel"},"name":"run"},{"hostPath":{"path":"/opt/cni/bin"},"name":"cni-plugin"},{"hostPath":{"path":"/etc/cni/net.d"},"name":"cni"},{"configMap":{"name":"kube-flannel-cfg"},"name":"flannel-cfg"},{"hostPath":{"path":"/run/xtables.lock","type":"FileOrCreate"},"name":"xtables-lock"}]}}}}
+    creationTimestamp: "2025-05-13T05:48:03Z"
+    generation: 1
+    labels:
+      app: flannel
+      k8s-app: flannel
+      tier: node
+    name: kube-flannel-ds
+    namespace: kube-flannel
+    resourceVersion: "2546434"
+    uid: 5b9c3bfa-f2d5-4d05-8ab9-310a96e50f99
+  spec:
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: flannel
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: flannel
+          tier: node
+      spec:
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/os
+                  operator: In
+                  values:
+                  - linux
+        containers:
+        - args:
+          - --ip-masq
+          - --kube-subnet-mgr
+          command:
+          - /opt/bin/flanneld
+          env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: EVENT_QUEUE_DEPTH
+            value: "5000"
+          image: ghcr.io/flannel-io/flannel:v0.26.7
+          imagePullPolicy: IfNotPresent
+          name: kube-flannel
+          resources:
+            requests:
+              cpu: 100m
+              memory: 50Mi
+          securityContext:
+            capabilities:
+              add:
+              - NET_ADMIN
+              - NET_RAW
+            privileged: false
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /run/flannel
+            name: run
+          - mountPath: /etc/kube-flannel/
+            name: flannel-cfg
+          - mountPath: /run/xtables.lock
+            name: xtables-lock
+        dnsPolicy: ClusterFirst
+        hostNetwork: true
+        initContainers:
+        - args:
+          - -f
+          - /flannel
+          - /opt/cni/bin/flannel
+          command:
+          - cp
+          image: ghcr.io/flannel-io/flannel-cni-plugin:v1.6.2-flannel1
+          imagePullPolicy: IfNotPresent
+          name: install-cni-plugin
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/cni/bin
+            name: cni-plugin
+        - args:
+          - -f
+          - /etc/kube-flannel/cni-conf.json
+          - /etc/cni/net.d/10-flannel.conflist
+          command:
+          - cp
+          image: ghcr.io/flannel-io/flannel:v0.26.7
+          imagePullPolicy: IfNotPresent
+          name: install-cni
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/cni/net.d
+            name: cni
+          - mountPath: /etc/kube-flannel/
+            name: flannel-cfg
+        priorityClassName: system-node-critical
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: flannel
+        serviceAccountName: flannel
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - effect: NoSchedule
+          operator: Exists
+        volumes:
+        - hostPath:
+            path: /run/flannel
+            type: ""
+          name: run
+        - hostPath:
+            path: /opt/cni/bin
+            type: ""
+          name: cni-plugin
+        - hostPath:
+            path: /etc/cni/net.d
+            type: ""
+          name: cni
+        - configMap:
+            defaultMode: 420
+            name: kube-flannel-cfg
+          name: flannel-cfg
+        - hostPath:
+            path: /run/xtables.lock
+            type: FileOrCreate
+          name: xtables-lock
+    updateStrategy:
+      rollingUpdate:
+        maxSurge: 0
+        maxUnavailable: 1
+      type: RollingUpdate
+  status:
+    currentNumberScheduled: 1
+    desiredNumberScheduled: 1
+    numberAvailable: 1
+    numberMisscheduled: 0
+    numberReady: 1
+    observedGeneration: 1
+    updatedNumberScheduled: 1
+- apiVersion: apps/v1
+  kind: DaemonSet
+  metadata:
+    annotations:
+      deprecated.daemonset.template.generation: "1"
+    creationTimestamp: "2025-04-21T02:09:42Z"
+    generation: 1
+    labels:
+      k8s-app: kube-proxy
+    name: kube-proxy
+    namespace: kube-system
+    resourceVersion: "2546078"
+    uid: 2c0dc9c3-6889-4b59-8ae1-d818c78ffd99
+  spec:
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        k8s-app: kube-proxy
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          k8s-app: kube-proxy
+      spec:
+        containers:
+        - command:
+          - /usr/local/bin/kube-proxy
+          - --config=/var/lib/kube-proxy/config.conf
+          - --hostname-override=$(NODE_NAME)
+          env:
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: spec.nodeName
+          image: registry.k8s.io/kube-proxy:v1.29.15
+          imagePullPolicy: IfNotPresent
+          name: kube-proxy
+          resources: {}
+          securityContext:
+            privileged: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /var/lib/kube-proxy
+            name: kube-proxy
+          - mountPath: /run/xtables.lock
+            name: xtables-lock
+          - mountPath: /lib/modules
+            name: lib-modules
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        hostNetwork: true
+        nodeSelector:
+          kubernetes.io/os: linux
+        priorityClassName: system-node-critical
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: kube-proxy
+        serviceAccountName: kube-proxy
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - operator: Exists
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: kube-proxy
+          name: kube-proxy
+        - hostPath:
+            path: /run/xtables.lock
+            type: FileOrCreate
+          name: xtables-lock
+        - hostPath:
+            path: /lib/modules
+            type: ""
+          name: lib-modules
+    updateStrategy:
+      rollingUpdate:
+        maxSurge: 0
+        maxUnavailable: 1
+      type: RollingUpdate
+  status:
+    currentNumberScheduled: 1
+    desiredNumberScheduled: 1
+    numberAvailable: 1
+    numberMisscheduled: 0
+    numberReady: 1
+    observedGeneration: 1
+    updatedNumberScheduled: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "2"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"isocontrol","env":"prod","role":"core"},"name":"isocontrol-core","namespace":"isocontrol-prod"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"isocontrol"}},"template":{"metadata":{"labels":{"app":"isocontrol","env":"prod","role":"core"}},"spec":{"containers":[{"env":[{"name":"PROBE_LIVENESS_PATH","value":"/healthz"},{"name":"PROBE_READINESS_PATH","value":"/ready"},{"name":"PROBE_STARTUP_PATH","value":"/startup"},{"name":"APP_PORT","value":"8080"}],"image":"localhost:5001/isocontrol-app:latest","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/healthz","port":8080},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":3},"name":"isocontrol-app","ports":[{"containerPort":8080}],"readinessProbe":{"failureThreshold":2,"httpGet":{"path":"/ready","port":8080},"initialDelaySeconds":5,"periodSeconds":5,"timeoutSeconds":2},"resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"250m","memory":"256Mi"}},"startupProbe":{"failureThreshold":10,"httpGet":{"path":"/startup","port":8080},"periodSeconds":10}},{"env":[{"name":"OPERATOR_API","value":"http://admin-api.isocontrol.svc.cluster.local:8080/alert"},{"name":"CHECK_INTERVAL","value":"20"}],"image":"localhost:5001/sidecar-monitor:latest","name":"sidecar-monitor","resources":{"limits":{"cpu":"100m","memory":"128Mi"},"requests":{"cpu":"50m","memory":"64Mi"}}},{"env":[{"name":"TARGET_URL","value":"http://isocontrol-core:8080/healthz"},{"name":"OPERATOR_API","value":"http://admin-api.isocontrol.svc.cluster.local:8080/alert"},{"name":"CHECK_INTERVAL","value":"20"},{"name":"LATENCY_THRESHOLD","value":"500"}],"image":"localhost:5001/sidecar-latency:latest","name":"sidecar-latency","resources":{"limits":{"cpu":"100m","memory":"128Mi"},"requests":{"cpu":"50m","memory":"64Mi"}}}]}}}}
+    creationTimestamp: "2025-05-13T06:41:42Z"
+    generation: 2
+    labels:
+      app: isocontrol
+      env: prod
+      role: core
+    name: isocontrol-core
+    namespace: isocontrol-prod
+    resourceVersion: "2644138"
+    uid: af46aa97-7eb2-4e3e-a28e-ddd191f4ffd1
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: isocontrol
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: isocontrol
+          env: prod
+          role: core
+      spec:
+        containers:
+        - env:
+          - name: PROBE_LIVENESS_PATH
+            value: /healthz
+          - name: PROBE_READINESS_PATH
+            value: /ready
+          - name: PROBE_STARTUP_PATH
+            value: /startup
+          - name: APP_PORT
+            value: "8080"
+          image: localhost:5001/isocontrol-app:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 3
+          name: isocontrol-app
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 2
+            httpGet:
+              path: /ready
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 2
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+          startupProbe:
+            failureThreshold: 10
+            httpGet:
+              path: /startup
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        - env:
+          - name: OPERATOR_API
+            value: http://admin-api.isocontrol.svc.cluster.local:8080/alert
+          - name: CHECK_INTERVAL
+            value: "20"
+          image: localhost:5001/sidecar-monitor:latest
+          imagePullPolicy: Always
+          name: sidecar-monitor
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        - env:
+          - name: TARGET_URL
+            value: http://isocontrol-core:8080/healthz
+          - name: OPERATOR_API
+            value: http://admin-api.isocontrol.svc.cluster.local:8080/alert
+          - name: CHECK_INTERVAL
+            value: "20"
+          - name: LATENCY_THRESHOLD
+            value: "500"
+          image: localhost:5001/sidecar-latency:latest
+          imagePullPolicy: Always
+          name: sidecar-latency
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    conditions:
+    - lastTransitionTime: "2025-05-13T06:41:42Z"
+      lastUpdateTime: "2025-05-13T06:41:42Z"
+      message: Deployment does not have minimum availability.
+      reason: MinimumReplicasUnavailable
+      status: "False"
+      type: Available
+    - lastTransitionTime: "2025-05-14T01:57:04Z"
+      lastUpdateTime: "2025-05-14T01:57:04Z"
+      message: ReplicaSet "isocontrol-core-69bcc6976c" has timed out progressing.
+      reason: ProgressDeadlineExceeded
+      status: "False"
+      type: Progressing
+    observedGeneration: 2
+    replicas: 2
+    unavailableReplicas: 2
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "2"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"isocontrol-core","namespace":"isocontrol"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"isocontrol"}},"template":{"metadata":{"labels":{"app":"isocontrol"}},"spec":{"containers":[{"image":"nginx:latest","livenessProbe":{"failureThreshold":3,"httpGet":{"path":"/healthz","port":8080},"initialDelaySeconds":10,"periodSeconds":10,"timeoutSeconds":3},"name":"isocontrol-app","ports":[{"containerPort":8080}],"readinessProbe":{"failureThreshold":2,"httpGet":{"path":"/ready","port":8080},"initialDelaySeconds":5,"periodSeconds":5,"timeoutSeconds":2},"resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"250m","memory":"256Mi"}},"startupProbe":{"failureThreshold":10,"httpGet":{"path":"/startup","port":8080},"periodSeconds":10}},{"env":[{"name":"OPERATOR_API","value":"http://admin-api.isocontrol.svc.cluster.local:8080/alert"},{"name":"CHECK_INTERVAL","value":"20"}],"image":"localhost:5000/sidecar-monitor:latest","name":"sidecar-monitor","resources":{"limits":{"cpu":"100m","memory":"128Mi"},"requests":{"cpu":"50m","memory":"64Mi"}}},{"env":[{"name":"TARGET_URL","value":"http://isocontrol-core:8080/healthz"},{"name":"OPERATOR_API","value":"http://admin-api.isocontrol.svc.cluster.local:8080/alert"},{"name":"CHECK_INTERVAL","value":"20"},{"name":"LATENCY_THRESHOLD","value":"500"}],"image":"localhost:5000/sidecar-latency:latest","name":"sidecar-latency","resources":{"limits":{"cpu":"100m","memory":"128Mi"},"requests":{"cpu":"50m","memory":"64Mi"}}}]}}}}
+    creationTimestamp: "2025-04-23T08:06:43Z"
+    generation: 2
+    name: isocontrol-core
+    namespace: isocontrol
+    resourceVersion: "1410633"
+    uid: 17844310-6a0e-4fbd-bd23-d928684810dd
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: isocontrol
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: isocontrol
+      spec:
+        containers:
+        - image: nginx:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 3
+          name: isocontrol-app
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 2
+            httpGet:
+              path: /ready
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 2
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+          startupProbe:
+            failureThreshold: 10
+            httpGet:
+              path: /startup
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        - env:
+          - name: OPERATOR_API
+            value: http://admin-api.isocontrol.svc.cluster.local:8080/alert
+          - name: CHECK_INTERVAL
+            value: "20"
+          image: localhost:5000/sidecar-monitor:latest
+          imagePullPolicy: Always
+          name: sidecar-monitor
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        - env:
+          - name: TARGET_URL
+            value: http://isocontrol-core:8080/healthz
+          - name: OPERATOR_API
+            value: http://admin-api.isocontrol.svc.cluster.local:8080/alert
+          - name: CHECK_INTERVAL
+            value: "20"
+          - name: LATENCY_THRESHOLD
+            value: "500"
+          image: localhost:5000/sidecar-latency:latest
+          imagePullPolicy: Always
+          name: sidecar-latency
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    conditions:
+    - lastTransitionTime: "2025-04-23T08:06:43Z"
+      lastUpdateTime: "2025-04-23T08:06:43Z"
+      message: Deployment does not have minimum availability.
+      reason: MinimumReplicasUnavailable
+      status: "False"
+      type: Available
+    - lastTransitionTime: "2025-05-03T04:35:52Z"
+      lastUpdateTime: "2025-05-03T04:35:52Z"
+      message: ReplicaSet "isocontrol-core-64d966bdb6" has timed out progressing.
+      reason: ProgressDeadlineExceeded
+      status: "False"
+      type: Progressing
+    observedGeneration: 2
+    replicas: 2
+    unavailableReplicas: 2
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+    creationTimestamp: "2025-04-21T02:09:42Z"
+    generation: 1
+    labels:
+      k8s-app: kube-dns
+    name: coredns
+    namespace: kube-system
+    resourceVersion: "2546084"
+    uid: e1de3a4a-9d02-49da-8b95-38ea06341dc1
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 2
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        k8s-app: kube-dns
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 1
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          k8s-app: kube-dns
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: k8s-app
+                    operator: In
+                    values:
+                    - kube-dns
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - args:
+          - -conf
+          - /etc/coredns/Corefile
+          image: registry.k8s.io/coredns/coredns:v1.11.1
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: coredns
+          ports:
+          - containerPort: 53
+            name: dns
+            protocol: UDP
+          - containerPort: 53
+            name: dns-tcp
+            protocol: TCP
+          - containerPort: 9153
+            name: metrics
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 8181
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 170Mi
+            requests:
+              cpu: 100m
+              memory: 70Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add:
+              - NET_BIND_SERVICE
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/coredns
+            name: config-volume
+            readOnly: true
+        dnsPolicy: Default
+        nodeSelector:
+          kubernetes.io/os: linux
+        priorityClassName: system-cluster-critical
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: coredns
+        serviceAccountName: coredns
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+        volumes:
+        - configMap:
+            defaultMode: 420
+            items:
+            - key: Corefile
+              path: Corefile
+            name: coredns
+          name: config-volume
+  status:
+    availableReplicas: 2
+    conditions:
+    - lastTransitionTime: "2025-04-21T02:27:14Z"
+      lastUpdateTime: "2025-04-21T02:27:20Z"
+      message: ReplicaSet "coredns-76f75df574" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2025-05-13T05:44:14Z"
+      lastUpdateTime: "2025-05-13T05:44:14Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 2
+    replicas: 2
+    updatedReplicas: 2
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "2"
+    creationTimestamp: "2025-05-14T01:47:03Z"
+    generation: 1
+    labels:
+      app: isocontrol
+      env: prod
+      pod-template-hash: 69bcc6976c
+      role: core
+    name: isocontrol-core-69bcc6976c
+    namespace: isocontrol-prod
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: isocontrol-core
+      uid: af46aa97-7eb2-4e3e-a28e-ddd191f4ffd1
+    resourceVersion: "2643280"
+    uid: 14fac8f7-8eda-4d7c-8f85-7785d23dc97e
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: isocontrol
+        pod-template-hash: 69bcc6976c
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: isocontrol
+          env: prod
+          pod-template-hash: 69bcc6976c
+          role: core
+      spec:
+        containers:
+        - env:
+          - name: PROBE_LIVENESS_PATH
+            value: /healthz
+          - name: PROBE_READINESS_PATH
+            value: /ready
+          - name: PROBE_STARTUP_PATH
+            value: /startup
+          - name: APP_PORT
+            value: "8080"
+          image: localhost:5001/isocontrol-app:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 3
+          name: isocontrol-app
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 2
+            httpGet:
+              path: /ready
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 2
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+          startupProbe:
+            failureThreshold: 10
+            httpGet:
+              path: /startup
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        - env:
+          - name: OPERATOR_API
+            value: http://admin-api.isocontrol.svc.cluster.local:8080/alert
+          - name: CHECK_INTERVAL
+            value: "20"
+          image: localhost:5001/sidecar-monitor:latest
+          imagePullPolicy: Always
+          name: sidecar-monitor
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        - env:
+          - name: TARGET_URL
+            value: http://isocontrol-core:8080/healthz
+          - name: OPERATOR_API
+            value: http://admin-api.isocontrol.svc.cluster.local:8080/alert
+          - name: CHECK_INTERVAL
+            value: "20"
+          - name: LATENCY_THRESHOLD
+            value: "500"
+          image: localhost:5001/sidecar-latency:latest
+          imagePullPolicy: Always
+          name: sidecar-latency
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    fullyLabeledReplicas: 1
+    observedGeneration: 1
+    replicas: 1
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "1"
+    creationTimestamp: "2025-05-13T06:41:42Z"
+    generation: 1
+    labels:
+      app: isocontrol
+      env: prod
+      pod-template-hash: 765dff4b7
+      role: core
+    name: isocontrol-core-765dff4b7
+    namespace: isocontrol-prod
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: isocontrol-core
+      uid: af46aa97-7eb2-4e3e-a28e-ddd191f4ffd1
+    resourceVersion: "2552905"
+    uid: 1c88e310-1857-465e-8147-cf3ab1490871
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: isocontrol
+        pod-template-hash: 765dff4b7
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: isocontrol
+          env: prod
+          pod-template-hash: 765dff4b7
+          role: core
+      spec:
+        containers:
+        - env:
+          - name: PROBE_LIVENESS_PATH
+            value: /healthz
+          - name: PROBE_READINESS_PATH
+            value: /ready
+          - name: PROBE_STARTUP_PATH
+            value: /startup
+          - name: APP_PORT
+            value: "8080"
+          image: nginx:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 3
+          name: isocontrol-app
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 2
+            httpGet:
+              path: /ready
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 2
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+          startupProbe:
+            failureThreshold: 10
+            httpGet:
+              path: /startup
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        - env:
+          - name: OPERATOR_API
+            value: http://admin-api.isocontrol.svc.cluster.local:8080/alert
+          - name: CHECK_INTERVAL
+            value: "20"
+          image: localhost:5001/sidecar-monitor:latest
+          imagePullPolicy: Always
+          name: sidecar-monitor
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        - env:
+          - name: TARGET_URL
+            value: http://isocontrol-core:8080/healthz
+          - name: OPERATOR_API
+            value: http://admin-api.isocontrol.svc.cluster.local:8080/alert
+          - name: CHECK_INTERVAL
+            value: "20"
+          - name: LATENCY_THRESHOLD
+            value: "500"
+          image: localhost:5001/sidecar-latency:latest
+          imagePullPolicy: Always
+          name: sidecar-latency
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    fullyLabeledReplicas: 1
+    observedGeneration: 1
+    replicas: 1
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "2"
+    creationTimestamp: "2025-04-29T02:20:00Z"
+    generation: 1
+    labels:
+      app: isocontrol
+      pod-template-hash: 64d966bdb6
+    name: isocontrol-core-64d966bdb6
+    namespace: isocontrol
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: isocontrol-core
+      uid: 17844310-6a0e-4fbd-bd23-d928684810dd
+    resourceVersion: "1409844"
+    uid: e5b09fed-4449-493d-961e-b7243c595fba
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: isocontrol
+        pod-template-hash: 64d966bdb6
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: isocontrol
+          pod-template-hash: 64d966bdb6
+      spec:
+        containers:
+        - image: nginx:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 3
+          name: isocontrol-app
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 2
+            httpGet:
+              path: /ready
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 2
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+          startupProbe:
+            failureThreshold: 10
+            httpGet:
+              path: /startup
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        - env:
+          - name: OPERATOR_API
+            value: http://admin-api.isocontrol.svc.cluster.local:8080/alert
+          - name: CHECK_INTERVAL
+            value: "20"
+          image: localhost:5000/sidecar-monitor:latest
+          imagePullPolicy: Always
+          name: sidecar-monitor
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        - env:
+          - name: TARGET_URL
+            value: http://isocontrol-core:8080/healthz
+          - name: OPERATOR_API
+            value: http://admin-api.isocontrol.svc.cluster.local:8080/alert
+          - name: CHECK_INTERVAL
+            value: "20"
+          - name: LATENCY_THRESHOLD
+            value: "500"
+          image: localhost:5000/sidecar-latency:latest
+          imagePullPolicy: Always
+          name: sidecar-latency
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    fullyLabeledReplicas: 1
+    observedGeneration: 1
+    replicas: 1
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "1"
+    creationTimestamp: "2025-04-23T08:06:43Z"
+    generation: 1
+    labels:
+      app: isocontrol
+      pod-template-hash: 7b84b5cb74
+    name: isocontrol-core-7b84b5cb74
+    namespace: isocontrol
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: isocontrol-core
+      uid: 17844310-6a0e-4fbd-bd23-d928684810dd
+    resourceVersion: "1409833"
+    uid: 015c3dea-5484-4344-b33c-2a603c382da2
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: isocontrol
+        pod-template-hash: 7b84b5cb74
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: isocontrol
+          pod-template-hash: 7b84b5cb74
+      spec:
+        containers:
+        - image: localhost:5000/isocontrol:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 3
+          name: isocontrol-app
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 2
+            httpGet:
+              path: /ready
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 2
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+          startupProbe:
+            failureThreshold: 10
+            httpGet:
+              path: /startup
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    fullyLabeledReplicas: 1
+    observedGeneration: 1
+    replicas: 1
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "2"
+      deployment.kubernetes.io/max-replicas: "3"
+      deployment.kubernetes.io/revision: "1"
+    creationTimestamp: "2025-04-21T02:09:55Z"
+    generation: 1
+    labels:
+      k8s-app: kube-dns
+      pod-template-hash: 76f75df574
+    name: coredns-76f75df574
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: coredns
+      uid: e1de3a4a-9d02-49da-8b95-38ea06341dc1
+    resourceVersion: "2546082"
+    uid: d1a627a6-7cb4-4422-811f-50ccb28496a1
+  spec:
+    replicas: 2
+    selector:
+      matchLabels:
+        k8s-app: kube-dns
+        pod-template-hash: 76f75df574
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          k8s-app: kube-dns
+          pod-template-hash: 76f75df574
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: k8s-app
+                    operator: In
+                    values:
+                    - kube-dns
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - args:
+          - -conf
+          - /etc/coredns/Corefile
+          image: registry.k8s.io/coredns/coredns:v1.11.1
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: coredns
+          ports:
+          - containerPort: 53
+            name: dns
+            protocol: UDP
+          - containerPort: 53
+            name: dns-tcp
+            protocol: TCP
+          - containerPort: 9153
+            name: metrics
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 8181
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 170Mi
+            requests:
+              cpu: 100m
+              memory: 70Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add:
+              - NET_BIND_SERVICE
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/coredns
+            name: config-volume
+            readOnly: true
+        dnsPolicy: Default
+        nodeSelector:
+          kubernetes.io/os: linux
+        priorityClassName: system-cluster-critical
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: coredns
+        serviceAccountName: coredns
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+        volumes:
+        - configMap:
+            defaultMode: 420
+            items:
+            - key: Corefile
+              path: Corefile
+            name: coredns
+          name: config-volume
+  status:
+    availableReplicas: 2
+    fullyLabeledReplicas: 2
+    observedGeneration: 1
+    readyReplicas: 2
+    replicas: 2
+kind: List
+metadata:
+  resourceVersion: ""
