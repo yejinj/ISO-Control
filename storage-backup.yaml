@@ -1,0 +1,67 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"PersistentVolume","metadata":{"annotations":{},"name":"test-pv"},"spec":{"accessModes":["ReadWriteOnce"],"capacity":{"storage":"1Gi"},"hostPath":{"path":"/mnt/data"},"persistentVolumeReclaimPolicy":"Retain"}}
+      pv.kubernetes.io/bound-by-controller: "yes"
+    creationTimestamp: "2025-05-16T04:28:57Z"
+    finalizers:
+    - kubernetes.io/pv-protection
+    name: test-pv
+    resourceVersion: "2893909"
+    uid: 9a54bfc1-6973-4972-90a4-67e04f87a424
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 1Gi
+    claimRef:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      name: test-pvc
+      namespace: default
+      resourceVersion: "2893906"
+      uid: 9d827b52-c370-49a6-ab48-29692be0a8e7
+    hostPath:
+      path: /mnt/data
+      type: ""
+    persistentVolumeReclaimPolicy: Retain
+    volumeMode: Filesystem
+  status:
+    lastPhaseTransitionTime: "2025-05-16T04:29:00Z"
+    phase: Bound
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"name":"test-pvc","namespace":"default"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"1Gi"}}}}
+      pv.kubernetes.io/bind-completed: "yes"
+      pv.kubernetes.io/bound-by-controller: "yes"
+    creationTimestamp: "2025-05-16T04:29:00Z"
+    finalizers:
+    - kubernetes.io/pvc-protection
+    name: test-pvc
+    namespace: default
+    resourceVersion: "2893913"
+    uid: 9d827b52-c370-49a6-ab48-29692be0a8e7
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+    volumeMode: Filesystem
+    volumeName: test-pv
+  status:
+    accessModes:
+    - ReadWriteOnce
+    capacity:
+      storage: 1Gi
+    phase: Bound
+kind: List
+metadata:
+  resourceVersion: ""
