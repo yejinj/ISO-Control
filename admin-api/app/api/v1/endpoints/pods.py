@@ -1,8 +1,10 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from kubernetes import client, config
 from typing import List
 from datetime import datetime
 from .alert import event_log  # event_log import
+import asyncio
+import random
 
 router = APIRouter()
 
@@ -15,6 +17,8 @@ def parse_last_restart(container_status):
 
 @router.get("/pods")
 async def get_pods():
+    # 의도적인 지연 추가 (0.2 ~ 1초)
+    await asyncio.sleep(random.uniform(0.2, 1.0))
     # 클러스터 내부에서 실행 시
     try:
         config.load_incluster_config()
