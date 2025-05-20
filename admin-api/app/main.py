@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.api.v1.endpoints import alert, probes, pods, events, latency
 from fastapi.middleware.cors import CORSMiddleware
+from app.middleware.latency import latency_middleware
 
 
 app = FastAPI()
@@ -13,6 +14,10 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"]
 )
+
+@app.middleware("http")
+async def add_latency_middleware(request, call_next):
+    return await latency_middleware(request, call_next)
 
 @app.get("/")
 async def root():

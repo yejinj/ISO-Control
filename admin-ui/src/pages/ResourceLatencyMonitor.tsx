@@ -34,7 +34,7 @@ const fetchResourceMetrics = async () => {
 };
 
 const fetchLatencyMetrics = async () => {
-  const res = await fetch('/api/v1/probes/metrics/latency');
+  const res = await fetch('/api/v1/latency');
   return res.json();
 };
 
@@ -48,8 +48,26 @@ const ResourceLatencyMonitor = () => {
   const [latencyData, setLatencyData] = useState<LatencyData[]>([]);
 
   useEffect(() => {
-    fetchResourceMetrics().then(setResourceData);
-    fetchLatencyMetrics().then(setLatencyData);
+    const fetchData = async () => {
+      try {
+        const [resourceMetrics, latencyMetrics] = await Promise.all([
+          fetchResourceMetrics(),
+          fetchLatencyMetrics()
+        ]);
+        setResourceData(resourceMetrics);
+        setLatencyData(latencyMetrics);
+      } catch (error) {
+        console.error('데이터 로드 실패:', error);
+      }
+    };
+
+    // 초기 데이터 로드
+    fetchData();
+
+    // 5초마다 데이터 갱신
+    const interval = setInterval(fetchData, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   // PVC 데이터를 차트용으로 변환
