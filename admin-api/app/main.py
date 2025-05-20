@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.v1.endpoints import alert, probes, pods, events
+from app.api.v1.endpoints import alert, probes, pods, events, latency
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -22,3 +22,4 @@ app.include_router(alert.router, prefix="/api/v1")
 app.include_router(probes.router, prefix="/api/v1")
 app.include_router(pods.router, prefix="/api/v1")
 app.include_router(events.router, prefix="/api/v1")
+app.include_router(latency.router, prefix="/api/v1")

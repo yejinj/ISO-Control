@@ -1,6 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { FiCpu, FiActivity, FiHardDrive } from 'react-icons/fi';
+import { Line as ChartLine } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip as ChartTooltip,
+  Legend as ChartLegend
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  ChartTooltip,
+  ChartLegend
+);
 
 const fetchResourceMetrics = async () => {
   const res = await fetch('/api/v1/probes');
@@ -17,9 +38,14 @@ const fetchLatencyMetrics = async () => {
   return res.json();
 };
 
+interface LatencyData {
+  timestamp: string;
+  latency_ms: number;
+}
+
 const ResourceLatencyMonitor = () => {
   const [resourceData, setResourceData] = useState<any>({ cpu: {}, memory: {}, pvc: {} });
-  const [latencyData, setLatencyData] = useState<any[]>([]);
+  const [latencyData, setLatencyData] = useState<LatencyData[]>([]);
 
   useEffect(() => {
     fetchResourceMetrics().then(setResourceData);
@@ -31,6 +57,46 @@ const ResourceLatencyMonitor = () => {
     name: pvcName,
     사용률: Number(usage)
   }));
+
+  const chartData = {
+    labels: latencyData.map(d => new Date(d.timestamp).toLocaleTimeString()),
+    datasets: [
+      {
+        label: 'API 응답 지연 (ms)',
+        data: latencyData.map(d => d.latency_ms),
+        borderColor: 'rgb(75, 192, 192)',
+        tension: 0.1
+      }
+    ]
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: true,
+        text: 'API 응답 지연 추이'
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: '지연 시간 (ms)'
+        }
+      },
+      x: {
+        title: {
+          display: true,
+          text: '시간'
+        }
+      }
+    }
+  };
 
   return (
     <div className="px-0 md:px-6 py-6 w-full max-w-7xl mx-auto">
@@ -92,15 +158,9 @@ const ResourceLatencyMonitor = () => {
             <FiActivity className="text-orange-400 mr-2" size={18} />
             <h2 className="text-base font-semibold text-gray-700">API 응답 지연 추이</h2>
           </div>
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={latencyData}>
-              <XAxis dataKey="timestamp" fontSize={11} />
-              <YAxis fontSize={11} unit="ms" />
-              <Tooltip formatter={v => `${v}ms`} />
-              <Legend />
-              <Line type="monotone" dataKey="latency_ms" stroke="#f59e42" strokeWidth={2.5} dot={{ r: 3 }} />
-            </LineChart>
-          </ResponsiveContainer>
+          <div className="h-[200px]">
+            <ChartLine data={chartData} options={options} />
+          </div>
           <div className="mt-4 text-xs text-gray-500 text-right">
             최근 10분간 1분 단위 평균 응답시간(ms)
           </div>
