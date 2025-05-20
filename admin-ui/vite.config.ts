@@ -12,7 +12,8 @@ export default defineConfig({
       '/api/v1/probes': 'http://localhost:8080',
       '/api/v1/events': 'http://localhost:8080',
       '/api/v1/healthz': 'http://localhost:8080',
-      '/api/v1/ready': 'http://localhost:8080'
+      '/api/v1/ready': 'http://localhost:8080',
+      '/api/v1/latency': 'http://localhost:8080'
     },
   },
 }) 
