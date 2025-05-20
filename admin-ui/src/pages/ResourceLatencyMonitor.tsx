@@ -10,7 +10,8 @@ import {
   LineElement,
   Title,
   Tooltip as ChartTooltip,
-  Legend as ChartLegend
+  Legend as ChartLegend,
+  Filler
 } from 'chart.js';
 
 ChartJS.register(
@@ -20,7 +21,8 @@ ChartJS.register(
   LineElement,
   Title,
   ChartTooltip,
-  ChartLegend
+  ChartLegend,
+  Filler
 );
 
 const fetchResourceMetrics = async () => {
@@ -77,19 +79,25 @@ const ResourceLatencyMonitor = () => {
   }));
 
   const chartData = {
-    labels: latencyData.map(d => new Date(d.timestamp).toLocaleTimeString()),
+    labels: latencyData.map(d => {
+      const date = new Date(d.timestamp);
+      return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    }),
     datasets: [
       {
         label: 'API 응답 지연 (ms)',
         data: latencyData.map(d => d.latency_ms),
         borderColor: 'rgb(75, 192, 192)',
-        tension: 0.1
+        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+        tension: 0.1,
+        fill: true
       }
     ]
   };
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'top' as const,
