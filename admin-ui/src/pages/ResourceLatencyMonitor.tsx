@@ -13,7 +13,7 @@ const fetchResourceMetrics = async () => {
 };
 
 const fetchLatencyMetrics = async () => {
-  const res = await fetch('/api/v1/probes/metrics/latency');
+  const res = await fetch('/api/v1/latency');
   return res.json();
 };
 
