@@ -1,5 +1,6 @@
 from fastapi import Request
 import time
+import asyncio
 from app.api.v1.endpoints.latency import record_latency
 
 async def latency_middleware(request: Request, call_next):

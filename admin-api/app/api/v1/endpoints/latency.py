@@ -12,8 +12,8 @@ latency_history = []
 
 @router.get("/latency")
 async def get_latency_history():
-    # 의도적인 지연 추가 (0.1 ~ 0.5초)
-    await asyncio.sleep(random.uniform(0.1, 0.5))
+    # 의도적인 지연 추가 (0.5 ~ 2초)
+    await asyncio.sleep(random.uniform(0.5, 2.0))
     return latency_history
 
 @router.post("/latency")
