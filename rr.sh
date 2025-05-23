@@ -12,7 +12,7 @@ if [ ! -f .env ]; then
 fi
 
 export $(grep -v '^#' .env | xargs)
-
+ 
 mkdir -p $OUTPUT_DIR
 
 for FILE in "${FILES[@]}"; do
