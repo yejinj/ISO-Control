@@ -14,7 +14,7 @@ fi
 export $(grep -v '^#' .env | xargs)
  
 mkdir -p $OUTPUT_DIR
-
+ 
 for FILE in "${FILES[@]}"; do
   envsubst < "$PROBES_DIR/$FILE" > "$OUTPUT_DIR/$FILE"
   echo "$FILE → $OUTPUT_DIR/$FILE"
