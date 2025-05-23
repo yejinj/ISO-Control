@@ -10,7 +10,7 @@ if [ ! -f .env ]; then
   echo ".env 파일이 없습니다. 환경변수를 직접 export 하거나 .env 파일을 생성하세요."
   exit 1
 fi
-
+ 
 export $(grep -v '^#' .env | xargs)
  
 mkdir -p $OUTPUT_DIR
