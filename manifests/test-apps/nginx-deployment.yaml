@@ -1,0 +1,182 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-test-deployment
+  namespace: default
+  labels:
+    app: nginx-test
+    purpose: migration-test
+spec:
+  replicas: 6  # 워커 노드 2개에 분산 배치
+  selector:
+    matchLabels:
+      app: nginx-test
+  template:
+    metadata:
+      labels:
+        app: nginx-test
+        purpose: migration-test
+    spec:
+      # 파드가 다른 노드에 분산되도록 설정
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - nginx-test
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: nginx
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        # 헬스체크 설정
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        # 커스텀 인덱스 페이지로 노드 정보 표시
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d
+        - name: html-content
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-config
+      - name: html-content
+        configMap:
+          name: nginx-html
+      # 빠른 재시작을 위한 설정
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: default
+data:
+  default.conf: |
+    server {
+        listen 80;
+        server_name localhost;
+        
+        location / {
+            root /usr/share/nginx/html;
+            index index.html;
+        }
+        
+        # 헬스체크 엔드포인트
+        location /health {
+            access_log off;
+            return 200 "healthy\n";
+            add_header Content-Type text/plain;
+        }
+        
+        # 노드 정보 엔드포인트
+        location /info {
+            access_log off;
+            return 200 "Pod: $hostname\nNode: $server_addr\n";
+            add_header Content-Type text/plain;
+        }
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-html
+  namespace: default
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Migration Test Pod</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            .container { max-width: 600px; margin: 0 auto; }
+            .info-box { background: #f0f0f0; padding: 20px; border-radius: 5px; margin: 20px 0; }
+            .status { color: green; font-weight: bold; }
+        </style>
+        <script>
+            function updateInfo() {
+                fetch('/info')
+                    .then(response => response.text())
+                    .then(data => {
+                        document.getElementById('pod-info').innerText = data;
+                    })
+                    .catch(error => {
+                        document.getElementById('pod-info').innerText = 'Error: ' + error;
+                    });
+            }
+            
+            setInterval(updateInfo, 5000);
+            window.onload = updateInfo;
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🚀 Kubernetes Migration Test Pod</h1>
+            <div class="info-box">
+                <h3>Pod Information</h3>
+                <pre id="pod-info">Loading...</pre>
+            </div>
+            <div class="info-box">
+                <h3>Status</h3>
+                <p class="status">✅ Pod is running and ready for migration testing</p>
+                <p>This pod is designed to test Kubernetes pod migration during node failures.</p>
+            </div>
+            <div class="info-box">
+                <h3>Test Instructions</h3>
+                <ol>
+                    <li>Deploy this application across multiple nodes</li>
+                    <li>Monitor pod distribution using kubectl</li>
+                    <li>Simulate node failure using stress testing</li>
+                    <li>Observe pod migration to healthy nodes</li>
+                </ol>
+            </div>
+        </div>
+    </body>
+    </html>
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-test-service
+  namespace: default
+  labels:
+    app: nginx-test
+spec:
+  selector:
+    app: nginx-test
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  type: ClusterIP 
