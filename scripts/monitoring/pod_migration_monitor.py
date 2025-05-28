@@ -172,13 +172,13 @@ class PodMigrationMonitor:
         print("="*80)
         
         # 노드 상태
-        print("\n📊 노드 상태:")
+        print("\n노드 상태:")
         for node_name, status in nodes.items():
-            status_icon = "✅" if status['ready'] else "❌"
+            status_icon = "정상" if status['ready'] else "비정상"
             print(f"  {status_icon} {node_name}: {'Ready' if status['ready'] else 'NotReady'}")
         
         # 파드 분포
-        print("\n📦 파드 분포:")
+        print("\n파드 분포:")
         pod_by_node = defaultdict(list)
         for pod in pods:
             node = pod['node']
@@ -192,20 +192,20 @@ class PodMigrationMonitor:
             
             print(f"  🖥️  {node_name}: {ready_count}/{total_count} 파드 Ready")
             for pod in pods_on_node:
-                status_icon = "✅" if pod['ready'] else "❌"
+                status_icon = "정상" if pod['ready'] else "비정상"
                 print(f"    {status_icon} {pod['name']} ({pod['phase']})")
         
         # 스케줄되지 않은 파드
         unscheduled_pods = [p for p in pods if p['node'] == 'Unscheduled']
         if unscheduled_pods:
-            print(f"\n⏳ 스케줄되지 않은 파드: {len(unscheduled_pods)}개")
+            print(f"\n스케줄되지 않은 파드: {len(unscheduled_pods)}개")
             for pod in unscheduled_pods:
-                print(f"    ⏳ {pod['name']} ({pod['phase']})")
+                print(f"    {pod['name']} ({pod['phase']})")
     
     def print_migration_events(self, migrations):
         """마이그레이션 이벤트 출력"""
         if migrations:
-            print("\n🔄 파드 마이그레이션 감지:")
+            print("\n파드 마이그레이션 감지:")
             for migration in migrations:
                 timestamp = migration['timestamp'].strftime('%H:%M:%S')
                 print(f"  [{timestamp}] {migration['pod_name']}: "
@@ -305,7 +305,7 @@ def main():
         
         # 요약 출력
         if monitor.migration_events:
-            print(f"\n📊 모니터링 요약:")
+            print(f"\n모니터링 요약:")
             print(f"  - 총 마이그레이션 이벤트: {len(monitor.migration_events)}개")
             
             # 노드별 마이그레이션 통계

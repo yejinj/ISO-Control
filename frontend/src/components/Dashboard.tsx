@@ -21,11 +21,11 @@ const Dashboard: React.FC = () => {
   );
 
   const tabs = [
-    { id: 'overview', label: '클러스터 개요', icon: '📊' },
-    { id: 'nodes', label: '노드 관리', icon: '🖥️' },
-    { id: 'pods', label: '파드 분포', icon: '📦' },
-    { id: 'isolation', label: '격리 제어', icon: '🔧' },
-    { id: 'events', label: '이벤트 로그', icon: '📋' },
+    { id: 'overview', label: '클러스터 개요', icon: 'Cluster' },
+    { id: 'nodes', label: '노드 관리', icon: 'Node' },
+    { id: 'pods', label: '파드 분포', icon: 'Pod' },
+    { id: 'isolation', label: '격리 제어', icon: 'Control' },
+    { id: 'events', label: '이벤트 로그', icon: 'Log' },
   ];
 
   if (error) {

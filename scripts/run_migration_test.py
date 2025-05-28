@@ -56,25 +56,25 @@ class MigrationTestOrchestrator:
     
     def deploy_test_application(self):
         """테스트 애플리케이션 배포"""
-        print("🚀 테스트 애플리케이션 배포 중...")
+        print("테스트 애플리케이션 배포 중...")
         
         # 기존 파드가 있는지 확인
         existing_result = self.run_kubectl_command("get pods -l app=nginx-test --no-headers")
         if existing_result and existing_result.returncode == 0 and existing_result.stdout.strip():
-            print("✅ 테스트 애플리케이션이 이미 배포되어 있습니다")
+            print("테스트 애플리케이션이 이미 배포되어 있습니다")
             return True
         
         manifest_path = "manifests/test-apps/nginx-deployment.yaml"
         result = self.run_kubectl_command(f"apply -f {manifest_path}")
         
         if not result or result.returncode != 0:
-            print(f"❌ 애플리케이션 배포 실패: {result.stderr if result else 'Unknown error'}")
+            print(f"애플리케이션 배포 실패: {result.stderr if result else 'Unknown error'}")
             return False
         
-        print("✅ 애플리케이션 배포 완료")
+        print("애플리케이션 배포 완료")
         
         # 파드가 Ready 상태가 될 때까지 대기 (개선된 로직)
-        print("⏳ 파드가 Ready 상태가 될 때까지 대기 중...")
+        print("파드가 Ready 상태가 될 때까지 대기 중...")
         for i in range(60):  # 최대 5분 대기
             result = self.run_kubectl_command("get pods -l app=nginx-test --no-headers")
             if result and result.returncode == 0:
@@ -93,52 +93,52 @@ class MigrationTestOrchestrator:
                                     if ready == total and ready != '0':
                                         ready_count += 1
                     
-                    print(f"📊 Ready 파드: {ready_count}/{total_count}")
+                    print(f"Ready 파드: {ready_count}/{total_count}")
                     
                     if ready_count == total_count:
-                        print("✅ 모든 파드가 Ready 상태입니다")
+                        print("모든 파드가 Ready 상태입니다")
                         break
             time.sleep(5)
         else:
-            print("⚠️  일부 파드가 아직 Ready 상태가 아닙니다")
+            print("일부 파드가 아직 Ready 상태가 아닙니다")
         
         return True
     
     def check_pod_distribution(self):
         """파드 분포 확인"""
-        print("\n📊 현재 파드 분포:")
+        print("\n현재 파드 분포:")
         result = self.run_kubectl_command("get pods -l app=nginx-test -o wide")
         if result and result.returncode == 0:
             print(result.stdout)
         else:
-            print("❌ 파드 분포 확인 실패")
+            print("파드 분포 확인 실패")
     
     def cleanup_test_application(self):
         """테스트 애플리케이션 정리"""
-        print("🧹 테스트 애플리케이션 정리 중...")
+        print("애플리케이션 정리 중...")
         
         manifest_path = "manifests/test-apps/nginx-deployment.yaml"
         result = self.run_kubectl_command(f"delete -f {manifest_path}")
         
         if result and result.returncode == 0:
-            print("✅ 애플리케이션 정리 완료")
+            print("애플리케이션 정리 완료")
         else:
-            print("⚠️  애플리케이션 정리 중 오류 발생")
+            print("애플리케이션 정리 중 오류 발생")
     
     def run_stress_test_thread(self, target_node, duration, cpu_percent, memory_percent):
         """부하 테스트를 별도 스레드에서 실행"""
         try:
             node_info = self.env_loader.get_node_by_name(target_node)
             if not node_info:
-                print(f"❌ 노드를 찾을 수 없습니다: {target_node}")
+                print(f"노드를 찾을 수 없습니다: {target_node}")
                 return
             
             node_ip = node_info['private_ip']
-            print(f"🔥 노드 {target_node} ({node_ip})에 부하 테스트 시작")
+            print(f"노드 {target_node} ({node_ip})에 부하 테스트 시작")
             
             # 스트레스 도구 설치
             if not self.stress_test.install_stress_tools(node_ip):
-                print(f"❌ 스트레스 도구 설치 실패: {target_node}")
+                print(f"스트레스 도구 설치 실패: {target_node}")
                 return
             
             # 복합 부하 테스트 시작
@@ -147,7 +147,7 @@ class MigrationTestOrchestrator:
             )
             
             if success:
-                print(f"✅ 부하 테스트 시작됨: {target_node}")
+                print(f"부하 테스트 시작됨: {target_node}")
                 
                 # 부하 테스트 완료까지 대기
                 while self.stress_test.stress_processes and self.test_active:
@@ -158,17 +158,17 @@ class MigrationTestOrchestrator:
                         if p.poll() is None
                     ]
                 
-                print(f"✅ 부하 테스트 완료: {target_node}")
+                print(f"부하 테스트 완료: {target_node}")
             else:
-                print(f"❌ 부하 테스트 시작 실패: {target_node}")
+                print(f"부하 테스트 시작 실패: {target_node}")
                 
         except Exception as e:
-            print(f"❌ 부하 테스트 스레드 오류: {e}")
+            print(f"부하 테스트 스레드 오류: {e}")
     
     def run_isolation_test_thread(self, target_node, method, duration):
         """노드 격리 테스트를 별도 스레드에서 실행"""
         try:
-            print(f"🎯 노드 격리 테스트 시작: {target_node} (방법: {method})")
+            print(f"노드 격리 테스트 시작: {target_node} (방법: {method})")
             
             # duration이 문자열인 경우 숫자로 변환
             if isinstance(duration, str):
@@ -179,26 +179,26 @@ class MigrationTestOrchestrator:
             success = self.node_isolation.isolate_node(target_node, method, duration_seconds)
             
             if success:
-                print(f"✅ 노드 격리 시작됨: {target_node}")
+                print(f"노드 격리 시작됨: {target_node}")
                 
                 # 격리 시간 동안 대기
                 time.sleep(duration_seconds)
                 
-                print(f"✅ 노드 격리 완료: {target_node}")
+                print(f"노드 격리 완료: {target_node}")
             else:
-                print(f"❌ 노드 격리 시작 실패: {target_node}")
+                print(f"노드 격리 시작 실패: {target_node}")
                 
         except Exception as e:
-            print(f"❌ 노드 격리 스레드 오류: {e}")
+            print(f"노드 격리 스레드 오류: {e}")
     
     def run_monitoring_thread(self, namespace, interval, output_file):
         """모니터링을 별도 스레드에서 실행"""
         try:
-            print(f"👀 파드 마이그레이션 모니터링 시작 (네임스페이스: {namespace})")
+            print(f"파드 마이그레이션 모니터링 시작 (네임스페이스: {namespace})")
             self.migration_monitor.monitoring_active = True
             self.migration_monitor.monitor_loop(namespace, interval)
         except Exception as e:
-            print(f"❌ 모니터링 스레드 오류: {e}")
+            print(f"모니터링 스레드 오류: {e}")
         finally:
             if output_file:
                 self.migration_monitor.export_migration_report(output_file)
@@ -208,7 +208,7 @@ class MigrationTestOrchestrator:
                           output_file=None, cleanup=True, isolation_method="stress"):
         """통합 테스트 실행"""
         print("="*80)
-        print("🚀 쿠버네티스 파드 마이그레이션 테스트 시작")
+        print("쿠버네티스 파드 마이그레이션 테스트 시작")
         print("="*80)
         print(f"대상 노드: {target_node}")
         print(f"테스트 지속시간: {duration}")
@@ -261,20 +261,20 @@ class MigrationTestOrchestrator:
                 self.threads.append(isolation_thread)
                 test_thread = isolation_thread
             
-            print(f"\n⏳ 테스트 실행 중... (지속시간: {duration})")
+            print(f"\n테스트 실행 중... (지속시간: {duration})")
             print("Ctrl+C를 눌러 중지할 수 있습니다.\n")
             
             # 5. 테스트 완료까지 대기
             test_thread.join()
             
             # 6. 추가 모니터링 시간 (복구 과정 관찰)
-            print("\n🔍 복구 과정 모니터링 중... (60초)")
+            print("\n복구 과정 모니터링 중... (60초)")
             time.sleep(60)
             
-            print("\n✅ 테스트 완료")
+            print("\n테스트 완료")
             
             # 7. 최종 파드 분포 확인
-            print("\n📊 최종 파드 분포:")
+            print("\n최종 파드 분포:")
             self.check_pod_distribution()
             
             return True
@@ -283,7 +283,7 @@ class MigrationTestOrchestrator:
             print("\n사용자에 의해 테스트가 중단되었습니다.")
             return False
         except Exception as e:
-            print(f"\n❌ 테스트 실행 중 오류 발생: {e}")
+            print(f"\n테스트 실행 중 오류 발생: {e}")
             return False
         finally:
             self.cleanup()
@@ -292,7 +292,7 @@ class MigrationTestOrchestrator:
     
     def cleanup(self):
         """리소스 정리"""
-        print("\n🧹 리소스 정리 중...")
+        print("\n리소스 정리 중...")
         
         self.test_active = False
         
@@ -310,7 +310,7 @@ class MigrationTestOrchestrator:
             if thread.is_alive():
                 thread.join(timeout=5)
         
-        print("✅ 리소스 정리 완료")
+        print("리소스 정리 완료")
 
 def main():
     parser = argparse.ArgumentParser(description="쿠버네티스 파드 마이그레이션 통합 테스트")
@@ -341,7 +341,7 @@ def main():
     orchestrator.setup_signal_handlers()
     
     # 환경변수 파일 생성
-    print("🔧 환경변수 파일 생성 중...")
+    print("환경변수 파일 생성 중...")
     orchestrator.env_loader.generate_bash_env()
     
     success = orchestrator.run_integrated_test(
