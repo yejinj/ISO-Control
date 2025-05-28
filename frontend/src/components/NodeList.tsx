@@ -42,21 +42,45 @@ const NodeList: React.FC<NodeListProps> = ({ nodes }) => {
     },
   });
 
-  const handleCordon = (nodeName: string) => {
-    if (confirm(`${nodeName} 노드를 cordon하시겠습니까?`)) {
-      cordonMutation.mutate(nodeName);
+  const handleCordon = async (nodeName: string) => {
+    if (!window.confirm(`${nodeName} 노드를 스케줄링 불가 상태로 변경하시겠습니까?`)) {
+      return;
+    }
+
+    try {
+      await nodeApi.cordonNode(nodeName);
+      queryClient.invalidateQueries('monitoring-data');
+    } catch (error) {
+      console.error('노드 cordon 오류:', error);
+      alert('노드 cordon 중 오류가 발생했습니다.');
     }
   };
 
-  const handleUncordon = (nodeName: string) => {
-    if (confirm(`${nodeName} 노드를 uncordon하시겠습니까?`)) {
-      uncordonMutation.mutate(nodeName);
+  const handleUncordon = async (nodeName: string) => {
+    if (!window.confirm(`${nodeName} 노드의 스케줄링 불가 상태를 해제하시겠습니까?`)) {
+      return;
+    }
+
+    try {
+      await nodeApi.uncordonNode(nodeName);
+      queryClient.invalidateQueries('monitoring-data');
+    } catch (error) {
+      console.error('노드 uncordon 오류:', error);
+      alert('노드 uncordon 중 오류가 발생했습니다.');
     }
   };
 
-  const handleDrain = (nodeName: string) => {
-    if (confirm(`${nodeName} 노드를 drain하시겠습니까? 모든 파드가 다른 노드로 이동됩니다.`)) {
-      drainMutation.mutate(nodeName);
+  const handleDrain = async (nodeName: string) => {
+    if (!window.confirm(`${nodeName} 노드의 모든 파드를 다른 노드로 이동하시겠습니까?`)) {
+      return;
+    }
+
+    try {
+      await nodeApi.drainNode(nodeName);
+      queryClient.invalidateQueries('monitoring-data');
+    } catch (error) {
+      console.error('노드 drain 오류:', error);
+      alert('노드 drain 중 오류가 발생했습니다.');
     }
   };
 

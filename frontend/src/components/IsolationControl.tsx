@@ -1,63 +1,103 @@
 import React, { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { isolationApi, nodeApi } from '../services/api';
-import { IsolationMethod, IsolationRequest } from '../types/api';
+import { IsolationMethod, IsolationRequest, IsolationResponse } from '../types/api';
 import { Play, Square, Clock, AlertTriangle } from 'lucide-react';
 
+interface Task {
+  task_id: string;
+  status: string;
+  message: string;
+  timestamp: string;
+  node_name: string;
+  method: string;
+  duration: number;
+  started_at?: string;
+}
+
+interface TasksResponse {
+  tasks: Task[];
+}
+
 const IsolationControl: React.FC = () => {
-  const [selectedNode, setSelectedNode] = useState('');
+  const [currentTask, setCurrentTask] = useState<Task | null>(null);
+  const [showTaskStatus, setShowTaskStatus] = useState(false);
+  const [selectedNode, setSelectedNode] = useState('worker-1');
   const [selectedMethod, setSelectedMethod] = useState<IsolationMethod>('kubelet');
   const [duration, setDuration] = useState(300);
   const queryClient = useQueryClient();
 
   const { data: nodes } = useQuery('nodes', nodeApi.getNodes);
-  const { data: tasks, refetch: refetchTasks } = useQuery(
+  const { data: tasksData } = useQuery<TasksResponse>(
     'isolation-tasks',
-    isolationApi.getAllTasks,
+    async () => {
+      const response = await isolationApi.getAllTasks();
+      return response as TasksResponse;
+    },
     { refetchInterval: 5000 }
   );
 
-  const startIsolationMutation = useMutation(isolationApi.startIsolation, {
-    onSuccess: () => {
-      refetchTasks();
-      alert('격리 작업이 시작되었습니다.');
-    },
-    onError: (error: any) => {
-      alert(`격리 시작 실패: ${error.response?.data?.detail || error.message}`);
-    },
-  });
+  const startIsolationMutation = useMutation(
+    (data: { node_name: string; duration: number; method: IsolationMethod }) =>
+      isolationApi.startIsolation(data),
+    {
+      onSuccess: (response: IsolationResponse) => {
+        setCurrentTask({
+          task_id: response.task_id,
+          status: response.status,
+          message: response.message,
+          timestamp: new Date().toISOString(),
+          node_name: response.node_name,
+          method: response.method,
+          duration: response.duration,
+          started_at: response.started_at
+        });
+        setShowTaskStatus(true);
+      },
+      onError: (error) => {
+        console.error('격리 시작 오류:', error);
+        alert('격리 시작 중 오류가 발생했습니다.');
+      }
+    }
+  );
 
-  const stopIsolationMutation = useMutation(isolationApi.stopIsolation, {
-    onSuccess: () => {
-      refetchTasks();
-      alert('격리 작업이 중지되었습니다.');
-    },
-    onError: (error: any) => {
-      alert(`격리 중지 실패: ${error.response?.data?.detail || error.message}`);
-    },
-  });
+  const stopIsolationMutation = useMutation(
+    (taskId: string) => isolationApi.stopIsolation(taskId),
+    {
+      onSuccess: () => {
+        setCurrentTask(null);
+        setShowTaskStatus(false);
+      },
+      onError: (error) => {
+        console.error('격리 중지 오류:', error);
+        alert('격리 중지 중 오류가 발생했습니다.');
+      }
+    }
+  );
 
-  const handleStartIsolation = () => {
-    if (!selectedNode) {
-      alert('노드를 선택해주세요.');
+  const handleStartIsolation = async () => {
+    if (!selectedNode || !selectedMethod) {
+      alert('노드와 격리 방법을 선택해주세요.');
       return;
     }
 
-    const request: IsolationRequest = {
-      node_name: selectedNode,
-      method: selectedMethod,
-      duration: duration,
-    };
-
-    if (confirm(`${selectedNode} 노드를 ${selectedMethod} 방법으로 ${duration}초간 격리하시겠습니까?`)) {
-      startIsolationMutation.mutate(request);
+    if (!window.confirm(`${selectedNode} 노드를 ${selectedMethod} 방식으로 격리하시겠습니까?`)) {
+      return;
     }
+
+    startIsolationMutation.mutate({
+      node_name: selectedNode,
+      duration: duration,
+      method: selectedMethod
+    });
   };
 
-  const handleStopIsolation = (taskId: string) => {
-    if (confirm('격리 작업을 중지하시겠습니까?')) {
-      stopIsolationMutation.mutate(taskId);
+  const handleStopIsolation = async (taskId: string) => {
+    if (!window.confirm('현재 실행 중인 격리 작업을 중지하시겠습니까?')) {
+      return;
     }
+
+    stopIsolationMutation.mutate(taskId);
   };
 
   const isolationMethods = [
@@ -175,9 +215,9 @@ const IsolationControl: React.FC = () => {
       <div className="card">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">격리 작업 현황</h3>
         
-        {tasks?.tasks && tasks.tasks.length > 0 ? (
+        {tasksData?.tasks && tasksData.tasks.length > 0 ? (
           <div className="space-y-4">
-            {tasks.tasks.map((task: any) => (
+            {tasksData.tasks.map((task: Task) => (
               <div key={task.task_id} className="border border-gray-200 rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
