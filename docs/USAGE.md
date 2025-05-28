@@ -1,6 +1,6 @@
 # 사용 가이드
 
-## 🚀 빠른 시작
+## 빠른 시작
 
 ### 1. 초기 설정
 ```bash
@@ -32,7 +32,7 @@ make test-worker1
 make test-worker2
 ```
 
-## 📊 모니터링
+## 모니터링
 
 ### 실시간 상태 확인
 ```bash
@@ -55,7 +55,7 @@ make watch-nodes
 make monitor
 ```
 
-## 🔥 부하 테스트
+## 부하 테스트
 
 ### 개별 부하 테스트
 ```bash
@@ -78,7 +78,7 @@ python scripts/stress/node_stress_test.py --node worker1 --type memory --memory-
 python scripts/stress/node_stress_test.py --node worker1 --type combined --duration 600s
 ```
 
-## 📋 테스트 시나리오
+## 테스트 시나리오
 
 ### 시나리오 1: 빠른 검증
 ```bash
@@ -98,7 +98,7 @@ make scenario-full
 - 파드 마이그레이션 모니터링
 - 리소스 정리
 
-## 🔧 고급 사용법
+## 고급 사용
 
 ### 환경변수 커스터마이징
 ```bash
@@ -125,7 +125,7 @@ python scripts/monitoring/pod_migration_monitor.py \
   --output monitoring_only.json
 ```
 
-## 📊 결과 분석
+## 결과 분석
 
 ### 테스트 로그 확인
 ```bash
@@ -154,7 +154,7 @@ cat migration_report_worker1.json | python -m json.tool
 }
 ```
 
-## 🧹 정리
+## 정리
 
 ### 테스트 애플리케이션만 정리
 ```bash
@@ -166,7 +166,7 @@ make clean
 make clean-all
 ```
 
-## ⚠️ 주의사항
+## 주의사항
 
 1. **SSH 키 설정**: 모든 노드에 SSH 키 기반 접속이 설정되어 있어야 합니다.
 2. **kubectl 설정**: 쿠버네티스 클러스터에 접근할 수 있는 kubectl이 설정되어 있어야 합니다.
@@ -196,7 +196,7 @@ kubectl describe nodes
 kubectl get events --sort-by=.metadata.creationTimestamp
 ```
 
-## 📞 지원
+## 추가
 
 문제가 발생하면 다음을 확인해주세요:
 1. 모든 노드가 Ready 상태인지 확인
