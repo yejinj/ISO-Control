@@ -1,12 +1,5 @@
 import axios from 'axios';
-import {
-  NodeListResponse,
-  PodDistributionResponse,
-  IsolationRequest,
-  IsolationResponse,
-  MonitoringResponse,
-  SuccessResponse
-} from '../types/api';
+import { IsolationMethod, IsolationResponse, NodeList } from '../types';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
@@ -17,56 +10,111 @@ const api = axios.create({
 
 // 노드 관련 API
 export const nodeApi = {
-  getNodes: (): Promise<NodeListResponse> =>
-    api.get('/nodes').then(res => res.data),
+  getNodes: async (): Promise<NodeList> => {
+    const response = await api.get<NodeList>('/nodes');
+    return response.data;
+  },
   
-  getNode: (nodeName: string) =>
-    api.get(`/nodes/${nodeName}`).then(res => res.data),
+  getNode: async (nodeName: string) => {
+    const response = await api.get(`/nodes/${nodeName}`);
+    return response.data;
+  },
   
-  cordonNode: (nodeName: string): Promise<SuccessResponse> =>
-    api.post(`/nodes/${nodeName}/cordon`).then(res => res.data),
+  cordonNode: async (nodeName: string) => {
+    const response = await api.post(`/nodes/${nodeName}/cordon`);
+    return response.data;
+  },
   
-  uncordonNode: (nodeName: string): Promise<SuccessResponse> =>
-    api.post(`/nodes/${nodeName}/uncordon`).then(res => res.data),
+  uncordonNode: async (nodeName: string) => {
+    const response = await api.post(`/nodes/${nodeName}/uncordon`);
+    return response.data;
+  },
   
-  drainNode: (nodeName: string): Promise<SuccessResponse> =>
-    api.post(`/nodes/${nodeName}/drain`).then(res => res.data),
+  drainNode: async (nodeName: string) => {
+    const response = await api.post(`/nodes/${nodeName}/drain`);
+    return response.data;
+  },
 };
 
 // 파드 관련 API
 export const podApi = {
-  getPods: (namespace?: string) =>
-    api.get('/pods', { params: { namespace } }).then(res => res.data),
+  getPods: async (namespace?: string) => {
+    const response = await api.get('/pods', { params: { namespace } });
+    return response.data;
+  },
   
-  getPodDistribution: (): Promise<PodDistributionResponse> =>
-    api.get('/pods/distribution').then(res => res.data),
+  getPodDistribution: async () => {
+    const response = await api.get('/pods/distribution');
+    return response.data;
+  },
 };
 
 // 격리 관련 API
 export const isolationApi = {
-  startIsolation: (request: IsolationRequest): Promise<IsolationResponse> =>
-    api.post('/isolation/start', request).then(res => res.data),
+  startIsolation: async (data: {
+    node_name: string;
+    duration: number;
+    method: IsolationMethod;
+  }): Promise<IsolationResponse> => {
+    const response = await api.post<IsolationResponse>('/isolation/start', data);
+    return response.data;
+  },
   
-  getIsolationStatus: (taskId: string): Promise<IsolationResponse> =>
-    api.get(`/isolation/status/${taskId}`).then(res => res.data),
+  getIsolationStatus: async (taskId: string) => {
+    const response = await api.get(`/isolation/status/${taskId}`);
+    return response.data;
+  },
   
-  stopIsolation: (taskId: string): Promise<SuccessResponse> =>
-    api.post('/isolation/stop', { task_id: taskId }).then(res => res.data),
+  stopIsolation: async (taskId: string) => {
+    const response = await api.post('/isolation/stop', { task_id: taskId });
+    return response.data;
+  },
   
-  getAllTasks: () =>
-    api.get('/isolation/tasks').then(res => res.data),
+  getAllTasks: async () => {
+    const response = await api.get('/isolation/tasks');
+    return response.data;
+  },
 };
 
 // 모니터링 관련 API
 export const monitoringApi = {
-  getClusterStatus: () =>
-    api.get('/monitoring/cluster').then(res => res.data),
+  getClusterStatus: async () => {
+    const response = await api.get('/monitoring/cluster');
+    return response.data;
+  },
   
-  getMonitoringEvents: (limit = 50) =>
-    api.get('/monitoring/events', { params: { limit } }).then(res => res.data),
+  getMonitoringEvents: async (limit = 50) => {
+    const response = await api.get('/monitoring/events', { params: { limit } });
+    return response.data;
+  },
   
-  getMonitoringData: (): Promise<MonitoringResponse> =>
-    api.get('/monitoring').then(res => res.data),
+  getMonitoringData: async () => {
+    try {
+      const [clusterResponse, eventsResponse] = await Promise.all([
+        api.get('/monitoring/cluster'),
+        api.get('/monitoring/events', { params: { limit: 50 } })
+      ]);
+      
+      return {
+        cluster_status: clusterResponse.data,
+        recent_events: (eventsResponse.data as any)?.events || []
+      };
+    } catch (error) {
+      console.error('모니터링 데이터 조회 실패:', error);
+      return {
+        cluster_status: {
+          timestamp: new Date().toISOString(),
+          nodes: [],
+          pod_distribution: [],
+          total_nodes: 0,
+          ready_nodes: 0,
+          total_pods: 0,
+          running_pods: 0
+        },
+        recent_events: []
+      };
+    }
+  },
 };
 
 export default api; 

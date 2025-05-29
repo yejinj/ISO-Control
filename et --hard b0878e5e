@@ -1,0 +1,51 @@
+[33m0747b1a1[m[33m ([m[1;36mHEAD -> [m[1;32mfeature/pod-isolation-scenario[m[33m, [m[1;31morigin/feature/pod-isolation-scenario[m[33m)[m HEAD@{0}: rebase -i (abort): updating HEAD
+[33m0747b1a1[m[33m ([m[1;36mHEAD -> [m[1;32mfeature/pod-isolation-scenario[m[33m, [m[1;31morigin/feature/pod-isolation-scenario[m[33m)[m HEAD@{1}: rebase -i (abort): updating HEAD
+[33mb0878e5e[m HEAD@{2}: reset: moving to b0878e5ea515b3c44e26c276b16e669ebb2c941a
+[33mb0878e5e[m HEAD@{3}: commit: feat: 개발용 백엔드 서버 파일 추가
+[33ma89280aa[m HEAD@{4}: commit: refactor: API 서비스 인터페이스 정리
+[33me434311f[m HEAD@{5}: commit: refactor: 기존 컴포넌트 구조 정리
+[33mfacfb64d[m HEAD@{6}: commit: feat: PodDistribution 컴포넌트 재구현
+[33ma7f12d47[m HEAD@{7}: commit: feat: MonitoringEvents 컴포넌트 재구현
+[33mc4f9c0e9[m HEAD@{8}: commit: feat: Dashboard 컴포넌트 완전 재구성
+[33md1428bb4[m HEAD@{9}: commit: feat: 프론트엔드 의존성 및 프록시 설정 추가
+[33m59548e25[m HEAD@{10}: commit: docs: USAGE.md 사용 가이드 업데이트
+[33m56c550b8[m HEAD@{11}: reset: moving to HEAD
+[33m56c550b8[m HEAD@{12}: rebase -i (continue): feat: 프론트엔드/백엔드 프로젝트 구조 생성 - React 프론트엔드 디렉토리 구조 - FastAPI 백엔드 디렉토리 구조 - Docker Compose 개발 환경 설정 - README 업데이트
+[33m8f583a02[m HEAD@{13}: commit: refactor: 구문 형식 수정
+[33m45c1e602[m HEAD@{14}: reset: moving to HEAD@{3}
+[33m0747b1a1[m[33m ([m[1;36mHEAD -> [m[1;32mfeature/pod-isolation-scenario[m[33m, [m[1;31morigin/feature/pod-isolation-scenario[m[33m)[m HEAD@{15}: rebase -i (abort): updating HEAD
+[33m0747b1a1[m[33m ([m[1;36mHEAD -> [m[1;32mfeature/pod-isolation-scenario[m[33m, [m[1;31morigin/feature/pod-isolation-scenario[m[33m)[m HEAD@{16}: rebase -i (abort): updating HEAD
+[33mab227f33[m HEAD@{17}: commit: chore: 프로젝트 설정 파일 업데이트
+[33m45c1e602[m HEAD@{18}: commit: feat: .gitignore 파일 추가 - Python, Node.js, IDE, 임시파일 제외 설정
+[33m878aabe1[m HEAD@{19}: reset: moving to HEAD~1
+[33m76115df4[m HEAD@{20}: commit: feat: 프로젝트 기본 설정 파일 추가 - .gitignore, requirements.txt, Makefile (이모지 제거)
+[33m878aabe1[m HEAD@{21}: commit: docs: 실행 방법 문서화
+[33mbe0ffbe1[m HEAD@{22}: reset: moving to be0ffbe10cb42bc976633c51e66455b3edb7df23
+[33mbe0ffbe1[m HEAD@{23}: commit (amend): feat: 프론트엔드/백엔드 프로젝트 구조 생성
+[33m0747b1a1[m[33m ([m[1;36mHEAD -> [m[1;32mfeature/pod-isolation-scenario[m[33m, [m[1;31morigin/feature/pod-isolation-scenario[m[33m)[m HEAD@{24}: commit: feat: React UI 컴포넌트 완성
+[33m323506d8[m HEAD@{25}: commit: feat: React 프론트엔드 기본 구조
+[33mbd702b58[m HEAD@{26}: commit: feat: 백엔드 API 라우터 완성
+[33m952f4d99[m HEAD@{27}: commit: feat: FastAPI 백엔드 기본 구조
+[33mb7077a0a[m HEAD@{28}: commit: feat: 프론트엔드/백엔드 프로젝트 구조 생성 - React 프론트엔드 디렉토리 구조 - FastAPI 백엔드 디렉토리 구조 - Docker Compose 개발 환경 설정 - README 업데이트
+[33m4ccbe2c3[m HEAD@{29}: commit: cleanup: Python 캐시 파일 삭제
+[33m4f95648a[m HEAD@{30}: reset: moving to HEAD
+[33m4f95648a[m HEAD@{31}: commit: cleanup: 기존 admin-api, admin-ui 관련 파일 정리
+[33m3ef64a77[m HEAD@{32}: commit: docs: 사용 가이드 문서 추가
+[33mef27bbce[m HEAD@{33}: commit: feat: nginx 테스트 애플리케이션 매니페스트 추가
+[33m706046ca[m HEAD@{34}: commit: feat: 통합 테스트 스크립트 추가
+[33m4a2cc306[m HEAD@{35}: commit: feat: 파드 마이그레이션 실시간 모니터링 스크립트 추가
+[33m2857f1a9[m HEAD@{36}: commit: feat: 노드 부하 테스트 스크립트 추가
+[33m685e7d9b[m HEAD@{37}: commit: feat: 노드 격리 스크립트 추가 - SSH 패스워드 인증 지원
+[33m0b990480[m HEAD@{38}: commit: feat: 환경변수 로더 유틸리티 추가
+[33m5dc9e14b[m HEAD@{39}: commit: feat: 환경 설정 파일 추가 - NCP 서버 정보 및 클러스터 설정
+[33m5036ac41[m HEAD@{40}: reset: moving to HEAD
+[33m5036ac41[m HEAD@{41}: reset: moving to HEAD
+[33m5036ac41[m HEAD@{42}: commit: feat: 프로젝트 기본 설정 파일 추가 - README.md: 프로젝트 개요 및 사용법 문서 - Makefile: 편의 명령어 모음 (setup, test, clean 등) - requirements.txt: Python 의존성 패키지 목록
+[33m64d9c642[m HEAD@{43}: reset: moving to HEAD
+[33m64d9c642[m HEAD@{44}: commit: feat: Pod eviction API 및 라우터 등록
+[33m2f4a012a[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{45}: checkout: moving from main to feature/pod-isolation-scenario
+[33m2f4a012a[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{46}: commit: fix: tailwind proxy error 해결
+[33m6854b44f[m HEAD@{47}: reset: moving to HEAD~2
+[33m9ab9937f[m HEAD@{48}: commit: test: commit test
+[33m6a5dd3b1[m HEAD@{49}: commit: 서브모듈 변경사항 커밋
+[33m6854b44f[m HEAD@{50}: clone: from https://github.com/yejinj/iso-control.git

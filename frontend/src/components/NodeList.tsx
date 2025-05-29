@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from 'react-query';
-import { NodeInfo } from '../types/api';
 import { nodeApi } from '../services/api';
-import { Server, Play, Pause, Download } from 'lucide-react';
+import { Server, Play, Pause, Download, Shield } from 'lucide-react';
+import { Node } from '../types';
 
 interface NodeListProps {
-  nodes: NodeInfo[];
+  nodes: Node[];
 }
 
 const NodeList: React.FC<NodeListProps> = ({ nodes }) => {
@@ -43,7 +43,12 @@ const NodeList: React.FC<NodeListProps> = ({ nodes }) => {
   });
 
   const handleCordon = async (nodeName: string) => {
-    if (!window.confirm(`${nodeName} 노드를 스케줄링 불가 상태로 변경하시겠습니까?`)) {
+    if (!isWorkerNode(nodeName)) {
+      alert('워커 노드만 Cordon할 수 있습니다.');
+      return;
+    }
+
+    if (!confirm(`${nodeName} 노드를 스케줄링 불가 상태로 변경하시겠습니까?`)) {
       return;
     }
 
@@ -57,7 +62,12 @@ const NodeList: React.FC<NodeListProps> = ({ nodes }) => {
   };
 
   const handleUncordon = async (nodeName: string) => {
-    if (!window.confirm(`${nodeName} 노드의 스케줄링 불가 상태를 해제하시겠습니까?`)) {
+    if (!isWorkerNode(nodeName)) {
+      alert('워커 노드만 Uncordon할 수 있습니다.');
+      return;
+    }
+
+    if (!confirm(`${nodeName} 노드의 스케줄링 불가 상태를 해제하시겠습니까?`)) {
       return;
     }
 
@@ -71,7 +81,12 @@ const NodeList: React.FC<NodeListProps> = ({ nodes }) => {
   };
 
   const handleDrain = async (nodeName: string) => {
-    if (!window.confirm(`${nodeName} 노드의 모든 파드를 다른 노드로 이동하시겠습니까?`)) {
+    if (!isWorkerNode(nodeName)) {
+      alert('워커 노드만 Drain할 수 있습니다.');
+      return;
+    }
+
+    if (!confirm(`${nodeName} 노드의 모든 파드를 다른 노드로 이동하시겠습니까?`)) {
       return;
     }
 
@@ -84,12 +99,23 @@ const NodeList: React.FC<NodeListProps> = ({ nodes }) => {
     }
   };
 
+  const isWorkerNode = (nodeName: string): boolean => {
+    return nodeName.includes('worker');
+  };
+
+  const getNodeIcon = (node: Node) => {
+    if (node.roles.includes('control-plane')) {
+      return <Shield className="w-5 h-5 text-blue-500 mr-3" />;
+    }
+    return <Server className="w-5 h-5 text-gray-400 mr-3" />;
+  };
+
   return (
     <div className="space-y-6">
       <div className="card">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">노드 관리</h3>
         <p className="text-sm text-gray-600 mb-6">
-          클러스터의 모든 노드를 관리하고 제어할 수 있습니다.
+          클러스터의 모든 노드를 관리하고 제어할 수 있습니다. (작업은 워커 노드만 가능)
         </p>
 
         <div className="overflow-x-auto">
@@ -121,7 +147,7 @@ const NodeList: React.FC<NodeListProps> = ({ nodes }) => {
                 <tr key={node.name} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <Server className="w-5 h-5 text-gray-400 mr-3" />
+                      {getNodeIcon(node)}
                       <div>
                         <div className="text-sm font-medium text-gray-900">
                           {node.name}
@@ -150,32 +176,36 @@ const NodeList: React.FC<NodeListProps> = ({ nodes }) => {
                     {node.internal_ip}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleCordon(node.name)}
-                        disabled={cordonMutation.isLoading}
-                        className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                      >
-                        <Pause className="w-3 h-3 mr-1" />
-                        Cordon
-                      </button>
-                      <button
-                        onClick={() => handleUncordon(node.name)}
-                        disabled={uncordonMutation.isLoading}
-                        className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                      >
-                        <Play className="w-3 h-3 mr-1" />
-                        Uncordon
-                      </button>
-                      <button
-                        onClick={() => handleDrain(node.name)}
-                        disabled={drainMutation.isLoading}
-                        className="inline-flex items-center px-3 py-1 border border-red-300 shadow-sm text-xs font-medium rounded-md text-red-700 bg-white hover:bg-red-50"
-                      >
-                        <Download className="w-3 h-3 mr-1" />
-                        Drain
-                      </button>
-                    </div>
+                    {isWorkerNode(node.name) ? (
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleCordon(node.name)}
+                          disabled={cordonMutation.isLoading}
+                          className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                        >
+                          <Pause className="w-3 h-3 mr-1" />
+                          Cordon
+                        </button>
+                        <button
+                          onClick={() => handleUncordon(node.name)}
+                          disabled={uncordonMutation.isLoading}
+                          className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                        >
+                          <Play className="w-3 h-3 mr-1" />
+                          Uncordon
+                        </button>
+                        <button
+                          onClick={() => handleDrain(node.name)}
+                          disabled={drainMutation.isLoading}
+                          className="inline-flex items-center px-3 py-1 border border-red-300 shadow-sm text-xs font-medium rounded-md text-red-700 bg-white hover:bg-red-50"
+                        >
+                          <Download className="w-3 h-3 mr-1" />
+                          Drain
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-gray-500">컨트롤 플레인 노드</span>
+                    )}
                   </td>
                 </tr>
               ))}

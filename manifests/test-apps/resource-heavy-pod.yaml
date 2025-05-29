@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resource-heavy-deployment
+  namespace: default
+  labels:
+    app: resource-heavy
+    purpose: stress-test
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: resource-heavy
+  template:
+    metadata:
+      labels:
+        app: resource-heavy
+        purpose: stress-test
+    spec:
+      containers:
+      - name: stress-container
+        image: containerstack/cpustress
+        resources:
+          requests:
+            cpu: "1"
+            memory: "512Mi"
+          limits:
+            cpu: "2"
+            memory: "1Gi"
+        command: ["stress"]
+        args: ["--cpu", "2", "--vm", "1", "--vm-bytes", "256M"]
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+      # 파드가 다른 노드에 분산되도록 설정
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - resource-heavy
+              topologyKey: kubernetes.io/hostname
+      # 빠른 재시작을 위한 설정
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: resource-heavy-service
+  namespace: default
+  labels:
+    app: resource-heavy
+spec:
+  selector:
+    app: resource-heavy
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  type: ClusterIP 
