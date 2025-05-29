@@ -54,10 +54,10 @@ class NodeStressTest:
         result = self.run_ssh_command(node_ip, install_cmd)
         
         if result and result.returncode == 0:
-            print(f"✅ 스트레스 도구 설치 완료: {node_ip}")
+            print(f"스트레스 도구 설치 완료: {node_ip}")
             return True
         else:
-            print(f"❌ 스트레스 도구 설치 실패: {node_ip}")
+            print(f"스트레스 도구 설치 실패: {node_ip}")
             return False
     
     def start_cpu_stress(self, node_ip, cpu_percentage=80, duration="300s"):
@@ -69,7 +69,7 @@ class NodeStressTest:
         result = self.run_ssh_command(node_ip, cpu_count_cmd)
         
         if not result or result.returncode != 0:
-            print(f"❌ CPU 코어 수 확인 실패: {node_ip}")
+            print(f"CPU 코어 수 확인 실패: {node_ip}")
             return False
         
         cpu_count = int(result.stdout.strip())
@@ -81,10 +81,10 @@ class NodeStressTest:
         
         if process:
             self.stress_processes.append(('cpu', node_ip, process))
-            print(f"✅ CPU 부하 테스트 시작됨: {node_ip} (워커: {workers}개)")
+            print(f"CPU 부하 테스트 시작됨: {node_ip} (워커: {workers}개)")
             return True
         else:
-            print(f"❌ CPU 부하 테스트 시작 실패: {node_ip}")
+            print(f"CPU 부하 테스트 시작 실패: {node_ip}")
             return False
     
     def start_memory_stress(self, node_ip, memory_percentage=70, duration="300s"):
@@ -96,7 +96,7 @@ class NodeStressTest:
         result = self.run_ssh_command(node_ip, memory_cmd)
         
         if not result or result.returncode != 0:
-            print(f"❌ 메모리 정보 확인 실패: {node_ip}")
+            print(f"메모리 정보 확인 실패: {node_ip}")
             return False
         
         total_memory = int(result.stdout.strip())
@@ -108,10 +108,10 @@ class NodeStressTest:
         
         if process:
             self.stress_processes.append(('memory', node_ip, process))
-            print(f"✅ 메모리 부하 테스트 시작됨: {node_ip} (목표: {target_memory}MB)")
+            print(f"메모리 부하 테스트 시작됨: {node_ip} (목표: {target_memory}MB)")
             return True
         else:
-            print(f"❌ 메모리 부하 테스트 시작 실패: {node_ip}")
+            print(f"메모리 부하 테스트 시작 실패: {node_ip}")
             return False
     
     def start_combined_stress(self, node_ip, cpu_percentage=80, memory_percentage=70, duration="300s"):
@@ -178,9 +178,9 @@ class NodeStressTest:
                 # 로컬 프로세스 종료
                 process.terminate()
                 process.wait(timeout=5)
-                print(f"✅ {stress_type} 부하 테스트 중지됨: {node_ip}")
+                print(f"{stress_type} 부하 테스트 중지됨: {node_ip}")
             except Exception as e:
-                print(f"❌ 부하 테스트 중지 실패: {node_ip} - {e}")
+                print(f"부하 테스트 중지 실패: {node_ip} - {e}")
         
         self.stress_processes.clear()
         self.stop_monitoring()
@@ -219,7 +219,7 @@ def main():
     # 노드 정보 가져오기
     node_info = stress_test.env_loader.get_node_by_name(args.node)
     if not node_info:
-        print(f"❌ 노드를 찾을 수 없습니다: {args.node}")
+        print(f"노드를 찾을 수 없습니다: {args.node}")
         sys.exit(1)
     
     node_ip = node_info['private_ip']
@@ -228,7 +228,7 @@ def main():
     # 노드 상태 확인
     status = stress_test.get_node_status(node_ip)
     if status != "HEALTHY":
-        print(f"❌ 노드 상태 이상: {status}")
+        print(f"노드 상태 이상: {status}")
         sys.exit(1)
     
     try:
@@ -252,7 +252,7 @@ def main():
             )
         
         if not success:
-            print("❌ 부하 테스트 시작 실패")
+            print("부하 테스트 시작 실패")
             sys.exit(1)
         
         print(f"부하 테스트가 실행 중입니다. 지속 시간: {args.duration}")
@@ -267,7 +267,7 @@ def main():
                 if p.poll() is None
             ]
         
-        print("✅ 부하 테스트 완료")
+        print("부하 테스트 완료")
         
     except KeyboardInterrupt:
         print("\n사용자에 의해 중단됨")

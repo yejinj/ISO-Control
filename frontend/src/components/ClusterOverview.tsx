@@ -18,33 +18,38 @@ const ClusterOverview: React.FC<ClusterOverviewProps> = ({ clusterStatus }) => {
   const stats = [
     {
       title: '전체 노드',
-      value: clusterStatus.total_nodes,
+      value: clusterStatus.total_nodes || 0,
       icon: Server,
       color: 'blue',
     },
     {
       title: '준비된 노드',
-      value: clusterStatus.ready_nodes,
+      value: clusterStatus.ready_nodes || 0,
       icon: CheckCircle,
       color: 'green',
     },
     {
       title: '전체 파드',
-      value: clusterStatus.total_pods,
+      value: clusterStatus.total_pods || 0,
       icon: Package,
       color: 'purple',
     },
     {
       title: '실행 중인 파드',
-      value: clusterStatus.running_pods,
+      value: clusterStatus.running_pods || 0,
       icon: CheckCircle,
       color: 'green',
     },
   ];
 
   const getHealthStatus = () => {
-    const nodeHealth = clusterStatus.ready_nodes / clusterStatus.total_nodes;
-    const podHealth = clusterStatus.running_pods / clusterStatus.total_pods;
+    const totalNodes = clusterStatus.total_nodes || 0;
+    const readyNodes = clusterStatus.ready_nodes || 0;
+    const totalPods = clusterStatus.total_pods || 0;
+    const runningPods = clusterStatus.running_pods || 0;
+    
+    const nodeHealth = totalNodes > 0 ? readyNodes / totalNodes : 0;
+    const podHealth = totalPods > 0 ? runningPods / totalPods : 0;
     
     if (nodeHealth >= 0.8 && podHealth >= 0.8) {
       return { status: 'healthy', label: '정상', color: 'green' };
@@ -106,7 +111,7 @@ const ClusterOverview: React.FC<ClusterOverviewProps> = ({ clusterStatus }) => {
         <div className="card">
           <h4 className="text-lg font-semibold text-gray-900 mb-4">노드 상태</h4>
           <div className="space-y-3">
-            {clusterStatus.nodes.map((node) => (
+            {clusterStatus.nodes?.map((node) => (
               <div key={node.name} className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className={`w-3 h-3 rounded-full ${
@@ -125,7 +130,11 @@ const ClusterOverview: React.FC<ClusterOverviewProps> = ({ clusterStatus }) => {
                   {node.status}
                 </span>
               </div>
-            ))}
+            )) || (
+              <div className="text-center py-4 text-gray-500">
+                노드 정보를 불러올 수 없습니다.
+              </div>
+            )}
           </div>
         </div>
 
@@ -133,7 +142,7 @@ const ClusterOverview: React.FC<ClusterOverviewProps> = ({ clusterStatus }) => {
         <div className="card">
           <h4 className="text-lg font-semibold text-gray-900 mb-4">파드 분포</h4>
           <div className="space-y-3">
-            {clusterStatus.pod_distribution.map((dist) => (
+            {clusterStatus.pod_distribution?.map((dist) => (
               <div key={dist.node_name} className="flex items-center justify-between">
                 <span className="font-medium">{dist.node_name}</span>
                 <div className="flex items-center space-x-2">
@@ -150,7 +159,11 @@ const ClusterOverview: React.FC<ClusterOverviewProps> = ({ clusterStatus }) => {
                   </div>
                 </div>
               </div>
-            ))}
+            )) || (
+              <div className="text-center py-4 text-gray-500">
+                파드 분포 정보를 불러올 수 없습니다.
+              </div>
+            )}
           </div>
         </div>
       </div>

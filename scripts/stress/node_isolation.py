@@ -41,10 +41,10 @@ class NodeIsolation:
                 result = subprocess.run(ssh_cmd, capture_output=True, text=True, timeout=30)
                 return result
         except subprocess.TimeoutExpired:
-            print(f"❌ SSH 명령 타임아웃: {node_ip}")
+            print(f"SSH 명령 타임아웃: {node_ip}")
             return None
         except Exception as e:
-            print(f"❌ SSH 명령 실행 오류: {e}")
+            print(f"SSH 명령 실행 오류: {e}")
             return None
     
     def run_kubectl_command(self, command):
@@ -63,12 +63,12 @@ class NodeIsolation:
     
     def method1_network_isolation(self, node_ip, duration=300):
         """방법 1: 네트워크 격리 - iptables로 API 서버 통신 차단"""
-        print(f"🔥 방법 1: 네트워크 격리 시작 - {node_ip}")
+        print(f"방법 1: 네트워크 격리 시작 - {node_ip}")
         
         # API 서버 IP 확인
         api_server_result = self.run_kubectl_command("cluster-info")
         if not api_server_result:
-            print("❌ API 서버 정보 확인 실패")
+            print("API 서버 정보 확인 실패")
             return False
         
         # 마스터 노드들의 IP 가져오기
@@ -81,18 +81,18 @@ class NodeIsolation:
             block_cmd = f"iptables -A OUTPUT -d {master_ip} -p tcp --dport 6443 -j DROP"
             result = self.run_ssh_command(node_ip, block_cmd)
             if result and result.returncode == 0:
-                print(f"✅ API 서버 {master_ip}:6443 통신 차단")
+                print(f"API 서버 {master_ip}:6443 통신 차단")
             else:
-                print(f"❌ API 서버 {master_ip}:6443 통신 차단 실패")
+                print(f"API 서버 {master_ip}:6443 통신 차단 실패")
         
         # 지정된 시간 후 복구
         def restore_network():
             time.sleep(duration)
-            print(f"🔄 네트워크 격리 해제 중 - {node_ip}")
+            print(f"네트워크 격리 해제 중 - {node_ip}")
             for master_ip in master_ips:
                 restore_cmd = f"iptables -D OUTPUT -d {master_ip} -p tcp --dport 6443 -j DROP"
                 self.run_ssh_command(node_ip, restore_cmd)
-            print(f"✅ 네트워크 격리 해제 완료 - {node_ip}")
+            print(f"네트워크 격리 해제 완료 - {node_ip}")
         
         restore_thread = threading.Thread(target=restore_network)
         restore_thread.daemon = True
@@ -102,28 +102,28 @@ class NodeIsolation:
     
     def method2_kubelet_stop(self, node_ip, duration=300):
         """방법 2: kubelet 서비스 중지"""
-        print(f"🔥 방법 2: kubelet 서비스 중지 - {node_ip}")
+        print(f"방법 2: kubelet 서비스 중지 - {node_ip}")
         
         # kubelet 중지
         stop_cmd = "systemctl stop kubelet"
         result = self.run_ssh_command(node_ip, stop_cmd)
         
         if result and result.returncode == 0:
-            print(f"✅ kubelet 서비스 중지됨 - {node_ip}")
+            print(f"kubelet 서비스 중지됨 - {node_ip}")
         else:
-            print(f"❌ kubelet 서비스 중지 실패 - {node_ip}")
+            print(f"kubelet 서비스 중지 실패 - {node_ip}")
             return False
         
         # 지정된 시간 후 복구
         def restore_kubelet():
             time.sleep(duration)
-            print(f"🔄 kubelet 서비스 재시작 중 - {node_ip}")
+            print(f"kubelet 서비스 재시작 중 - {node_ip}")
             start_cmd = "systemctl start kubelet"
             result = self.run_ssh_command(node_ip, start_cmd)
             if result and result.returncode == 0:
-                print(f"✅ kubelet 서비스 재시작 완료 - {node_ip}")
+                print(f"kubelet 서비스 재시작 완료 - {node_ip}")
             else:
-                print(f"❌ kubelet 서비스 재시작 실패 - {node_ip}")
+                print(f"kubelet 서비스 재시작 실패 - {node_ip}")
         
         restore_thread = threading.Thread(target=restore_kubelet)
         restore_thread.daemon = True
@@ -133,7 +133,7 @@ class NodeIsolation:
     
     def method3_container_runtime_stop(self, node_ip, duration=300):
         """방법 3: 컨테이너 런타임 중지 (containerd/docker)"""
-        print(f"🔥 방법 3: 컨테이너 런타임 중지 - {node_ip}")
+        print(f"방법 3: 컨테이너 런타임 중지 - {node_ip}")
         
         # containerd 또는 docker 확인
         check_containerd = "systemctl is-active containerd"
@@ -148,7 +148,7 @@ class NodeIsolation:
         elif docker_result and "active" in docker_result.stdout:
             runtime_service = "docker"
         else:
-            print(f"❌ 컨테이너 런타임을 찾을 수 없음 - {node_ip}")
+            print(f"컨테이너 런타임을 찾을 수 없음 - {node_ip}")
             return False
         
         # 런타임 중지
@@ -156,21 +156,21 @@ class NodeIsolation:
         result = self.run_ssh_command(node_ip, stop_cmd)
         
         if result and result.returncode == 0:
-            print(f"✅ {runtime_service} 서비스 중지됨 - {node_ip}")
+            print(f"{runtime_service} 서비스 중지됨 - {node_ip}")
         else:
-            print(f"❌ {runtime_service} 서비스 중지 실패 - {node_ip}")
+            print(f"{runtime_service} 서비스 중지 실패 - {node_ip}")
             return False
         
         # 지정된 시간 후 복구
         def restore_runtime():
             time.sleep(duration)
-            print(f"🔄 {runtime_service} 서비스 재시작 중 - {node_ip}")
+            print(f"{runtime_service} 서비스 재시작 중 - {node_ip}")
             start_cmd = f"systemctl start {runtime_service}"
             result = self.run_ssh_command(node_ip, start_cmd)
             if result and result.returncode == 0:
-                print(f"✅ {runtime_service} 서비스 재시작 완료 - {node_ip}")
+                print(f"{runtime_service} 서비스 재시작 완료 - {node_ip}")
             else:
-                print(f"❌ {runtime_service} 서비스 재시작 실패 - {node_ip}")
+                print(f"{runtime_service} 서비스 재시작 실패 - {node_ip}")
         
         restore_thread = threading.Thread(target=restore_runtime)
         restore_thread.daemon = True
@@ -180,14 +180,14 @@ class NodeIsolation:
     
     def method4_node_drain_manual(self, node_name, duration=300):
         """방법 4: 수동 노드 드레인 (kubectl 사용하지만 직접 구현)"""
-        print(f"🔥 방법 4: 수동 노드 드레인 - {node_name}")
+        print(f"방법 4: 수동 노드 드레인 - {node_name}")
         
         # 노드의 파드 목록 가져오기
         get_pods_cmd = f"get pods --all-namespaces --field-selector spec.nodeName={node_name} -o jsonpath='{{.items[*].metadata.name}}'"
         result = self.run_kubectl_command(get_pods_cmd)
         
         if not result or result.returncode != 0:
-            print(f"❌ 노드 {node_name}의 파드 목록 조회 실패")
+            print(f"노드 {node_name}의 파드 목록 조회 실패")
             return False
         
         pod_names = result.stdout.strip().split()
@@ -195,7 +195,7 @@ class NodeIsolation:
             print(f"⚠️  노드 {node_name}에 파드가 없습니다")
             return True
         
-        print(f"📦 노드 {node_name}에서 {len(pod_names)}개 파드 발견")
+        print(f"노드 {node_name}에서 {len(pod_names)}개 파드 발견")
         
         # 각 파드를 수동으로 삭제
         deleted_pods = []
@@ -213,24 +213,24 @@ class NodeIsolation:
                     delete_result = self.run_kubectl_command(delete_cmd)
                     
                     if delete_result and delete_result.returncode == 0:
-                        print(f"✅ 파드 삭제됨: {pod_name} (namespace: {namespace})")
+                        print(f"파드 삭제됨: {pod_name} (namespace: {namespace})")
                         deleted_pods.append((pod_name, namespace))
                     else:
-                        print(f"❌ 파드 삭제 실패: {pod_name}")
+                        print(f"파드 삭제 실패: {pod_name}")
         
-        print(f"✅ 총 {len(deleted_pods)}개 파드가 삭제되어 다른 노드로 재스케줄링됩니다")
+        print(f"총 {len(deleted_pods)}개 파드가 삭제되어 다른 노드로 재스케줄링됩니다")
         return True
     
     def method5_extreme_resource_exhaustion(self, node_ip, duration=300):
         """방법 5: 극한 리소스 고갈 (메모리 99% 사용)"""
-        print(f"🔥 방법 5: 극한 리소스 고갈 - {node_ip}")
+        print(f"방법 5: 극한 리소스 고갈 - {node_ip}")
         
         # 사용 가능한 메모리의 99% 사용
         memory_cmd = "free -m | awk 'NR==2{printf \"%d\", $2 * 0.99}'"
         result = self.run_ssh_command(node_ip, memory_cmd)
         
         if not result or result.returncode != 0:
-            print(f"❌ 메모리 정보 확인 실패: {node_ip}")
+            print(f"메모리 정보 확인 실패: {node_ip}")
             return False
         
         target_memory = result.stdout.strip()
@@ -240,11 +240,11 @@ class NodeIsolation:
         process = self.run_ssh_command(node_ip, stress_cmd, background=True)
         
         if process:
-            print(f"✅ 극한 리소스 고갈 시작됨: {node_ip} (메모리: {target_memory}MB)")
+            print(f"극한 리소스 고갈 시작됨: {node_ip} (메모리: {target_memory}MB)")
             self.isolation_processes.append(('extreme_stress', node_ip, process))
             return True
         else:
-            print(f"❌ 극한 리소스 고갈 시작 실패: {node_ip}")
+            print(f"극한 리소스 고갈 시작 실패: {node_ip}")
             return False
     
     def isolate_node(self, node_name, method="network", duration=300):
@@ -260,7 +260,7 @@ class NodeIsolation:
                 node_info = self.env_loader.get_node_by_name(mapped_name)
             
             if not node_info:
-                print(f"❌ 노드를 찾을 수 없습니다: {node_name}")
+                print(f"노드를 찾을 수 없습니다: {node_name}")
                 print("사용 가능한 노드:")
                 all_nodes = self.env_loader.get_all_nodes()
                 for name in all_nodes.keys():
@@ -285,12 +285,12 @@ class NodeIsolation:
         elif method == "extreme":
             return self.method5_extreme_resource_exhaustion(node_ip, duration)
         else:
-            print(f"❌ 알 수 없는 격리 방법: {method}")
+            print(f"알 수 없는 격리 방법: {method}")
             return False
     
     def stop_isolation(self):
         """격리 중지"""
-        print("🛑 모든 격리 프로세스를 중지합니다...")
+        print("모든 격리 프로세스를 중지합니다...")
         
         for isolation_type, node_ip, process in self.isolation_processes:
             try:
@@ -301,9 +301,9 @@ class NodeIsolation:
                 # 로컬 프로세스 종료
                 process.terminate()
                 process.wait(timeout=5)
-                print(f"✅ {isolation_type} 격리 중지됨: {node_ip}")
+                print(f"{isolation_type} 격리 중지됨: {node_ip}")
             except Exception as e:
-                print(f"❌ 격리 중지 실패: {node_ip} - {e}")
+                print(f"격리 중지 실패: {node_ip} - {e}")
         
         self.isolation_processes.clear()
 

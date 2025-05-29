@@ -140,14 +140,14 @@ data:
     </head>
     <body>
         <div class="container">
-            <h1>🚀 Kubernetes Migration Test Pod</h1>
+            <h1>Kubernetes Migration Test Pod</h1>
             <div class="info-box">
                 <h3>Pod Information</h3>
                 <pre id="pod-info">Loading...</pre>
             </div>
             <div class="info-box">
                 <h3>Status</h3>
-                <p class="status">✅ Pod is running and ready for migration testing</p>
+                <p class="status">Pod is running and ready for migration testing</p>
                 <p>This pod is designed to test Kubernetes pod migration during node failures.</p>
             </div>
             <div class="info-box">

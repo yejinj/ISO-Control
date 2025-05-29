@@ -1,8 +1,8 @@
-# 쿠버네티스 노드 격리 및 파드 마이그레이션 테스트 프로젝트
+# ISO Control
 
-NCP 서버 6대(마스터 3대, 워커 2대, 로드밸런서 1대)를 이용한 쿠버네티스 멀티마스터 클러스터에서 노드 장애 시 파드 마이그레이션을 테스트하는 프로젝트입니다.
+쿠버네티스 노드 격리 및 파드 마이그레이션 테스트 도구
 
-## 🏗️ 프로젝트 구조
+## 프로젝트 구조
 
 ```
 iso-control/
@@ -30,7 +30,7 @@ iso-control/
 └── docker-compose.yml          # 개발 환경 구성
 ```
 
-## 🚀 빠른 시작
+## 빠른 시작
 
 ### 개발 환경 실행
 
@@ -61,7 +61,7 @@ python3 scripts/monitoring/pod_migration_monitor.py
 python3 scripts/run_migration_test.py
 ```
 
-## 🎯 주요 기능
+## 주요 기능
 
 ### 웹 UI 기능
 - **실시간 클러스터 모니터링**: 노드 상태, 파드 분포 실시간 확인
@@ -76,7 +76,7 @@ python3 scripts/run_migration_test.py
 4. **Drain**: 수동 파드 삭제
 5. **Extreme**: 극한 리소스 고갈
 
-## 🔧 기술 스택
+## 기술 스택
 
 ### Frontend
 - React 18 + TypeScript
@@ -96,29 +96,29 @@ python3 scripts/run_migration_test.py
 - NCP (Naver Cloud Platform)
 - Docker & Docker Compose
 
-## 📊 서버 정보
+## 서버 정보
 
 - **마스터 노드**: isc-master1, isc-master2, isc-master3
 - **워커 노드**: isc-worker1, isc-worker2
 - **로드밸런서**: isc-loadbalancer
 - **네트워크**: 10.20.1.0/24 (내부), 공인 IP 할당
 
-## 🧪 테스트 결과
+## 테스트 결과
 
-✅ **성공적으로 검증된 기능**:
+**성공적으로 검증된 기능**:
 - SSH 패스워드 인증을 통한 원격 노드 제어
 - kubelet 서비스 중지를 통한 노드 격리
 - isc-worker1 → isc-worker2로 파드 자동 재스케줄링
 - 클러스터 고가용성 및 자동 복구 기능
 
-## 📝 사용법
+## 사용법
 
 자세한 사용법은 [docs/USAGE.md](docs/USAGE.md)를 참고하세요.
 
-## 🤝 기여
+## 기여
 
 이슈나 개선사항이 있으시면 GitHub Issues를 통해 알려주세요.
 
-## 📄 라이선스
+## 라이선스
 
 MIT License 

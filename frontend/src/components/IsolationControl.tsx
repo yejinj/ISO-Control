@@ -1,63 +1,101 @@
 import React, { useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { isolationApi, nodeApi } from '../services/api';
-import { IsolationMethod, IsolationRequest } from '../types/api';
+import { IsolationMethod, IsolationRequest, IsolationResponse, NodeList, Node } from '../types';
 import { Play, Square, Clock, AlertTriangle } from 'lucide-react';
 
-const IsolationControl: React.FC = () => {
-  const [selectedNode, setSelectedNode] = useState('');
-  const [selectedMethod, setSelectedMethod] = useState<IsolationMethod>('kubelet');
-  const [duration, setDuration] = useState(300);
-  const queryClient = useQueryClient();
+interface Task {
+  task_id: string;
+  status: string;
+  message: string;
+  timestamp: string;
+  node_name: string;
+  method: string;
+  duration: number;
+  started_at?: string;
+}
 
-  const { data: nodes } = useQuery('nodes', nodeApi.getNodes);
-  const { data: tasks, refetch: refetchTasks } = useQuery(
+interface TasksResponse {
+  tasks: Task[];
+}
+
+interface TaskStatus {
+  taskId: string;
+  status: string;
+  message: string;
+}
+
+export const IsolationControl = () => {
+  const [selectedNode, setSelectedNode] = useState('');
+  const [duration, setDuration] = useState(300);
+  const [method, setMethod] = useState<IsolationMethod>('network');
+  const [currentTask, setCurrentTask] = useState<TaskStatus | null>(null);
+  const [showTaskStatus, setShowTaskStatus] = useState(false);
+
+  const { data: nodes } = useQuery<NodeList>('nodes', nodeApi.getNodes);
+  const { data: tasksData } = useQuery<TasksResponse>(
     'isolation-tasks',
-    isolationApi.getAllTasks,
+    async () => {
+      const response = await isolationApi.getAllTasks();
+      return response as TasksResponse;
+    },
     { refetchInterval: 5000 }
   );
 
-  const startIsolationMutation = useMutation(isolationApi.startIsolation, {
-    onSuccess: () => {
-      refetchTasks();
-      alert('격리 작업이 시작되었습니다.');
+  const startIsolationMutation = useMutation<
+    IsolationResponse,
+    Error,
+    IsolationRequest
+  >({
+    mutationFn: (data: IsolationRequest) => isolationApi.startIsolation(data),
+    onSuccess: (response: IsolationResponse) => {
+      setCurrentTask({
+        taskId: response.task_id,
+        status: response.status,
+        message: response.message
+      });
+      setShowTaskStatus(true);
     },
-    onError: (error: any) => {
-      alert(`격리 시작 실패: ${error.response?.data?.detail || error.message}`);
-    },
+    onError: (error) => {
+      console.error('격리 시작 오류:', error);
+      alert('격리 시작 중 오류가 발생했습니다.');
+    }
   });
 
-  const stopIsolationMutation = useMutation(isolationApi.stopIsolation, {
-    onSuccess: () => {
-      refetchTasks();
-      alert('격리 작업이 중지되었습니다.');
-    },
-    onError: (error: any) => {
-      alert(`격리 중지 실패: ${error.response?.data?.detail || error.message}`);
-    },
-  });
+  const stopIsolationMutation = useMutation(
+    (taskId: string) => isolationApi.stopIsolation(taskId),
+    {
+      onSuccess: () => {
+        setCurrentTask(null);
+        setShowTaskStatus(false);
+      },
+      onError: (error) => {
+        console.error('격리 중지 오류:', error);
+        alert('격리 중지 중 오류가 발생했습니다.');
+      }
+    }
+  );
 
   const handleStartIsolation = () => {
     if (!selectedNode) {
       alert('노드를 선택해주세요.');
       return;
     }
-
-    const request: IsolationRequest = {
+    
+    startIsolationMutation.mutate({
       node_name: selectedNode,
-      method: selectedMethod,
       duration: duration,
-    };
-
-    if (confirm(`${selectedNode} 노드를 ${selectedMethod} 방법으로 ${duration}초간 격리하시겠습니까?`)) {
-      startIsolationMutation.mutate(request);
-    }
+      method: method
+    });
   };
 
-  const handleStopIsolation = (taskId: string) => {
-    if (confirm('격리 작업을 중지하시겠습니까?')) {
-      stopIsolationMutation.mutate(taskId);
+  const handleStopIsolation = async (taskId: string) => {
+    // eslint-disable-next-line no-restricted-globals
+    if (!confirm('현재 실행 중인 격리 작업을 중지하시겠습니까?')) {
+      return;
     }
+
+    stopIsolationMutation.mutate(taskId);
   };
 
   const isolationMethods = [
@@ -100,8 +138,8 @@ const IsolationControl: React.FC = () => {
             >
               <option value="">노드를 선택하세요</option>
               {nodes?.nodes
-                .filter(node => node.roles.includes('worker'))
-                .map((node) => (
+                .filter((node: Node) => node.roles.includes('worker'))
+                .map((node: Node) => (
                   <option key={node.name} value={node.name}>
                     {node.name} ({node.status})
                   </option>
@@ -115,8 +153,8 @@ const IsolationControl: React.FC = () => {
               격리 방법
             </label>
             <select
-              value={selectedMethod}
-              onChange={(e) => setSelectedMethod(e.target.value as IsolationMethod)}
+              value={method}
+              onChange={(e) => setMethod(e.target.value as IsolationMethod)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {isolationMethods.map((method) => (
@@ -135,8 +173,8 @@ const IsolationControl: React.FC = () => {
             <input
               type="number"
               value={duration}
-              onChange={(e) => setDuration(Number(e.target.value))}
-              min="10"
+              onChange={(e) => setDuration(parseInt(e.target.value))}
+              min="60"
               max="3600"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -149,10 +187,10 @@ const IsolationControl: React.FC = () => {
             <AlertTriangle className="w-5 h-5 text-blue-500 mt-0.5 mr-2" />
             <div>
               <h4 className="text-sm font-medium text-blue-900">
-                {isolationMethods.find(m => m.value === selectedMethod)?.label}
+                {isolationMethods.find(m => m.value === method)?.label}
               </h4>
               <p className="text-sm text-blue-700 mt-1">
-                {isolationMethods.find(m => m.value === selectedMethod)?.description}
+                {isolationMethods.find(m => m.value === method)?.description}
               </p>
             </div>
           </div>
@@ -175,9 +213,9 @@ const IsolationControl: React.FC = () => {
       <div className="card">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">격리 작업 현황</h3>
         
-        {tasks?.tasks && tasks.tasks.length > 0 ? (
+        {tasksData?.tasks && tasksData.tasks.length > 0 ? (
           <div className="space-y-4">
-            {tasks.tasks.map((task: any) => (
+            {tasksData.tasks.map((task: Task) => (
               <div key={task.task_id} className="border border-gray-200 rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
@@ -228,6 +266,4 @@ const IsolationControl: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default IsolationControl; 
+}; 
