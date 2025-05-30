@@ -1,108 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { Package, Server, Activity, RefreshCw } from 'lucide-react';
+import React from 'react';
+import { useQuery } from 'react-query';
+import { Package, Activity, Server, RefreshCw } from 'lucide-react';
+import { podApi } from '../services/api';
+import { useRefresh } from '../contexts/RefreshContext';
+import { PodDistribution } from '../types';
 
-interface PodInfo {
-  name: string;
-  namespace: string;
-  status: 'Running' | 'Pending' | 'Failed' | 'Terminating';
-  restarts: number;
-}
+const PodDistributionView: React.FC = () => {
+  const { isRefreshing, lastUpdate, refreshAll } = useRefresh();
 
-interface NodePodDistribution {
-  nodeName: string;
-  totalPods: number;
-  runningPods: number;
-  pendingPods: number;
-  failedPods: number;
-  pods: PodInfo[];
-}
-
-const PodDistribution: React.FC = () => {
-  const [distributions, setDistributions] = useState<NodePodDistribution[]>([
+  const { data: distributions = [], isLoading } = useQuery<PodDistribution[]>(
+    'pod-distribution',
+    podApi.getPodDistribution,
     {
-      nodeName: 'isc-master1',
-      totalPods: 8,
-      runningPods: 8,
-      pendingPods: 0,
-      failedPods: 0,
-      pods: [
-        { name: 'kube-apiserver-master1', namespace: 'kube-system', status: 'Running', restarts: 0 },
-        { name: 'kube-controller-manager-master1', namespace: 'kube-system', status: 'Running', restarts: 0 },
-        { name: 'kube-scheduler-master1', namespace: 'kube-system', status: 'Running', restarts: 0 },
-        { name: 'etcd-master1', namespace: 'kube-system', status: 'Running', restarts: 0 },
-        { name: 'coredns-1', namespace: 'kube-system', status: 'Running', restarts: 0 },
-        { name: 'calico-node-1', namespace: 'kube-system', status: 'Running', restarts: 0 },
-        { name: 'kube-proxy-1', namespace: 'kube-system', status: 'Running', restarts: 0 },
-        { name: 'metrics-server-1', namespace: 'kube-system', status: 'Running', restarts: 0 }
-      ]
-    },
-    {
-      nodeName: 'isc-master2',
-      totalPods: 7,
-      runningPods: 7,
-      pendingPods: 0,
-      failedPods: 0,
-      pods: [
-        { name: 'kube-apiserver-master2', namespace: 'kube-system', status: 'Running', restarts: 0 },
-        { name: 'kube-controller-manager-master2', namespace: 'kube-system', status: 'Running', restarts: 0 },
-        { name: 'kube-scheduler-master2', namespace: 'kube-system', status: 'Running', restarts: 0 },
-        { name: 'etcd-master2', namespace: 'kube-system', status: 'Running', restarts: 0 },
-        { name: 'coredns-2', namespace: 'kube-system', status: 'Running', restarts: 0 },
-        { name: 'calico-node-2', namespace: 'kube-system', status: 'Running', restarts: 0 },
-        { name: 'kube-proxy-2', namespace: 'kube-system', status: 'Running', restarts: 0 }
-      ]
-    },
-    {
-      nodeName: 'isc-master3',
-      totalPods: 6,
-      runningPods: 6,
-      pendingPods: 0,
-      failedPods: 0,
-      pods: [
-        { name: 'kube-apiserver-master3', namespace: 'kube-system', status: 'Running', restarts: 0 },
-        { name: 'kube-controller-manager-master3', namespace: 'kube-system', status: 'Running', restarts: 0 },
-        { name: 'kube-scheduler-master3', namespace: 'kube-system', status: 'Running', restarts: 0 },
-        { name: 'etcd-master3', namespace: 'kube-system', status: 'Running', restarts: 0 },
-        { name: 'calico-node-3', namespace: 'kube-system', status: 'Running', restarts: 0 },
-        { name: 'kube-proxy-3', namespace: 'kube-system', status: 'Running', restarts: 0 }
-      ]
-    },
-    {
-      nodeName: 'isc-worker1',
-      totalPods: 3,
-      runningPods: 3,
-      pendingPods: 0,
-      failedPods: 0,
-      pods: [
-        { name: 'nginx-test-deployment-1', namespace: 'default', status: 'Running', restarts: 0 },
-        { name: 'nginx-test-deployment-2', namespace: 'default', status: 'Running', restarts: 0 },
-        { name: 'nginx-test-deployment-3', namespace: 'default', status: 'Running', restarts: 0 }
-      ]
-    },
-    {
-      nodeName: 'isc-worker2',
-      totalPods: 3,
-      runningPods: 3,
-      pendingPods: 0,
-      failedPods: 0,
-      pods: [
-        { name: 'nginx-test-deployment-4', namespace: 'default', status: 'Running', restarts: 0 },
-        { name: 'nginx-test-deployment-5', namespace: 'default', status: 'Running', restarts: 0 },
-        { name: 'nginx-test-deployment-6', namespace: 'default', status: 'Running', restarts: 0 }
-      ]
+      refetchInterval: 10000, // 10초마다 자동 새로고침
     }
-  ]);
-
-  const [lastUpdate, setLastUpdate] = useState(new Date());
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const refreshData = async () => {
-    setIsRefreshing(true);
-    // 시뮬레이션: 데이터 새로고침
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setLastUpdate(new Date());
-    setIsRefreshing(false);
-  };
+  );
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -119,8 +31,8 @@ const PodDistribution: React.FC = () => {
     }
   };
 
-  const totalPods = distributions.reduce((sum, dist) => sum + dist.totalPods, 0);
-  const totalRunning = distributions.reduce((sum, dist) => sum + dist.runningPods, 0);
+  const totalPods = distributions.reduce((sum: number, dist: PodDistribution) => sum + dist.pod_count, 0);
+  const totalRunning = distributions.reduce((sum: number, dist: PodDistribution) => sum + dist.ready_count, 0);
 
   return (
     <div className="space-y-6">
@@ -207,7 +119,7 @@ const PodDistribution: React.FC = () => {
               노드별 파드 분포
             </h3>
             <button
-              onClick={refreshData}
+              onClick={() => refreshAll()}
               disabled={isRefreshing}
               className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
@@ -217,15 +129,15 @@ const PodDistribution: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {distributions.map((dist) => (
-              <div key={dist.nodeName} className="border border-gray-200 rounded-lg p-4">
+            {distributions.map((dist: PodDistribution) => (
+              <div key={dist.node_name} className="border border-gray-200 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-2">
                     <Server className="w-5 h-5 text-gray-400" />
-                    <h4 className="font-medium text-gray-900">{dist.nodeName}</h4>
+                    <h4 className="font-medium text-gray-900">{dist.node_name}</h4>
                   </div>
                   <div className="text-sm text-gray-600">
-                    {dist.runningPods}/{dist.totalPods} 실행 중
+                    {dist.ready_count}/{dist.pod_count} 실행 중
                   </div>
                 </div>
 
@@ -233,13 +145,13 @@ const PodDistribution: React.FC = () => {
                 <div className="mb-4">
                   <div className="flex justify-between text-sm text-gray-600 mb-1">
                     <span>파드 상태</span>
-                    <span>{Math.round((dist.runningPods / dist.totalPods) * 100) || 0}%</span>
+                    <span>{Math.round((dist.ready_count / dist.pod_count) * 100) || 0}%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className="bg-green-600 h-2 rounded-full"
                       style={{
-                        width: `${dist.totalPods > 0 ? (dist.runningPods / dist.totalPods) * 100 : 0}%`
+                        width: `${dist.pod_count > 0 ? (dist.ready_count / dist.pod_count) * 100 : 0}%`
                       }}
                     ></div>
                   </div>
@@ -276,4 +188,4 @@ const PodDistribution: React.FC = () => {
   );
 };
 
-export default PodDistribution; 
+export default PodDistributionView; 
