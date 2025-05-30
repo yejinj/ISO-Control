@@ -48,7 +48,7 @@ const NodeList: React.FC<NodeListProps> = ({ nodes }) => {
       return;
     }
 
-    if (!confirm(`${nodeName} 노드를 스케줄링 불가 상태로 변경하시겠습니까?`)) {
+    if (!window.confirm(`${nodeName} 노드를 스케줄링 불가 상태로 변경하시겠습니까?`)) {
       return;
     }
 
@@ -67,7 +67,7 @@ const NodeList: React.FC<NodeListProps> = ({ nodes }) => {
       return;
     }
 
-    if (!confirm(`${nodeName} 노드의 스케줄링 불가 상태를 해제하시겠습니까?`)) {
+    if (!window.confirm(`${nodeName} 노드의 스케줄링 불가 상태를 해제하시겠습니까?`)) {
       return;
     }
 
@@ -86,7 +86,7 @@ const NodeList: React.FC<NodeListProps> = ({ nodes }) => {
       return;
     }
 
-    if (!confirm(`${nodeName} 노드의 모든 파드를 다른 노드로 이동하시겠습니까?`)) {
+    if (!window.confirm(`${nodeName} 노드의 모든 파드를 다른 노드로 이동하시겠습니까?`)) {
       return;
     }
 
@@ -177,32 +177,32 @@ const NodeList: React.FC<NodeListProps> = ({ nodes }) => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     {isWorkerNode(node.name) ? (
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => handleCordon(node.name)}
-                          disabled={cordonMutation.isLoading}
-                          className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                        >
-                          <Pause className="w-3 h-3 mr-1" />
-                          Cordon
-                        </button>
-                        <button
-                          onClick={() => handleUncordon(node.name)}
-                          disabled={uncordonMutation.isLoading}
-                          className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                        >
-                          <Play className="w-3 h-3 mr-1" />
-                          Uncordon
-                        </button>
-                        <button
-                          onClick={() => handleDrain(node.name)}
-                          disabled={drainMutation.isLoading}
-                          className="inline-flex items-center px-3 py-1 border border-red-300 shadow-sm text-xs font-medium rounded-md text-red-700 bg-white hover:bg-red-50"
-                        >
-                          <Download className="w-3 h-3 mr-1" />
-                          Drain
-                        </button>
-                      </div>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleCordon(node.name)}
+                        disabled={cordonMutation.isLoading}
+                        className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                      >
+                        <Pause className="w-3 h-3 mr-1" />
+                        Cordon
+                      </button>
+                      <button
+                        onClick={() => handleUncordon(node.name)}
+                        disabled={uncordonMutation.isLoading}
+                        className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                      >
+                        <Play className="w-3 h-3 mr-1" />
+                        Uncordon
+                      </button>
+                      <button
+                        onClick={() => handleDrain(node.name)}
+                        disabled={drainMutation.isLoading}
+                        className="inline-flex items-center px-3 py-1 border border-red-300 shadow-sm text-xs font-medium rounded-md text-red-700 bg-white hover:bg-red-50"
+                      >
+                        <Download className="w-3 h-3 mr-1" />
+                        Drain
+                      </button>
+                    </div>
                     ) : (
                       <span className="text-xs text-gray-500">컨트롤 플레인 노드</span>
                     )}
