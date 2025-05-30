@@ -77,4 +77,7 @@ stress_test_*.log
 
 # Docker
 .dockerignore
-docker-compose.override.yml 
+docker-compose.override.yml
+
+# 환경 설정 파일
+config/env.yaml 

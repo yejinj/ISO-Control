@@ -7,11 +7,13 @@ import PodDistribution from './PodDistribution';
 import { IsolationControl } from './IsolationControl';
 import MonitoringEvents from './MonitoringEvents';
 import { RefreshCw } from 'lucide-react';
+import { useRefresh } from '../contexts/RefreshContext';
 
 const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
+  const { isRefreshing, lastUpdate, refreshAll } = useRefresh();
 
-  const { data: monitoringData, isLoading, error, refetch } = useQuery(
+  const { data: monitoringData, isLoading, error } = useQuery(
     'monitoring-data',
     monitoringApi.getMonitoringData,
     {
@@ -39,7 +41,7 @@ const Dashboard: React.FC = () => {
             백엔드 서버가 실행 중인지 확인해주세요 (http://localhost:8000)
           </p>
           <button
-            onClick={() => refetch()}
+            onClick={() => refreshAll()}
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
           >
             다시 시도
@@ -70,13 +72,16 @@ const Dashboard: React.FC = () => {
               </span>
             </div>
             <button
-              onClick={() => refetch()}
-              disabled={isLoading}
+              onClick={() => refreshAll()}
+              disabled={isRefreshing}
               className="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               <span>새로고침</span>
             </button>
+            <span className="text-sm text-gray-500">
+              마지막 업데이트: {lastUpdate.toLocaleTimeString()}
+            </span>
           </div>
         </div>
 

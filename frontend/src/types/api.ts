@@ -43,6 +43,15 @@ export interface PodDistributionResponse {
   total_pods: number;
 }
 
+export interface NodePodDistribution {
+  nodeName: string;
+  totalPods: number;
+  runningPods: number;
+  pendingPods: number;
+  failedPods: number;
+  pods: PodInfo[];
+}
+
 // 격리 관련 타입
 export type IsolationMethod = 'network' | 'kubelet' | 'runtime' | 'drain' | 'extreme';
 export type IsolationStatus = 'idle' | 'running' | 'stopping' | 'completed' | 'failed';
@@ -76,13 +85,12 @@ export interface ClusterStatus {
 }
 
 export interface MonitoringEvent {
+  id: string;
   timestamp: string;
-  event_type: string;
-  node_name?: string;
-  pod_name?: string;
-  namespace?: string;
+  type: 'info' | 'warning' | 'error' | 'success';
   message: string;
-  details?: Record<string, any>;
+  node?: string;
+  pod?: string;
 }
 
 export interface MonitoringResponse {

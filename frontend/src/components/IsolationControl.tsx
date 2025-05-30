@@ -48,18 +48,18 @@ export const IsolationControl = () => {
     IsolationRequest
   >({
     mutationFn: (data: IsolationRequest) => isolationApi.startIsolation(data),
-    onSuccess: (response: IsolationResponse) => {
-      setCurrentTask({
+      onSuccess: (response: IsolationResponse) => {
+        setCurrentTask({
         taskId: response.task_id,
-        status: response.status,
+          status: response.status,
         message: response.message
-      });
-      setShowTaskStatus(true);
-    },
-    onError: (error) => {
-      console.error('격리 시작 오류:', error);
-      alert('격리 시작 중 오류가 발생했습니다.');
-    }
+        });
+        setShowTaskStatus(true);
+      },
+      onError: (error) => {
+        console.error('격리 시작 오류:', error);
+        alert('격리 시작 중 오류가 발생했습니다.');
+      }
   });
 
   const stopIsolationMutation = useMutation(
@@ -81,7 +81,7 @@ export const IsolationControl = () => {
       alert('노드를 선택해주세요.');
       return;
     }
-    
+
     startIsolationMutation.mutate({
       node_name: selectedNode,
       duration: duration,
@@ -266,4 +266,4 @@ export const IsolationControl = () => {
       </div>
     </div>
   );
-}; 
+};
