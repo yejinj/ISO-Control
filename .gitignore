@@ -1,4 +1,4 @@
-# Python 캐시
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -70,3 +70,31 @@ package.json
 admin-ui/.env
 
 README.md
+
+# React build
+frontend/build/
+frontend/dist/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Project specific
+migration_report_*.json
+stress_test_*.log
+*.pid
+
+# Kubernetes
+*.kubeconfig
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# 환경 설정 파일
+config/env.yaml 

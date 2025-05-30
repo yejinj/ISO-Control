@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
+import { useQueryClient } from 'react-query';
 
 interface RefreshContextType {
   isRefreshing: boolean;
   lastUpdate: Date;
-  refreshAll: () => void;
+  refreshAll: () => Promise<void>;
 }
 
 const RefreshContext = createContext<RefreshContextType | undefined>(undefined);
@@ -11,13 +12,23 @@ const RefreshContext = createContext<RefreshContextType | undefined>(undefined);
 export const RefreshProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(new Date());
+  const queryClient = useQueryClient();
 
-  const refreshAll = useCallback(() => {
+  const refreshAll = useCallback(async () => {
     setIsRefreshing(true);
-    // 실제 새로고침 로직은 각 컴포넌트에서 처리
-    setLastUpdate(new Date());
-    setIsRefreshing(false);
-  }, []);
+    try {
+      await Promise.all([
+        queryClient.invalidateQueries('monitoring-data'),
+        queryClient.invalidateQueries('nodes'),
+        queryClient.invalidateQueries('isolation-tasks'),
+      ]);
+      setLastUpdate(new Date());
+    } catch (error) {
+      console.error('데이터 새로고침 중 오류 발생:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [queryClient]);
 
   return (
     <RefreshContext.Provider value={{ isRefreshing, lastUpdate, refreshAll }}>
