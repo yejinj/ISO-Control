@@ -1,5 +1,12 @@
 import axios from 'axios';
-import { IsolationMethod, IsolationResponse, NodeList } from '../types';
+import { 
+  IsolationMethod, 
+  IsolationResponse, 
+  NodeList, 
+  PodDistribution,
+  PodDistributionResponse,
+  MonitoringEvent
+} from '../types';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
@@ -43,9 +50,9 @@ export const podApi = {
     return response.data;
   },
   
-  getPodDistribution: async () => {
-    const response = await api.get('/pods/distribution');
-    return response.data;
+  getPodDistribution: async (): Promise<PodDistribution[]> => {
+    const response = await api.get<PodDistributionResponse>('/pods/distribution');
+    return response.data.distributions;
   },
 };
 
@@ -97,7 +104,7 @@ export const monitoringApi = {
       
       return {
         cluster_status: clusterResponse.data,
-        recent_events: (eventsResponse.data as any)?.events || []
+        recent_events: (eventsResponse.data as { events: MonitoringEvent[] }).events || []
       };
     } catch (error) {
       console.error('모니터링 데이터 조회 실패:', error);
