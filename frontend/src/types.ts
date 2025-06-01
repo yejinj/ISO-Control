@@ -32,18 +32,25 @@ export interface PodDistribution {
   node_name: string;
   pod_count: number;
   ready_count: number;
-  pods: Pod[];
+  pods: PodInfo[];
 }
 
-export interface Pod {
+export interface PodInfo {
   name: string;
   namespace: string;
   status: string;
+  ready: string;
   restarts: number;
+  age: string;
+  ip?: string;
+  node: string;
+  nominated_node?: string;
+  readiness_gates?: string;
 }
 
 export interface PodDistributionResponse {
   distributions: PodDistribution[];
+  total_pods: number;
 }
 
 // 모니터링 이벤트 관련 타입

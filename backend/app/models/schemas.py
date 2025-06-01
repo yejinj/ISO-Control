@@ -15,22 +15,29 @@ class NodeStatus(str, Enum):
     NOT_READY = "NotReady"
     UNKNOWN = "Unknown"
 
-class NodeInfo(BaseModel):
-    """노드 정보"""
+class Node(BaseModel):
     name: str
-    status: NodeStatus
+    status: str
     roles: List[str]
     age: str
     version: str
     internal_ip: str
-    external_ip: Optional[str] = None
-    os_image: str
-    kernel_version: str
+    external_ip: str
+    os: str
+    kernel: str
     container_runtime: str
+    architecture: str
+    cpu: str
+    memory: str
+    pods: str
+    unschedulable: bool
+
+class NodeList(BaseModel):
+    nodes: List[Node]
 
 class NodeListResponse(BaseModel):
     """노드 목록 응답"""
-    nodes: List[NodeInfo]
+    nodes: List[Node]
     total_count: int
 
 # 파드 관련 모델
@@ -47,7 +54,7 @@ class PodInfo(BaseModel):
     """파드 정보"""
     name: str
     namespace: str
-    status: PodStatus
+    status: str
     ready: str
     restarts: int
     age: str
@@ -72,6 +79,36 @@ class PodDistributionResponse(BaseModel):
     """파드 분포 응답"""
     distributions: List[PodDistribution]
     total_pods: int
+
+# 모니터링 관련 모델
+class MonitoringEvent(BaseModel):
+    """모니터링 이벤트"""
+    id: str
+    type: str
+    reason: str
+    message: str
+    timestamp: str
+    source: Dict[str, Any] = {
+        "component": "",
+        "host": None
+    }
+    involved_object: Dict[str, Any] = {
+        "kind": "",
+        "name": "",
+        "namespace": ""
+    }
+
+class IntegratedPodData(BaseModel):
+    """통합 파드 데이터"""
+    timestamp: str
+    pod_distribution: List[PodDistribution]
+    events: List[MonitoringEvent]
+    summary: dict = {
+        "total_pods": 0,
+        "running_pods": 0,
+        "total_nodes": 0,
+        "active_nodes": 0
+    }
 
 # 격리 관련 모델
 class IsolationMethod(str, Enum):
@@ -111,26 +148,15 @@ class IsolationStopRequest(BaseModel):
     """격리 중지 요청"""
     task_id: str
 
-# 모니터링 관련 모델
 class ClusterStatus(BaseModel):
     """클러스터 상태"""
     timestamp: datetime
-    nodes: List[NodeInfo]
+    nodes: List[Node]
     pod_distribution: List[PodDistribution]
     total_nodes: int
     ready_nodes: int
     total_pods: int
     running_pods: int
-
-class MonitoringEvent(BaseModel):
-    """모니터링 이벤트"""
-    timestamp: datetime
-    event_type: str
-    node_name: Optional[str] = None
-    pod_name: Optional[str] = None
-    namespace: Optional[str] = None
-    message: str
-    details: Optional[Dict[str, Any]] = None
 
 class MonitoringResponse(BaseModel):
     """모니터링 응답"""

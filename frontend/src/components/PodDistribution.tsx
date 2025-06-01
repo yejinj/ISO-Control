@@ -2,6 +2,7 @@ import React from 'react';
 import { Package, Activity, Server, RefreshCw } from 'lucide-react';
 import { usePodData } from '../contexts/PodContext';
 import { useRefresh } from '../contexts/RefreshContext';
+import { PodInfo } from '../types';
 
 const PodDistributionView: React.FC = () => {
   const { isRefreshing, lastUpdate, refreshAll } = useRefresh();
@@ -22,8 +23,12 @@ const PodDistributionView: React.FC = () => {
     }
   };
 
-  if (isLoading || !data) {
-    return <div>로딩 중...</div>;
+  if (isLoading || !data || !data.summary || !data.pod_distribution) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-gray-500">데이터를 불러오는 중...</div>
+      </div>
+    );
   }
 
   const { pod_distribution, summary } = data;

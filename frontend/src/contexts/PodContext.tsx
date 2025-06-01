@@ -15,7 +15,7 @@ const PodContext = createContext<PodContextType | undefined>(undefined);
 export const PodProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { data, isLoading, error } = useQuery<IntegratedPodData>(
     'integrated-pod-data',
-    podApi.getIntegratedData,
+    podApi.getIntegratedPodData,
     {
       refetchInterval: 10000, // 10초마다 자동 새로고침
     }

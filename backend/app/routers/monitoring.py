@@ -4,73 +4,102 @@
 """
 
 from fastapi import APIRouter, HTTPException
-import asyncio
-from datetime import datetime
 from typing import List
+import subprocess
+import json
+from datetime import datetime
 
 from app.models.schemas import (
     MonitoringResponse, ClusterStatus, MonitoringEvent
 )
-from app.routers.nodes import get_nodes
-from app.routers.pods import get_pod_distribution
 
 router = APIRouter()
 
-# 모니터링 이벤트 저장소 (실제로는 데이터베이스 사용)
+# 모니터링 이벤트 저장소
 monitoring_events: List[MonitoringEvent] = []
 
-@router.get("/cluster", response_model=ClusterStatus)
+def run_kubectl_command(command: List[str]) -> str:
+    try:
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        raise HTTPException(status_code=500, detail=f"kubectl 명령 실행 실패: {e.stderr}")
+
+@router.get("/monitoring/cluster", response_model=ClusterStatus)
 async def get_cluster_status():
     """클러스터 상태 조회"""
     try:
         # 노드 정보 조회
-        nodes_response = await get_nodes()
-        nodes = nodes_response.nodes
+        nodes_cmd = ["kubectl", "get", "nodes", "-o", "json"]
+        nodes_output = run_kubectl_command(nodes_cmd)
+        nodes_data = json.loads(nodes_output)
         
-        # 파드 분포 조회
-        pod_distribution_response = await get_pod_distribution()
-        pod_distributions = pod_distribution_response.distributions
+        # 파드 정보 조회
+        pods_cmd = ["kubectl", "get", "pods", "-o", "json", "--all-namespaces"]
+        pods_output = run_kubectl_command(pods_cmd)
+        pods_data = json.loads(pods_output)
         
-        # 통계 계산
-        total_nodes = len(nodes)
-        ready_nodes = sum(1 for node in nodes if node.status.value == "Ready")
-        total_pods = pod_distribution_response.total_pods
-        running_pods = sum(dist.ready_count for dist in pod_distributions)
+        # 노드별 파드 분포 계산
+        node_pods = {}
+        for pod in pods_data.get("items", []):
+            node_name = pod["spec"].get("nodeName", "unknown")
+            if node_name not in node_pods:
+                node_pods[node_name] = {"total": 0, "ready": 0}
+            
+            node_pods[node_name]["total"] += 1
+            if pod["status"].get("phase") == "Running":
+                node_pods[node_name]["ready"] += 1
         
+        # 클러스터 상태 구성
         return ClusterStatus(
-            timestamp=datetime.now(),
-            nodes=nodes,
-            pod_distribution=pod_distributions,
-            total_nodes=total_nodes,
-            ready_nodes=ready_nodes,
-            total_pods=total_pods,
-            running_pods=running_pods
+            timestamp=datetime.utcnow().isoformat(),
+            nodes=nodes_data.get("items", []),
+            pod_distribution=[
+                {
+                    "node_name": node,
+                    "total_pods": info["total"],
+                    "ready_pods": info["ready"]
+                }
+                for node, info in node_pods.items()
+            ],
+            total_nodes=len(nodes_data.get("items", [])),
+            ready_nodes=sum(1 for node in nodes_data.get("items", []) 
+                          if any(cond["type"] == "Ready" and cond["status"] == "True" 
+                                for cond in node["status"].get("conditions", []))),
+            total_pods=sum(info["total"] for info in node_pods.values()),
+            running_pods=sum(info["ready"] for info in node_pods.values())
         )
-        
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"클러스터 상태 조회 실패: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/events")
+@router.get("/monitoring/events", response_model=List[MonitoringEvent])
 async def get_monitoring_events(limit: int = 50):
     """모니터링 이벤트 조회"""
     try:
-        # 최근 이벤트 반환 (최신순)
-        recent_events = monitoring_events[-limit:] if monitoring_events else []
-        recent_events.reverse()
+        cmd = ["kubectl", "get", "events", "-o", "json", "--all-namespaces"]
+        output = run_kubectl_command(cmd)
+        data = json.loads(output)
         
-        return {
-            "events": recent_events,
-            "total_count": len(monitoring_events)
-        }
+        events = []
+        for event in data.get("items", [])[:limit]:
+            events.append(MonitoringEvent(
+                id=event["metadata"]["uid"],
+                type=event["type"],
+                reason=event["reason"],
+                message=event["message"],
+                timestamp=event["lastTimestamp"],
+                source=event.get("source", {}),
+                involved_object=event.get("involvedObject", {})
+            ))
         
+        return events
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"모니터링 이벤트 조회 실패: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/", response_model=MonitoringResponse)
 async def get_monitoring_data():
@@ -80,12 +109,11 @@ async def get_monitoring_data():
         cluster_status = await get_cluster_status()
         
         # 최근 이벤트 조회
-        recent_events = monitoring_events[-10:] if monitoring_events else []
-        recent_events.reverse()
+        events = await get_monitoring_events(limit=10)
         
         return MonitoringResponse(
             cluster_status=cluster_status,
-            recent_events=recent_events
+            recent_events=events
         )
         
     except Exception as e:
@@ -97,8 +125,8 @@ async def get_monitoring_data():
 def add_monitoring_event(event_type: str, message: str, **kwargs):
     """모니터링 이벤트 추가"""
     event = MonitoringEvent(
-        timestamp=datetime.now(),
-        event_type=event_type,
+        timestamp=datetime.utcnow().isoformat(),
+        type=event_type,
         message=message,
         **kwargs
     )
