@@ -1,205 +1,197 @@
 # 사용 가이드
 
-## 빠른 시작
+## 시작하기
 
-### 1. 초기 설정
-```bash
-# 프로젝트 디렉토리로 이동
-cd iso-control
+### 1. 로그인
+[로그인 화면 스크린샷 - 로그인 폼]
 
-# 초기 환경 설정
-make setup
+1. 웹 브라우저에서 `http://localhost:3000` 접속
+2. 기본 계정으로 로그인:
+   - 사용자명: admin
+   - 비밀번호: admin123
 
-# 클러스터 노드 정보 확인
-make list-nodes
-```
+### 2. 대시보드
+[대시보드 화면 스크린샷 - 전체 클러스터 상태]
 
-### 2. 빠른 테스트 실행
-```bash
-# worker1 노드 빠른 테스트 (2분)
-make quick-test-worker1
+- 클러스터 전체 상태 확인
+- 노드별 파드 분포 확인
+- 실시간 이벤트 모니터링
 
-# worker2 노드 빠른 테스트 (2분)
-make quick-test-worker2
-```
+## 노드 격리 테스트
 
-### 3. 전체 테스트 실행
-```bash
-# worker1 노드 전체 테스트 (5분)
-make test-worker1
+### 1. 네트워크 격리
+[네트워크 격리 화면 스크린샷 - 격리 설정]
 
-# worker2 노드 전체 테스트 (5분)
-make test-worker2
-```
+1. 노드 선택
+2. "네트워크 격리" 방법 선택
+3. "격리 시작" 버튼 클릭
+4. 격리 해제 시 "격리 중지" 버튼 클릭
+
+### 2. Kubelet 중지
+[Kubelet 제어 화면 스크린샷 - 서비스 제어]
+
+1. 노드 선택
+2. "Kubelet 중지" 방법 선택
+3. "격리 시작" 버튼 클릭
+4. 서비스 재시작 시 "격리 중지" 버튼 클릭
+
+### 3. 컨테이너 런타임 중지
+[런타임 제어 화면 스크린샷 - 런타임 선택]
+
+1. 노드 선택
+2. "런타임 중지" 방법 선택
+3. 런타임 선택 (containerd/docker)
+4. "격리 시작" 버튼 클릭
+5. 서비스 재시작 시 "격리 중지" 버튼 클릭
+
+### 4. 수동 드레인
+[드레인 화면 스크린샷 - 드레인 옵션]
+
+1. 노드 선택
+2. "수동 드레인" 방법 선택
+3. 드레인 옵션 설정:
+   - 그레이스풀 종료 시간
+   - 파드 삭제 순서
+4. "격리 시작" 버튼 클릭
+
+### 5. 리소스 고갈
+[리소스 제어 화면 스크린샷 - 리소스 설정]
+
+1. 노드 선택
+2. "리소스 고갈" 방법 선택
+3. 리소스 설정:
+   - CPU 사용량 (%)
+   - 메모리 사용량 (GB)
+   - 디스크 사용량 (GB)
+4. "격리 시작" 버튼 클릭
 
 ## 모니터링
 
-### 실시간 상태 확인
+### 1. 클러스터 상태
+[클러스터 상태 화면 스크린샷 - 상태 지표]
+
+- 노드 상태
+- 파드 상태
+- 서비스 상태
+- 이벤트 로그
+
+### 2. 파드 분포
+[파드 분포 화면 스크린샷 - 분포 시각화]
+
+- 노드별 파드 수
+- 파드 상태 분포
+- 리소스 사용량
+
+### 3. 이벤트 로그
+[이벤트 로그 화면 스크린샷 - 로그 테이블]
+
+- 실시간 이벤트
+- 이벤트 필터링
+- 로그 다운로드
+
+## 문제 해결
+
+### 1. 일반적인 문제
+
+#### 로그인 실패
+- **증상**: 로그인 화면에서 인증 실패
+- **해결 방법**:
+  1. 계정 정보 확인
+  2. 브라우저 캐시 삭제
+  3. 서비스 재시작
+
+#### 연결 오류
+- **증상**: "서버에 연결할 수 없습니다" 메시지
+- **해결 방법**:
+  1. 네트워크 연결 확인
+  2. 백엔드 서비스 상태 확인
+  3. 방화벽 설정 확인
+
+### 2. 격리 관련 문제
+
+#### 격리 시작 실패
+- **증상**: 격리 시작 버튼 클릭 후 실패
+- **해결 방법**:
+  1. 노드 접근 권한 확인
+  2. 격리 방법별 사전 요구사항 확인
+  3. 로그 확인
+
+#### 격리 중지 실패
+- **증상**: 격리 중지 버튼 클릭 후 실패
+- **해결 방법**:
+  1. 노드 상태 확인
+  2. 수동 복구 시도
+  3. 로그 확인
+
+### 3. 모니터링 관련 문제
+
+#### 데이터 업데이트 지연
+- **증상**: UI 데이터가 최신 상태가 아님
+- **해결 방법**:
+  1. WebSocket 연결 상태 확인
+  2. 브라우저 새로고침
+  3. 서비스 재시작
+
+#### 차트 표시 오류
+- **증상**: 차트가 정상적으로 표시되지 않음
+- **해결 방법**:
+  1. 브라우저 캐시 삭제
+  2. 다른 브라우저로 시도
+  3. 데이터 형식 확인
+
+## 고급 기능
+
+### 1. 자동화
+
+#### 스케줄링된 격리
+- **설정 방법**:
+  1. 노드 선택
+  2. 격리 방법 선택
+  3. 스케줄 설정
+  4. 반복 주기 설정
+
+#### 조건부 격리
+- **설정 방법**:
+  1. 조건 설정
+  2. 격리 방법 선택
+  3. 임계값 설정
+  4. 자동화 활성화
+
+### 2. 리포트
+
+#### 테스트 결과 리포트
+- **생성 방법**:
+  1. 테스트 기간 선택
+  2. 리포트 형식 선택
+  3. 리포트 생성
+  4. 다운로드
+
+#### 성능 분석 리포트
+- **생성 방법**:
+  1. 분석 기간 선택
+  2. 메트릭 선택
+  3. 리포트 생성
+  4. 다운로드
+
+### 3. API 사용
+
+#### REST API
+- **기본 URL**: `http://localhost:8000/api/v1`
+- **인증**: JWT 토큰
+- **예제**:
 ```bash
-# 클러스터 상태 확인
-make status
-
-# 파드 분포 확인
-make pod-distribution
-
-# 실시간 파드 모니터링
-make watch-pods
-
-# 실시간 노드 모니터링
-make watch-nodes
+curl -X GET \
+  http://localhost:8000/api/v1/monitoring/data \
+  -H 'Authorization: Bearer <token>'
 ```
 
-### 독립적인 모니터링
-```bash
-# 파드 마이그레이션만 모니터링
-make monitor
-```
-
-## 부하 테스트
-
-### 개별 부하 테스트
-```bash
-# worker1 노드에만 부하 테스트
-make stress-worker1
-
-# worker2 노드에만 부하 테스트
-make stress-worker2
-```
-
-### 수동 부하 테스트
-```bash
-# 특정 노드에 CPU 부하만
-python scripts/stress/node_stress_test.py --node worker1 --type cpu --cpu-percent 90
-
-# 특정 노드에 메모리 부하만
-python scripts/stress/node_stress_test.py --node worker1 --type memory --memory-percent 80
-
-# 복합 부하 테스트
-python scripts/stress/node_stress_test.py --node worker1 --type combined --duration 600s
-```
-
-## 테스트 시나리오
-
-### 시나리오 1: 빠른 검증
-```bash
-make scenario-1
-```
-- 테스트 애플리케이션 배포
-- worker1 노드 2분 부하 테스트
-- 파드 마이그레이션 모니터링
-- 리소스 정리
-
-### 시나리오 2: 전체 검증
-```bash
-make scenario-full
-```
-- 테스트 애플리케이션 배포
-- 모든 워커 노드 순차 테스트
-- 파드 마이그레이션 모니터링
-- 리소스 정리
-
-## 고급 사용
-
-### 환경변수 커스터마이징
-```bash
-# config/env.yaml 파일 수정 후
-make env
-```
-
-### 커스텀 테스트 실행
-```bash
-python scripts/run_migration_test.py \
-  --target-node worker1 \
-  --duration 180s \
-  --cpu-percent 85 \
-  --memory-percent 75 \
-  --monitor-interval 5 \
-  --output custom_test.json
-```
-
-### 모니터링만 실행
-```bash
-python scripts/monitoring/pod_migration_monitor.py \
-  --namespace default \
-  --interval 5 \
-  --output monitoring_only.json
-```
-
-## 결과 분석
-
-### 테스트 로그 확인
-```bash
-# 모든 테스트 결과 확인
-make logs
-
-# 특정 리포트 확인
-cat migration_report_worker1.json | python -m json.tool
-```
-
-### 마이그레이션 이벤트 분석
-```json
-{
-  "total_migrations": 3,
-  "migration_events": [
-    {
-      "pod_name": "nginx-test-deployment-xxx",
-      "namespace": "default",
-      "from_node": "isc-worker1",
-      "to_node": "isc-worker2",
-      "timestamp": "2024-01-15T10:30:45",
-      "phase": "Running",
-      "ready": true
-    }
-  ]
-}
-```
-
-## 정리
-
-### 테스트 애플리케이션만 정리
-```bash
-make clean
-```
-
-### 모든 리소스 정리
-```bash
-make clean-all
-```
-
-## 주의사항
-
-1. **SSH 키 설정**: 모든 노드에 SSH 키 기반 접속이 설정되어 있어야 합니다.
-2. **kubectl 설정**: 쿠버네티스 클러스터에 접근할 수 있는 kubectl이 설정되어 있어야 합니다.
-3. **네트워크 접근**: 마스터 노드에서 모든 워커 노드에 SSH 접근이 가능해야 합니다.
-4. **권한**: 노드에 stress-ng 등의 도구를 설치할 수 있는 권한이 필요합니다.
-
-## 🔍 트러블슈팅
-
-### SSH 연결 실패
-```bash
-# SSH 키 확인
-ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
-ssh-copy-id root@<node_ip>
-```
-
-### kubectl 연결 실패
-```bash
-# 클러스터 연결 확인
-kubectl cluster-info
-kubectl get nodes
-```
-
-### 파드 스케줄링 실패
-```bash
-# 노드 상태 확인
-kubectl describe nodes
-kubectl get events --sort-by=.metadata.creationTimestamp
-```
-
-## 추가
-
-문제가 발생하면 다음을 확인해주세요:
-1. 모든 노드가 Ready 상태인지 확인
-2. SSH 연결이 정상적으로 작동하는지 확인
-3. kubectl이 클러스터에 접근할 수 있는지 확인
-4. 네트워크 연결 상태 확인 
+#### WebSocket API
+- **연결 URL**: `ws://localhost:8000/ws`
+- **인증**: JWT 토큰
+- **예제**:
+```javascript
+const ws = new WebSocket('ws://localhost:8000/ws');
+ws.onmessage = (event) => {
+  console.log(event.data);
+};
+``` 
