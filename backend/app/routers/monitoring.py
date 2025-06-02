@@ -38,14 +38,25 @@ async def fetch_events():
         
         events = []
         for event in data.get("items", []):
+            metadata = event.get("metadata", {})
+            involved_object = event.get("involvedObject", {})
+            source = event.get("source", {})
+            
             events.append(MonitoringEvent(
-                timestamp=event["lastTimestamp"],
-                event_type=event["type"],
-                node_name=event.get("involvedObject", {}).get("name"),
-                pod_name=event.get("involvedObject", {}).get("name"),
-                namespace=event.get("involvedObject", {}).get("namespace"),
-                message=event["message"],
-                details=event.get("source", {})
+                id=metadata.get("uid", metadata.get("name", "")),
+                type=event.get("type", "Normal"),
+                reason=event.get("reason", ""),
+                message=event.get("message", ""),
+                timestamp=event.get("lastTimestamp", event.get("firstTimestamp", datetime.utcnow().isoformat())),
+                source={
+                    "component": source.get("component", ""),
+                    "host": source.get("host")
+                },
+                involved_object={
+                    "kind": involved_object.get("kind", ""),
+                    "name": involved_object.get("name", ""),
+                    "namespace": involved_object.get("namespace", "")
+                }
             ))
         
         event_store.update_events(events)
