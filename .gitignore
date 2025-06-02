@@ -36,6 +36,7 @@ backend/venv/
 
 # Environment
 config/env.yaml
+config/env.sh
 .env
 .env.local
 .env.development.local
@@ -62,6 +63,10 @@ yarn-error.log*
 # npm/yarn 잠금 파일 (루트만)
 /package-lock.json
 /package.json
+
+# 기존 gitignore 항목들도 제거
+# package.json
+# **/package.json
 
 .env
 admin-ui/.env
@@ -94,4 +99,5 @@ stress_test_*.log
 docker-compose.override.yml
 
 # 환경 설정 파일
-config/env.yaml 
+config/env.yaml
+config/env.sh 
