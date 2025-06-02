@@ -59,12 +59,9 @@ yarn-error.log*
 # Node 모듈
 **/node_modules/
 
-# npm/yarn 잠금 파일
-package-lock.json
-**/package-lock.json
-
-package.json
-**/package.json
+# npm/yarn 잠금 파일 (루트만)
+/package-lock.json
+/package.json
 
 .env
 admin-ui/.env
