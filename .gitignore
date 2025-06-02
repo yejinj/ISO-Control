@@ -35,8 +35,7 @@ backend/venv/
 *.swo
 
 # Environment
-config/env.yaml
-config/env.sh
+config/
 .env
 .env.local
 .env.development.local
