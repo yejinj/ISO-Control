@@ -1,12 +1,14 @@
 import React from 'react';
 import { Package, Activity, Server, RefreshCw } from 'lucide-react';
-import { usePodData } from '../contexts/PodContext';
 import { useRefresh } from '../contexts/RefreshContext';
-import { PodInfo } from '../types';
+import { PodDistribution as PodDistributionType } from '../types';
 
-const PodDistributionView: React.FC = () => {
+interface PodDistributionProps {
+  podDistribution: PodDistributionType[];
+}
+
+const PodDistribution: React.FC<PodDistributionProps> = ({ podDistribution }) => {
   const { isRefreshing, lastUpdate, refreshAll } = useRefresh();
-  const { data, isLoading } = usePodData();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -23,15 +25,17 @@ const PodDistributionView: React.FC = () => {
     }
   };
 
-  if (isLoading || !data || !data.summary || !data.pod_distribution) {
+  if (!podDistribution || podDistribution.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">데이터를 불러오는 중...</div>
+        <div className="text-gray-500">파드 데이터가 없습니다.</div>
       </div>
     );
   }
 
-  const { pod_distribution, summary } = data;
+  const totalPods = podDistribution.reduce((sum, dist) => sum + dist.pod_count, 0);
+  const runningPods = podDistribution.reduce((sum, dist) => sum + dist.ready_count, 0);
+  const activeNodes = podDistribution.length;
 
   return (
     <div className="space-y-6">
@@ -48,7 +52,7 @@ const PodDistributionView: React.FC = () => {
                   총 파드
                 </dt>
                 <dd className="text-lg font-medium text-gray-900">
-                  {summary.total_pods}
+                  {totalPods}
                 </dd>
               </dl>
             </div>
@@ -66,7 +70,7 @@ const PodDistributionView: React.FC = () => {
                   실행 중
                 </dt>
                 <dd className="text-lg font-medium text-gray-900">
-                  {summary.running_pods}
+                  {runningPods}
                 </dd>
               </dl>
             </div>
@@ -84,7 +88,7 @@ const PodDistributionView: React.FC = () => {
                   활성 노드
                 </dt>
                 <dd className="text-lg font-medium text-gray-900">
-                  {summary.active_nodes}
+                  {activeNodes}
                 </dd>
               </dl>
             </div>
@@ -128,7 +132,7 @@ const PodDistributionView: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {pod_distribution.map((dist) => (
+            {podDistribution.map((dist) => (
               <div key={dist.node_name} className="border border-gray-200 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-2">
@@ -183,4 +187,4 @@ const PodDistributionView: React.FC = () => {
   );
 };
 
-export default PodDistributionView; 
+export default PodDistribution; 

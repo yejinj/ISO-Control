@@ -112,7 +112,7 @@ const Dashboard: React.FC = () => {
               {activeTab === 'nodes' && (
                 <NodeList nodes={(monitoringData as any)?.cluster_status?.nodes || []} />
               )}
-              {activeTab === 'pods' && <PodDistribution />}
+              {activeTab === 'pods' && <PodDistribution podDistribution={(monitoringData as any)?.cluster_status?.pod_distribution || []} />}
               {activeTab === 'isolation' && <IsolationControl />}
               {activeTab === 'events' && <MonitoringEvents />}
             </>
