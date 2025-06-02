@@ -14,14 +14,26 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str = "Kubernetes Node Isolation API"
     VERSION: str = "1.0.0"
+    API_HOST: str = os.getenv("API_HOST", "0.0.0.0")
+    API_PORT: int = int(os.getenv("API_PORT", "8000"))
+    
+    # URL 설정
+    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    BACKEND_URL: str = os.getenv("BACKEND_URL", "http://localhost:8000")
     
     # CORS 설정
-    BACKEND_CORS_ORIGINS: List[str] = [
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:8000",
-        "http://127.0.0.1:8000",
-    ]
+    @property
+    def BACKEND_CORS_ORIGINS(self) -> List[str]:
+        """CORS 허용 오리진 동적 생성"""
+        origins = [
+            self.FRONTEND_URL,
+            self.BACKEND_URL,
+        ]
+        # 추가 CORS 오리진이 있으면 환경변수에서 읽기
+        extra_origins = os.getenv("EXTRA_CORS_ORIGINS", "")
+        if extra_origins:
+            origins.extend([origin.strip() for origin in extra_origins.split(",")])
+        return origins
     
     # 쿠버네티스 설정
     KUBECONFIG_PATH: str = os.getenv("KUBECONFIG", "~/.kube/config")

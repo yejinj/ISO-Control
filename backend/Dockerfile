@@ -15,8 +15,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 애플리케이션 코드 복사
 COPY . .
 
-# 포트 노출
+# 환경변수 설정
+ENV API_HOST=0.0.0.0
+ENV API_PORT=8000
+
+# 포트 노출 (빌드 시점에는 기본값 사용)
 EXPOSE 8000
 
 # 애플리케이션 실행
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"] 
+CMD ["sh", "-c", "uvicorn app.main:app --host $API_HOST --port $API_PORT --reload"] 
