@@ -43,7 +43,7 @@ socket_app = socketio.ASGIApp(sio, app)
 # API 라우터 등록
 app.include_router(nodes.router, prefix="/api/v1", tags=["nodes"])
 app.include_router(pods.router, prefix="/api/v1", tags=["pods"])
-app.include_router(isolation.router, prefix="/api/v1", tags=["isolation"])
+app.include_router(isolation.router, prefix="/api/v1/isolation", tags=["isolation"])
 app.include_router(monitoring.router, prefix="/api/v1", tags=["monitoring"])
 
 @app.get("/")
