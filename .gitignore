@@ -99,10 +99,4 @@ docker-compose.override.yml
 
 # 환경 설정 파일
 config/env.yaml
-config/env.sh
-
-# 환경변수 예제 파일 및 문서
-.env.example
-backend/.env.example
-frontend/.env.example
-ENV_SETUP.md 
+config/env.sh 
