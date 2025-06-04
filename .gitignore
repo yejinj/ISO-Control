@@ -106,5 +106,3 @@ config/env.sh
 backend/.env.example
 frontend/.env.example
 ENV_SETUP.md 
-
-/images/
