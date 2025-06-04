@@ -56,9 +56,10 @@ export const IsolationControl = () => {
         });
         setShowTaskStatus(true);
       },
-      onError: (error) => {
+    onError: (error: any) => {
         console.error('격리 시작 오류:', error);
-        alert('격리 시작 중 오류가 발생했습니다.');
+      console.error('오류 상세:', error.response?.data);
+      alert(`격리 시작 중 오류가 발생했습니다: ${error.response?.data?.detail || error.message}`);
       }
   });
 
@@ -82,10 +83,31 @@ export const IsolationControl = () => {
       return;
     }
 
-    startIsolationMutation.mutate({
+    console.log('격리 시작 요청:', {
       node_name: selectedNode,
       duration: duration,
       method: method
+    });
+
+    startIsolationMutation.mutate({
+      node_name: selectedNode,
+      duration: duration,
+      method: method as IsolationMethod
+    }, {
+      onSuccess: (response) => {
+        console.log('격리 시작 성공:', response);
+        setCurrentTask({
+          taskId: response.task_id,
+          status: response.status,
+          message: response.message
+        });
+        setShowTaskStatus(true);
+      },
+      onError: (error: any) => {
+        console.error('격리 시작 오류:', error);
+        console.error('오류 상세:', error.response?.data);
+        alert(`격리 시작 중 오류가 발생했습니다: ${error.response?.data?.detail || error.message}`);
+      }
     });
   };
 

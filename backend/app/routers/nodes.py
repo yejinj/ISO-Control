@@ -49,10 +49,22 @@ async def get_nodes():
             )
             
             # 노드 정보 구성
+            # 역할 정보 파싱 - 라벨에서 역할 추출
+            labels = metadata.get("labels", {})
+            roles = []
+            
+            # 마스터/컨트롤 플레인 노드 확인
+            if "node-role.kubernetes.io/control-plane" in labels or "node-role.kubernetes.io/master" in labels:
+                roles.append("control-plane")
+            
+            # 워커 노드 확인 (명시적 워커 라벨이 있거나, 다른 역할이 없으면 워커)
+            if "node-role.kubernetes.io/worker" in labels or len(roles) == 0:
+                roles.append("worker")
+            
             node = Node(
                 name=metadata.get("name", ""),
                 status=ready_condition.get("status", "Unknown"),
-                roles=metadata.get("labels", {}).get("kubernetes.io/role", "worker"),
+                roles=roles,  # 이제 List[str] 형태
                 age=metadata.get("creationTimestamp", ""),
                 version=status.get("nodeInfo", {}).get("kubeletVersion", ""),
                 internal_ip=next(

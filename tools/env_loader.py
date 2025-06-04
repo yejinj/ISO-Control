@@ -33,14 +33,14 @@ class EnvLoader:
         
         # 마스터 노드 추가
         for name, info in self.config['masters'].items():
-            nodes[name] = info
+            nodes[info['hostname']] = info
         
         # 워커 노드 추가
         for name, info in self.config['workers'].items():
-            nodes[name] = info
+            nodes[info['hostname']] = info
         
         # 로드밸런서 추가
-        nodes['loadbalancer'] = self.config['loadbalancer']
+        nodes[self.config['loadbalancer']['hostname']] = self.config['loadbalancer']
         
         return nodes
     
@@ -59,7 +59,10 @@ class EnvLoader:
     def get_node_by_name(self, node_name):
         """특정 노드 정보 반환"""
         all_nodes = self.get_all_nodes()
-        return all_nodes.get(node_name)
+        for name, info in all_nodes.items():
+            if info['hostname'] == node_name:
+                return info
+        return None
     
     def get_private_ips(self):
         """모든 노드의 비공인 IP 리스트 반환"""

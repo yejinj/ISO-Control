@@ -13,7 +13,7 @@ from typing import Dict
 
 # 기존 스크립트 경로 추가
 sys.path.append(os.path.join(os.path.dirname(__file__), "../../../"))
-from scripts.stress.node_isolation import NodeIsolation
+from scripts.stress.node_isolation import isolate_node
 
 from app.models.schemas import (
     IsolationRequest, IsolationResponse, IsolationStatus, 
@@ -26,9 +26,6 @@ router = APIRouter()
 running_tasks: Dict[str, dict] = {}
 
 class IsolationService:
-    def __init__(self):
-        self.node_isolation = NodeIsolation()
-    
     async def run_isolation(self, task_id: str, request: IsolationRequest):
         """격리 작업 실행"""
         try:
@@ -37,16 +34,16 @@ class IsolationService:
             running_tasks[task_id]["started_at"] = datetime.now()
             
             # 격리 실행
-            success = self.node_isolation.isolate_node(
-                node_name=request.node_name,
-                method=request.method.value,
+            isolate_node(
+                node=request.node_name,
+                method=request.method,
                 duration=request.duration
             )
             
             # 작업 완료
-            running_tasks[task_id]["status"] = IsolationStatus.COMPLETED if success else IsolationStatus.FAILED
+            running_tasks[task_id]["status"] = IsolationStatus.COMPLETED
             running_tasks[task_id]["completed_at"] = datetime.now()
-            running_tasks[task_id]["message"] = "격리 작업이 완료되었습니다." if success else "격리 작업이 실패했습니다."
+            running_tasks[task_id]["message"] = "격리 작업이 완료되었습니다."
             
         except Exception as e:
             running_tasks[task_id]["status"] = IsolationStatus.FAILED
@@ -59,6 +56,9 @@ isolation_service = IsolationService()
 async def start_isolation(request: IsolationRequest, background_tasks: BackgroundTasks):
     """노드 격리 시작"""
     try:
+        # 요청 데이터 로깅
+        print(f"격리 요청: {request.dict()}")
+        
         # 작업 ID 생성
         task_id = str(uuid.uuid4())
         
@@ -91,6 +91,7 @@ async def start_isolation(request: IsolationRequest, background_tasks: Backgroun
         )
         
     except Exception as e:
+        print(f"격리 시작 오류: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail=f"격리 작업 시작 실패: {str(e)}"
@@ -135,9 +136,6 @@ async def stop_isolation(request: IsolationStopRequest):
                 status_code=400,
                 detail="중지할 수 있는 상태가 아닙니다."
             )
-        
-        # 격리 중지
-        isolation_service.node_isolation.stop_isolation()
         
         # 상태 업데이트
         running_tasks[request.task_id]["status"] = IsolationStatus.STOPPING

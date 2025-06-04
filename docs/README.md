@@ -142,7 +142,7 @@ npm start
 
 ## 사용법 및 환경 설정
 
-자세한 사용법은 [USAGE.md](USAGE.md)를 참고하세요.
+자세한 사용법은 [USAGE.md](USAGE.md)를 참고하세요. <br>
 환경 변수 설정은 [ENV_CONFIG.md](ENV_CONFIG.md)를 참고하세요.
 
 ## 아키텍처
@@ -170,8 +170,7 @@ npm start
 
 ### 데이터 흐름
 
-#### 1. 실시간 모니터링
-[데이터 흐름 다이어그램 - 모니터링 데이터 흐름]
+#### 1. 실시간 모니터링 흐름
 
 ```mermaid
 graph LR
@@ -181,8 +180,7 @@ graph LR
     D --> E[UI Components]
 ```
 
-#### 2. 격리 제어
-[데이터 흐름 다이어그램 - 격리 명령 흐름]
+#### 2. 격리 제어 흐름
 
 ```mermaid
 graph LR
@@ -191,8 +189,7 @@ graph LR
     C --> D[Node Control]
 ```
 
-#### 3. 이벤트 처리
-[데이터 흐름 다이어그램 - 이벤트 처리 흐름]
+#### 3. 이벤트 처리 데이터 흐름
 
 ```mermaid
 graph LR
