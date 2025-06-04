@@ -125,7 +125,7 @@ export const IsolationControl = () => {
     { value: 'network', label: '네트워크 차단', description: 'iptables로 API 서버 통신 차단' },
     { value: 'runtime', label: '런타임 중지', description: '컨테이너 런타임 중지' },
     { value: 'drain', label: '파드 드레인', description: '수동으로 파드 삭제' },
-    { value: 'extreme', label: '극한 부하', description: '극한 리소스 고갈 시뮬레이션' },
+    { value: 'extreme', label: '극한 부하 테스트', description: '극한 리소스 고갈 시뮬레이션' },
   ];
 
   const getStatusColor = (status: string) => {
