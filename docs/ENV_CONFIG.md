@@ -1,6 +1,5 @@
 # 환경변수 사용법
-
-`docker-compose.yml`에서 사용되는 모든 환경변수가 루트의 `.env`에 정의되어 있습니다.
+`docker-compose.yml`에서 사용되는 모든 환경변수를 루트의 `.env` 에서 정의합니다.
 
 ## 주요 환경변수
 - `API_PORT`: 백엔드 API 서버 포트
