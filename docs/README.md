@@ -35,17 +35,17 @@
 - **실시간 새로고침**: 수동 새로고침 버튼 및 자동 업데이트
 
 ### 4. 격리 제어
-- **격리 방법 선택**:
+- **격리 방법 선택**
   1. **Kubelet 중지**: kubelet 서비스를 중지하여 노드 격리
   2. **네트워크 차단**: iptables로 API 서버 통신 차단
   3. **런타임 중지**: 컨테이너 런타임 중지
   4. **파드 드레인**: 수동으로 파드 삭제
   5. **리소스 극한 부하 테스트**: 리소스 고갈 시뮬레이션
-- **격리 제어 인터페이스**:
+- **격리 제어 인터페이스**
   - 워커 노드 선택 (컨트롤 플레인 노드 제외)
   - 격리 지속 시간 설정 (60초~3600초)
   - 선택한 방법별 상세 설명 표시
-- **작업 모니터링**:
+- **작업 모니터링**
   - 실행 중인 격리 작업 실시간 추적
   - 작업 상태별 색상 구분 (running/completed/failed/stopping)
   - 작업 시작 시간 및 진행 상황 표시
@@ -67,28 +67,28 @@
 ## 기술 스택
 
 ### Backend
-- **프레임워크**: FastAPI
-- **언어**: Python 3.9+
-- **쿠버네티스 클라이언트**: kubernetes-python
-- **비동기 처리**: asyncio
-- **실시간 통신**: Socket.IO
-- **API 문서**: Swagger/OpenAPI
+- 프레임워크: FastAPI
+- 언어: Python 3.9+
+- 쿠버네티스 클라이언트: kubernetes-python
+- 비동기 처리: asyncio
+- 실시간 통신: Socket.IO
+- API 문서: Swagger/OpenAPI
 
 ### Frontend  
-- **프레임워크**: React 18.2.0
-- **언어**: TypeScript 4.9.4
-- **상태 관리**: React Context API
-- **데이터 페칭**: React Query 3.39.3
-- **스타일링**: Tailwind CSS 3.3.6
-- **아이콘**: Lucide React 0.294.0
-- **차트**: Chart.js 4.4.0 + React-chartjs-2 5.2.0
-- **실시간 통신**: Socket.io-client 4.7.4
-- **HTTP 클라이언트**: Axios 1.9.0
+- 프레임워크: React 18.2.0
+- 언어: TypeScript 4.9.4
+- 상태 관리: React Context API
+- 데이터 페칭: React Query 3.39.3
+- 스타일링: Tailwind CSS 3.3.6
+- 아이콘: Lucide React 0.294.0
+- 차트: Chart.js 4.4.0 + React-chartjs-2 5.2.0
+- 실시간 통신: Socket.io-client 4.7.4
+- HTTP 클라이언트: Axios 1.9.0
 
 ### DevOps
-- **컨테이너**: Docker & Docker Compose
-- **쿠버네티스**: 1.27+
-- **환경변수 관리**: .env 파일
+- 컨테이너: Docker & Docker Compose
+- 쿠버네티스: 1.27+
+- 환경변수 관리: .env 파일
 
 ## 시작하기
 
