@@ -39,9 +39,9 @@ def run_command(cmd, node):
 
 def isolate_node(node, method, duration):
     """노드 격리 실행"""
-    print(f"🎯 노드 격리 시작: {node}")
-    print(f"📌 방법: {method}")
-    print(f"⏱️  지속 시간: {duration}초")
+    print(f"{node}번째 노드 격리 시작..")
+    print(f"격리 방법: {method}")
+    print(f"지속 시간: {duration}초")
     
     try:
         if method == "network":
@@ -116,10 +116,10 @@ def isolate_node(node, method, duration):
         else:
             raise ValueError(f"지원하지 않는 격리 방법: {method}")
         
-        print("✅ 격리 완료")
+        print("격리가 완료되었습니다.")
         
     except Exception as e:
-        print(f"❌ 격리 실패: {str(e)}")
+        print(f"{str(e)} 격리를 실패하였습니다.")
         raise
 
 def main():
