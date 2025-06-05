@@ -59,7 +59,7 @@
   - Error (빨간색): 오류 이벤트
 - **상세 정보 표시**:
   - 이벤트 메시지 및 관련 객체명
-  - 정확한 타임스탬프 (년/월/일 시:분:초)
+  - 타임스탬프로 초 단위 표시
   - 이벤트 연결선으로 시간 흐름 표시
 - **실시간 스트리밍**: 새로운 이벤트 자동 추가 및 수동 새로고침
 - **Context 기반 관리**: PodContext를 통한 효율적인 상태 관리
@@ -97,22 +97,14 @@ git clone https://github.com/yejinj/iso-control.git
 cd iso-control
 ```
 
-2. **환경변수 설정**
+2. **실행**
 ```bash
-# 루트 디렉토리
-cp .env.example .env
-
 # 백엔드
-cp backend/.env.example backend/.env
+cp backend/.env
 # SSH_PASSWORD를 실제 값으로 수정
 
 # 프론트엔드  
-cp frontend/.env.example frontend/.env
-```
-
-3. **Docker Compose 실행**
-```bash
-docker compose up -d
+cp frontend/.env
 ```
 
 ### 로컬 개발 환경
@@ -160,9 +152,8 @@ npm start
 ```mermaid
 graph LR
     A[Kubernetes API] --> B[Backend]
-    B --> C[WebSocket]
-    C --> D[Frontend]
-    D --> E[UI Components]
+    B --> C[Frontend]
+    C --> D[UI Components]
 ```
 
 #### 2. 격리 제어 흐름
@@ -170,19 +161,10 @@ graph LR
 ```mermaid
 graph LR
     A[UI] --> B[Backend API]
-    B --> C[Isolation Service]
+    B --> C[ISO-Control Service]
     C --> D[Node Control]
 ```
 
-#### 3. 이벤트 처리 데이터 흐름
-
-```mermaid
-graph LR
-    A[Kubernetes Events] --> B[Event Collector]
-    B --> C[Event Processor]
-    C --> D[WebSocket]
-    D --> E[UI]
-```
 
 ## 사용법 및 환경 설정
 
