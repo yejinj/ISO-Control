@@ -70,9 +70,6 @@
 - 프레임워크: FastAPI
 - 언어: Python 3.9+
 - 쿠버네티스 클라이언트: kubernetes-python
-- 비동기 처리: asyncio
-- 실시간 통신: Socket.IO
-- API 문서: Swagger/OpenAPI
 
 ### Frontend  
 - 프레임워크: React 18.2.0
@@ -80,15 +77,11 @@
 - 상태 관리: React Context API
 - 데이터 페칭: React Query 3.39.3
 - 스타일링: Tailwind CSS 3.3.6
-- 아이콘: Lucide React 0.294.0
-- 차트: Chart.js 4.4.0 + React-chartjs-2 5.2.0
-- 실시간 통신: Socket.io-client 4.7.4
-- HTTP 클라이언트: Axios 1.9.0
 
 ### DevOps
 - 컨테이너: Docker & Docker Compose
 - 쿠버네티스: 1.27+
-- 환경변수 관리: .env 파일
+- 환경변수 관리: .env
 
 ## 시작하기
 

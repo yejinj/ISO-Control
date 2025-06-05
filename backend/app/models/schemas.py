@@ -8,7 +8,6 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime
 from enum import Enum
 
-# 노드 관련 모델
 class NodeStatus(str, Enum):
     """노드 상태"""
     READY = "Ready"
@@ -18,7 +17,7 @@ class NodeStatus(str, Enum):
 class Node(BaseModel):
     name: str
     status: str
-    roles: List[str]
+    roles: List[str] # master, worker
     age: str
     version: str
     internal_ip: str
@@ -40,7 +39,6 @@ class NodeListResponse(BaseModel):
     nodes: List[Node]
     total_count: int
 
-# 파드 관련 모델
 class PodStatus(str, Enum):
     """파드 상태"""
     RUNNING = "Running"
