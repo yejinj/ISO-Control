@@ -107,7 +107,7 @@ def isolate_node(node, method, duration):
             if result.returncode != 0:
                 raise Exception(f"stress-ng 설치 실패: {result.stderr}")
             
-            # CPU와 메모리 부하 생성
+            # CPU와 메모리 부하 생성: CPU 4개, 메모리 2개, 1GB 사용, 10초 동안 실행
             cmd = "stress-ng --cpu 4 --vm 2 --vm-bytes 1G --timeout 10s && echo '부하 생성 완료'"
             result = run_command(cmd, node)
             if result.returncode != 0:
