@@ -39,15 +39,15 @@ class Settings(BaseSettings):
     KUBECONFIG_PATH: str = os.getenv("KUBECONFIG", "~/.kube/config")
     
     # SSH 설정
-    SSH_PASSWORD: str = "standing0812@"
-    SSH_USER: str = "root"
-    SSH_PORT: int = 22
+    SSH_PASSWORD: str = os.getenv("SSH_PASSWORD", "")
+    SSH_USER: str = os.getenv("SSH_USER", "")
+    SSH_PORT: int = int(os.getenv("SSH_PORT", "22"))
     
     # 모니터링 설정
-    MONITORING_INTERVAL: int = 10  # 초
+    MONITORING_INTERVAL: int = int(os.getenv("MONITORING_INTERVAL", "10"))
     
     # 로그 설정
-    LOG_LEVEL: str = "INFO"
+    LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
     
     class Config:
         case_sensitive = True
