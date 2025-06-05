@@ -27,7 +27,7 @@ interface TaskStatus {
 
 export const IsolationControl = () => {
   const [selectedNode, setSelectedNode] = useState('');
-  const [duration, setDuration] = useState(300);
+  const [duration, setDuration] = useState(10);
   const [method, setMethod] = useState<IsolationMethod>('network');
   const [currentTask, setCurrentTask] = useState<TaskStatus | null>(null);
   const [showTaskStatus, setShowTaskStatus] = useState(false);
