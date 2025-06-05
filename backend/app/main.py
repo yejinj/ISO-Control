@@ -6,7 +6,6 @@ FastAPI 메인 애플리케이션
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 import socketio
 import uvicorn
 
@@ -31,7 +30,7 @@ app = FastAPI(
 # CORS 미들웨어 설정
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 개발 환경에서는 모든 오리진 허용
+    allow_origins=["*"], # 개발환경에서는 모든 오리진 허용
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -79,5 +78,5 @@ if __name__ == "__main__":
         "app.main:socket_app",
         host=settings.API_HOST,
         port=settings.API_PORT,
-        reload=True
+        reload=True # 변경 시 자동 리로드
     )
