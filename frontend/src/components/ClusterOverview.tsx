@@ -1,13 +1,13 @@
 import React from 'react';
 import { ClusterStatus } from '../types/api';
-import { Server, Package, CheckCircle, AlertCircle } from 'lucide-react';
+import { Server, Package, CheckCircle, AlertCircle } from 'lucide-react'; // 아이콘
 
 interface ClusterOverviewProps {
   clusterStatus?: ClusterStatus;
 }
 
 const ClusterOverview: React.FC<ClusterOverviewProps> = ({ clusterStatus }) => {
-  if (!clusterStatus) {
+  if (!clusterStatus) { // 데이터 로딩 중 처리
     return (
       <div className="text-center py-8">
         <div className="text-gray-500">클러스터 데이터를 불러오는 중...</div>
@@ -26,19 +26,19 @@ const ClusterOverview: React.FC<ClusterOverviewProps> = ({ clusterStatus }) => {
       title: '준비된 노드',
       value: clusterStatus.ready_nodes || 0,
       icon: CheckCircle,
-      color: 'green',
+      color: 'blue',
     },
     {
       title: '전체 파드',
       value: clusterStatus.total_pods || 0,
       icon: Package,
-      color: 'purple',
+      color: 'blue',
     },
     {
       title: '실행 중인 파드',
       value: clusterStatus.running_pods || 0,
       icon: CheckCircle,
-      color: 'green',
+      color: 'blue',
     },
   ];
 
