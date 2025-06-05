@@ -112,7 +112,6 @@ export const IsolationControl = () => {
   };
 
   const handleStopIsolation = async (taskId: string) => {
-    // eslint-disable-next-line no-restricted-globals
     if (!confirm('현재 실행 중인 격리 작업을 중지하시겠습니까?')) {
       return;
     }
