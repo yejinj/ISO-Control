@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 *.so
 .Python
+env/
 build/
 develop-eggs/
 dist/
@@ -99,4 +100,15 @@ docker-compose.override.yml
 
 # 환경 설정 파일
 config/env.yaml
-config/env.sh 
+config/env.sh
+
+# 환경 변수
+.env
+.env.*
+!.env.example
+
+# OS
+Thumbs.db
+
+# Makefile 무시
+Makefile
