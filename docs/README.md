@@ -75,7 +75,6 @@
 - 프레임워크: React 18.2.0
 - 언어: TypeScript 4.9.4
 - 상태 관리: React Context API
-- 데이터 페칭: React Query 3.39.3
 - 스타일링: Tailwind CSS 3.3.6
 
 ### DevOps
