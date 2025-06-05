@@ -1,3 +1,5 @@
+// 실제 API 호출 로직
+
 import axios from 'axios';
 import type { 
   IsolationMethod, 
@@ -92,16 +94,19 @@ export const isolationApi = {
 // 모니터링 관련 API
 export const monitoringApi = {
   getClusterStatus: async () => {
+    // 클러스터 전체 상태 조회
     const response = await api.get('/monitoring/cluster');
     return response.data;
   },
   
   getMonitoringEvents: async (limit = 50) => {
+    // 최근 이벤트 조회
     const response = await api.get('/monitoring/events', { params: { limit } });
     return response.data;
   },
   
   getMonitoringData: async () => {
+    // 통합 조회
     try {
       const [clusterResponse, eventsResponse] = await Promise.all([
         api.get('/monitoring/cluster'),

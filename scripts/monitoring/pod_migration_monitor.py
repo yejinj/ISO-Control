@@ -22,9 +22,9 @@ class PodMigrationMonitor:
     def __init__(self):
         self.env_loader = EnvLoader()
         self.monitoring_active = False
-        self.pod_history = defaultdict(list)
-        self.node_status = {}
-        self.migration_events = []
+        self.pod_history = defaultdict(list) # 파드 이력 추적
+        self.node_status = {} # 노드 상태 추적
+        self.migration_events = [] # 마이그레이션 이벤트 기록
     
     def run_kubectl_command(self, command):
         """kubectl 명령 실행"""

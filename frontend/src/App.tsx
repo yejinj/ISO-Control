@@ -8,7 +8,7 @@ import './index.css';
 const queryClient = new QueryClient();
 
 const App: React.FC = () => {
-  return (
+  return ( // 최상위 컴포넌트, Context 사용 가능케 함
     <QueryClientProvider client={queryClient}>
       <RefreshProvider>
         <PodProvider>

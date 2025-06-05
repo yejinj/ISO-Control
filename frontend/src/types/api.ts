@@ -1,3 +1,5 @@
+// 타입 정의만 포함
+
 // 노드 관련 타입
 export interface NodeInfo {
   name: string;

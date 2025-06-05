@@ -1,4 +1,4 @@
-apiVersion: apps/v1
+# 마이그레이션 테스트용 Nginx 웹 서버 배포apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-test-deployment
@@ -7,7 +7,7 @@ metadata:
     app: nginx-test
     purpose: migration-test
 spec:
-  replicas: 6  # 워커 노드 2개에 분산 배치
+  replicas: 6  # 6개의 파드 생성
   selector:
     matchLabels:
       app: nginx-test
@@ -29,13 +29,13 @@ spec:
                   operator: In
                   values:
                   - nginx-test
-              topologyKey: kubernetes.io/hostname
+              topologyKey: kubernetes.io/hostname #노드 단위 분산 배치
       containers:
       - name: nginx
         image: nginx:1.21
         ports:
         - containerPort: 80
-        resources:
+        resources: #리소스 제한 설정
           requests:
             cpu: 100m
             memory: 128Mi
@@ -68,9 +68,8 @@ spec:
       - name: html-content
         configMap:
           name: nginx-html
-      # 빠른 재시작을 위한 설정
       restartPolicy: Always
-      terminationGracePeriodSeconds: 30
+      terminationGracePeriodSeconds: 30 #종료 유예시간
 
 ---
 apiVersion: v1
@@ -179,4 +178,4 @@ spec:
     port: 80
     targetPort: 80
     protocol: TCP
-  type: ClusterIP 
+  type: ClusterIP # 내부 클러스터 접근 가능
